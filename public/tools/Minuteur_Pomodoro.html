@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Minuteur Pomodoro — Internate</title>
+<title>Minuteur Pomodoro â€” Internate</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
@@ -212,20 +212,55 @@
     .timer-display { font-size: 3rem; }
     .controls { grid-template-columns: 1fr 1fr; }
   }
+
+  @media (max-width: 768px) {
+    body { padding: 52px 12px 12px; }
+    .tool-topbar { padding: 10px 16px; font-size: 0.8rem; }
+    .tool-topbar a, .tool-topbar .current { font-size: 0.75rem; }
+  }
+  @media (max-width: 480px) {
+    body { padding: 48px 8px 8px; }
+    .tool-topbar { padding: 8px 12px; gap: 8px; }
+    .tool-topbar a, .tool-topbar .current { font-size: 0.7rem; }
+  }
+  .loading-overlay {
+    position: fixed; inset: 0;
+    background: var(--bg);
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.4s ease;
+  }
+  .loading-overlay.hidden { opacity: 0; pointer-events: none; }
+  .spinner {
+    width: 40px; height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-overlay p { color: var(--muted); font-size: 0.85rem; margin-top: 16px; }
 </style>
 </head>
 <body>
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <p>Chargement...</p>
+</div>
 <div class="tool-topbar">
   <a href="../dashboard/Connected_internate.html">Internate</a>
-  <span class="sep">›</span>
+  <span class="sep">â€º</span>
   <a href="../courses/Ressources_ex.html">Cours</a>
-  <span class="sep">›</span>
+  <span class="sep">â€º</span>
   <span class="current">Pomodoro</span>
 </div>
 
 <div class="container">
-  <h1>⏱️ Minuteur Pomodoro</h1>
-  <p class="subtitle">Optimise ton temps d'étude</p>
+  <h1>â±ï¸ Minuteur Pomodoro</h1>
+  <p class="subtitle">Optimise ton temps d'Ã©tude</p>
   
   <div class="settings">
     <div class="setting-row">
@@ -251,26 +286,26 @@
   </div>
   
   <div class="timer-display" id="timerDisplay">25:00</div>
-  <div class="status" id="status">⏸️ Prêt à démarrer</div>
+  <div class="status" id="status">â¸ï¸ PrÃªt Ã  dÃ©marrer</div>
   
   <div class="controls">
-    <button onclick="startTimer()">▶️ Démarrer</button>
-    <button onclick="pauseTimer()">⏸️ Pause</button>
-    <button class="stop" onclick="resetTimer()">🔄 Réinitialiser</button>
+    <button onclick="startTimer()">â–¶ï¸ DÃ©marrer</button>
+    <button onclick="pauseTimer()">â¸ï¸ Pause</button>
+    <button class="stop" onclick="resetTimer()">ðŸ”„ RÃ©initialiser</button>
   </div>
   
   <div class="stats">
     <div class="stat-item">
-      <span>Sessions complétées</span>
+      <span>Sessions complÃ©tÃ©es</span>
       <span class="stat-value" id="sessionsCompleted">0</span>
     </div>
     <div class="stat-item">
-      <span>Temps total travaillé</span>
+      <span>Temps total travaillÃ©</span>
       <span class="stat-value" id="totalWorked">0h</span>
     </div>
   </div>
   
-  <button class="secondary" onclick="goBack()">← Retour au dashboard</button>
+  <button class="secondary" onclick="goBack()">â† Retour au dashboard</button>
 </div>
 
 <script>
@@ -306,7 +341,7 @@ function updateDisplay() {
 function startTimer() {
   if (isRunning) return;
   isRunning = true;
-  document.getElementById('status').textContent = isWorkTime ? '📚 En travail...' : '☕ En pause...';
+  document.getElementById('status').textContent = isWorkTime ? 'ðŸ“š En travail...' : 'â˜• En pause...';
   
   timerInterval = setInterval(() => {
     timeLeft--;
@@ -321,7 +356,7 @@ function startTimer() {
 function pauseTimer() {
   isRunning = false;
   clearInterval(timerInterval);
-  document.getElementById('status').textContent = '⏸️ En pause';
+  document.getElementById('status').textContent = 'â¸ï¸ En pause';
 }
 
 function resetTimer() {
@@ -329,7 +364,7 @@ function resetTimer() {
   isWorkTime = true;
   timeLeft = settings.workTime * 60;
   updateDisplay();
-  document.getElementById('status').textContent = '🔄 Réinitialisé';
+  document.getElementById('status').textContent = 'ðŸ”„ RÃ©initialisÃ©';
 }
 
 function completePhase() {
@@ -342,24 +377,24 @@ function completePhase() {
     document.getElementById('sessionsCompleted').textContent = sessionCount;
     document.getElementById('totalWorked').textContent = Math.floor(totalMinutesWorked / 60) + 'h';
     
-    // Déterminer le type de pause
+    // DÃ©terminer le type de pause
     const isLongBreak = sessionCount % settings.sessionsBeforeLong === 0;
     const breakDuration = isLongBreak ? settings.longBreakTime : settings.breakTime;
     
     playSound();
-    alert(`✅ Bonne session ! ${isLongBreak ? 'Pause longue de ' + breakDuration + ' min' : 'Pause courte de ' + breakDuration + ' min'}`);
+    alert(`âœ… Bonne session ! ${isLongBreak ? 'Pause longue de ' + breakDuration + ' min' : 'Pause courte de ' + breakDuration + ' min'}`);
     
     isWorkTime = false;
     timeLeft = breakDuration * 60;
   } else {
     playSound();
-    alert('☕ Pause terminée ! Nouvelle session ?');
+    alert('â˜• Pause terminÃ©e ! Nouvelle session ?');
     isWorkTime = true;
     timeLeft = settings.workTime * 60;
   }
   
   updateDisplay();
-  document.getElementById('status').textContent = isWorkTime ? '📚 Prêt pour une session' : '☕ Pause terminée';
+  document.getElementById('status').textContent = isWorkTime ? 'ðŸ“š PrÃªt pour une session' : 'â˜• Pause terminÃ©e';
 }
 
 function playSound() {
@@ -380,9 +415,13 @@ function goBack() {
   window.location.href = '../dashboard/Connected_internate.html';
 }
 
-// Auth check
+const loadingOverlay = document.getElementById('loadingOverlay');
 const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
-if (!user.email) window.location.href = '../auth/Login_Internate.html';
+if (user.email) {
+  loadingOverlay.classList.add('hidden');
+} else {
+  window.location.href = '../auth/Login_Internate.html';
+}
 
 // Charger statistiques depuis localStorage
 const saved = JSON.parse(localStorage.getItem('pomodoroStats') || '{}');

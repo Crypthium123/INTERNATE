@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tableau Blanc — Internate</title>
+<title>Tableau Blanc â€” Internate</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
@@ -158,25 +158,60 @@
       margin-right: 0;
     }
   }
+
+  @media (max-width: 768px) {
+    body { padding: 52px 12px 12px; }
+    .tool-topbar { padding: 10px 16px; font-size: 0.8rem; }
+    .tool-topbar a, .tool-topbar .current { font-size: 0.75rem; }
+  }
+  @media (max-width: 480px) {
+    body { padding: 48px 8px 8px; }
+    .tool-topbar { padding: 8px 12px; gap: 8px; }
+    .tool-topbar a, .tool-topbar .current { font-size: 0.7rem; }
+  }
+  .loading-overlay {
+    position: fixed; inset: 0;
+    background: var(--bg);
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.4s ease;
+  }
+  .loading-overlay.hidden { opacity: 0; pointer-events: none; }
+  .spinner {
+    width: 40px; height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-overlay p { color: var(--muted); font-size: 0.85rem; margin-top: 16px; }
 </style>
 </head>
 <body>
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <p>Chargement...</p>
+</div>
 <div class="tool-topbar">
   <a href="../dashboard/Connected_internate.html">Internate</a>
-  <span class="sep">›</span>
+  <span class="sep">â€º</span>
   <a href="../courses/Ressources_ex.html">Cours</a>
-  <span class="sep">›</span>
+  <span class="sep">â€º</span>
   <span class="current">Tableau Blanc</span>
 </div>
 
 <div class="toolbar">
-  <h1>🎨 Tableau Blanc</h1>
+  <h1>ðŸŽ¨ Tableau Blanc</h1>
   
-  <div class="tool" onclick="selectTool('pen')" id="penTool">✏️ Crayon</div>
-  <div class="tool" onclick="selectTool('line')">📐 Ligne</div>
-  <div class="tool" onclick="selectTool('rect')">▭ Rectangle</div>
-  <div class="tool" onclick="selectTool('circle')">● Cercle</div>
-  <div class="tool" onclick="selectTool('eraser')">🧹 Gomme</div>
+  <div class="tool" onclick="selectTool('pen')" id="penTool">âœï¸ Crayon</div>
+  <div class="tool" onclick="selectTool('line')">ðŸ“ Ligne</div>
+  <div class="tool" onclick="selectTool('rect')">â–­ Rectangle</div>
+  <div class="tool" onclick="selectTool('circle')">â— Cercle</div>
+  <div class="tool" onclick="selectTool('eraser')">ðŸ§¹ Gomme</div>
   
   <div class="tool-separator"></div>
   
@@ -191,10 +226,10 @@
   
   <div class="tool-separator"></div>
   
-  <button onclick="undo()">↶ Annuler</button>
-  <button onclick="clearCanvas()" class="danger">🗑️ Effacer tout</button>
-  <button onclick="downloadDrawing()">💾 Télécharger</button>
-  <button onclick="goBack()">← Retour au dashboard</button>
+  <button onclick="undo()">â†¶ Annuler</button>
+  <button onclick="clearCanvas()" class="danger">ðŸ—‘ï¸ Effacer tout</button>
+  <button onclick="downloadDrawing()">ðŸ’¾ TÃ©lÃ©charger</button>
+  <button onclick="goBack()">â† Retour au dashboard</button>
 </div>
 
 <canvas id="canvas"></canvas>
@@ -288,7 +323,7 @@ function undo() {
 }
 
 function clearCanvas() {
-  if (confirm('Êtes-vous sûr ?')) {
+  if (confirm('ÃŠtes-vous sÃ»r ?')) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     states = [];
   }
@@ -305,9 +340,13 @@ function goBack() {
   window.location.href = '../dashboard/Connected_internate.html';
 }
 
-// Auth check
+const loadingOverlay = document.getElementById('loadingOverlay');
 const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
-if (!user.email) window.location.href = '../auth/Login_Internate.html';
+if (user.email) {
+  loadingOverlay.classList.add('hidden');
+} else {
+  window.location.href = '../auth/Login_Internate.html';
+}
 
 window.addEventListener('resize', () => {
   canvas.width = window.innerWidth;

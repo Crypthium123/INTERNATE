@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fabricateur de Fiches — Internate</title>
+<title>Fabricateur de Fiches â€” Internate</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
@@ -270,36 +270,71 @@
     .form-row { grid-template-columns: 1fr; }
     .fiches-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
   }
+
+  @media (max-width: 768px) {
+    body { padding: 52px 12px 12px; }
+    .tool-topbar { padding: 10px 16px; font-size: 0.8rem; }
+    .tool-topbar a, .tool-topbar .current { font-size: 0.75rem; }
+  }
+  @media (max-width: 480px) {
+    body { padding: 48px 8px 8px; }
+    .tool-topbar { padding: 8px 12px; gap: 8px; }
+    .tool-topbar a, .tool-topbar .current { font-size: 0.7rem; }
+  }
+  .loading-overlay {
+    position: fixed; inset: 0;
+    background: var(--bg);
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.4s ease;
+  }
+  .loading-overlay.hidden { opacity: 0; pointer-events: none; }
+  .spinner {
+    width: 40px; height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-overlay p { color: var(--muted); font-size: 0.85rem; margin-top: 16px; }
 </style>
 </head>
 <body>
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <p>Chargement...</p>
+</div>
 <div class="tool-topbar">
   <a href="../dashboard/Connected_internate.html">Internate</a>
-  <span class="sep">›</span>
+  <span class="sep">â€º</span>
   <a href="../courses/Ressources_ex.html">Cours</a>
-  <span class="sep">›</span>
+  <span class="sep">â€º</span>
   <span class="current">Fiches</span>
 </div>
 
 <div class="container">
-  <h1>🗂️ Fabricateur de Fiches de Révision</h1>
+  <h1>ðŸ—‚ï¸ Fabricateur de Fiches de RÃ©vision</h1>
   
   <div class="creator">
     <div class="form-row">
       <div class="form-group">
         <label>Titre de la fiche</label>
-        <input type="text" id="ficheName" placeholder="ex: Photosynthèse">
+        <input type="text" id="ficheName" placeholder="ex: PhotosynthÃ¨se">
       </div>
       <div class="form-group">
-        <label>Matière</label>
+        <label>MatiÃ¨re</label>
         <select id="subject">
-          <option>Mathématiques</option>
+          <option>MathÃ©matiques</option>
           <option>Physique</option>
           <option>Chimie</option>
           <option>SVT</option>
           <option>Histoire</option>
-          <option>Géographie</option>
-          <option>Français</option>
+          <option>GÃ©ographie</option>
+          <option>FranÃ§ais</option>
           <option>Anglais</option>
           <option>Espagnol</option>
           <option>Philosophie</option>
@@ -320,17 +355,17 @@
     
     <div class="form-group" style="margin-bottom: 16px;">
       <label>Contenu (recto-verso)</label>
-      <textarea id="fichContent" placeholder="Écris ton contenu ici. Utilise | pour séparer recto et verso.&#10;&#10;Exemple:&#10;Recto: Définition du photosynthèse | Verso: Processus de transformation de la lumière en énergie chimique"></textarea>
+      <textarea id="fichContent" placeholder="Ã‰cris ton contenu ici. Utilise | pour sÃ©parer recto et verso.&#10;&#10;Exemple:&#10;Recto: DÃ©finition du photosynthÃ¨se | Verso: Processus de transformation de la lumiÃ¨re en Ã©nergie chimique"></textarea>
     </div>
     
     <div class="btn-group">
-      <button class="btn" onclick="createFiche()">➕ Créer la fiche</button>
-      <button class="btn secondary" onclick="exportAllPDF()">📕 Exporter en PDF</button>
-      <button class="btn secondary" onclick="goBack()">← Retour au dashboard</button>
+      <button class="btn" onclick="createFiche()">âž• CrÃ©er la fiche</button>
+      <button class="btn secondary" onclick="exportAllPDF()">ðŸ“• Exporter en PDF</button>
+      <button class="btn secondary" onclick="goBack()">â† Retour au dashboard</button>
     </div>
   </div>
   
-  <div class="section-title">📚 Vos fiches</div>
+  <div class="section-title">ðŸ“š Vos fiches</div>
   <div class="fiches-grid" id="fichesContainer"></div>
 </div>
 
@@ -350,7 +385,7 @@ function createFiche() {
   const content = document.getElementById('fichContent').value;
   
   if (!name || !content) {
-    alert('⚠️ Remplis le titre et le contenu');
+    alert('âš ï¸ Remplis le titre et le contenu');
     return;
   }
   
@@ -381,12 +416,12 @@ function renderFiches() {
     div.style.background = fiche.color;
     div.style.color = 'white';
     div.innerHTML = `
-      <button class="fiche-delete" onclick="deleteFiche(${fiche.id})">✕</button>
+      <button class="fiche-delete" onclick="deleteFiche(${fiche.id})">âœ•</button>
       <div class="fiche-back">
         <div class="fiche-subject">${fiche.subject}</div>
         <div class="fiche-title">${fiche.name}</div>
         <div class="fiche-content">${fiche.recto}</div>
-        <div class="fiche-hint">Cliquez pour retourner →</div>
+        <div class="fiche-hint">Cliquez pour retourner â†’</div>
       </div>
       <div class="fiche-front">
         <div class="fiche-content">${fiche.verso}</div>
@@ -411,19 +446,23 @@ function deleteFiche(id) {
 
 function exportAllPDF() {
   if (fiches.length === 0) {
-    alert('📚 Vous n\'avez pas de fiches à exporter');
+    alert('ðŸ“š Vous n\'avez pas de fiches Ã  exporter');
     return;
   }
-  alert('📕 Fonctionnalité PDF : appuyez sur Ctrl+P (ou Cmd+P) pour imprimer vos fiches en PDF depuis cette page.');
+  alert('ðŸ“• FonctionnalitÃ© PDF : appuyez sur Ctrl+P (ou Cmd+P) pour imprimer vos fiches en PDF depuis cette page.');
 }
 
 function goBack() {
   window.location.href = '../dashboard/Connected_internate.html';
 }
 
-// Auth check
+const loadingOverlay = document.getElementById('loadingOverlay');
 const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
-if (!user.email) window.location.href = '../auth/Login_Internate.html';
+if (user.email) {
+  loadingOverlay.classList.add('hidden');
+} else {
+  window.location.href = '../auth/Login_Internate.html';
+}
 
 renderFiches();
 </script>
@@ -432,3 +471,4 @@ renderFiches();
 </div>
 </body>
 </html>
+

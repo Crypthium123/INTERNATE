@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cours & Ressources — Internate</title>
+<title>Cours & Ressources â€” Internate</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
@@ -680,43 +680,120 @@
     gap: 10px;
     justify-content: flex-end;
   }
+
+
+
+  .menu-toggle {
+    display: none;
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 60;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    width: 40px; height: 40px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    color: var(--text);
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .menu-toggle:hover { background: var(--surface2); }
+  @media (max-width: 900px) {
+    .menu-toggle { display: flex; position: fixed; }
+    .sidebar { transform: translateX(-100%); transition: transform 0.3s ease; z-index: 55; }
+    .sidebar.open { transform: translateX(0); }
+    .main { margin-left: 0; width: 100%; max-width: 100%; }
+    .page-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+  }
+  @media (max-width: 600px) {
+    .main { padding: 16px 12px; padding-top: 60px; }
+    .filter-bar { flex-direction: column; }
+    .filter-select { width: 100%; min-width: unset; }
+    .modal { padding: 24px 20px; max-width: 100vw; }
+    .form-row { grid-template-columns: 1fr; }
+    .tools-row { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 400px) {
+    .sidebar { width: 220px; }
+    .tools-row { grid-template-columns: 1fr; }
+  }
+
+  /* Loading spinner overlay */
+  .loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.4s ease;
+  }
+  .loading-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  .loading-overlay p {
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-top: 16px;
+  }
 </style>
 </head>
 <body>
-
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <p>Chargement...</p>
+</div>
 <!-- SIDEBAR -->
 <aside class="sidebar">
   <a href="../dashboard/Connected_internate.html" class="sidebar-logo">Internate</a>
 
   <div class="nav-section-label">Principal</div>
   <a class="nav-item" href="../dashboard/Connected_internate.html">
-    <span class="nav-icon">🏠</span> Dashboard
+    <span class="nav-icon">ðŸ </span> Dashboard
   </a>
   <a class="nav-item active" href="#">
-    <span class="nav-icon">📚</span> Mes cours
+    <span class="nav-icon">ðŸ“š</span> Mes cours
   </a>
 
   <div class="nav-section-label">Outils</div>
   <a class="nav-item" href="../tools/Calculatrice_Scientifique.html">
-    <span class="nav-icon">🧮</span> Calculatrice
+    <span class="nav-icon">ðŸ§®</span> Calculatrice
   </a>
   <a class="nav-item" href="../tools/Convertisseur_Unites.html">
-    <span class="nav-icon">📊</span> Convertisseur
+    <span class="nav-icon">ðŸ“Š</span> Convertisseur
   </a>
   <a class="nav-item" href="../tools/Fabricateur_Fiches.html">
-    <span class="nav-icon">🗂️</span> Fiches
+    <span class="nav-icon">ðŸ—‚ï¸</span> Fiches
   </a>
   <a class="nav-item" href="../tools/Generateur_QCM.html">
-    <span class="nav-icon">📋</span> QCM
+    <span class="nav-icon">ðŸ“‹</span> QCM
   </a>
   <a class="nav-item" href="../tools/Minuteur_Pomodoro.html">
-    <span class="nav-icon">⏱️</span> Pomodoro
+    <span class="nav-icon">â±ï¸</span> Pomodoro
   </a>
   <a class="nav-item" href="../tools/Redacteur_Plan.html">
-    <span class="nav-icon">📝</span> Plan
+    <span class="nav-icon">ðŸ“</span> Plan
   </a>
   <a class="nav-item" href="../tools/Tableau_Blanc.html">
-    <span class="nav-icon">🎨</span> Tableau Blanc
+    <span class="nav-icon">ðŸŽ¨</span> Tableau Blanc
   </a>
 
   <div class="sidebar-footer">
@@ -724,46 +801,50 @@
       <div class="avatar" id="avatarEl">?</div>
       <div class="user-info">
         <strong id="userNameEl">Utilisateur</strong>
-        <span id="userEmailEl">—</span>
+        <span id="userEmailEl">â€”</span>
       </div>
     </div>
     <button class="logout-btn" onclick="logout()">
-      <span>🚪</span> Se déconnecter
+      <span>ðŸšª</span> Se dÃ©connecter
     </button>
     <button class="logout-btn" onclick="logout()">
-      <span>🚪</span> Se déconnecter
+      <span>ðŸšª</span> Se dÃ©connecter
     </button>
     <a href="../contact.html" class="logout-btn" style="text-decoration:none;margin-top:2px;">
-      <span>💬</span> Contact & retours
+      <span>ðŸ’¬</span> Contact & retours
     </a>
   </div>
 
-  <!-- FILTRES -->
+  </aside>
+
+<button class="menu-toggle" onclick="toggleSidebar()" aria-label="Menu">?</button>
+
+<!-- FILTRES -->
   <div class="filter-bar">
     <select class="filter-select" id="filterFiliere" onchange="applyFilters()">
-      <option value="">Toutes filières</option>
-      <option value="generale">Générale</option>
+      <option value="">Toutes filiÃ¨res</option>
+      <option value="generale">GÃ©nÃ©rale</option>
       <option value="technologique">Technologique</option>
     </select>
     <select class="filter-select" id="filterAnnee" onchange="applyFilters()">
-      <option value="">Toutes années</option>
+      <option value="">Toutes annÃ©es</option>
       <option value="2nde">2nde</option>
-      <option value="1ere">1ère</option>
+      <option value="1ere">1Ã¨re</option>
       <option value="terminale">Terminale</option>
     </select>
     <select class="filter-select" id="filterSpecialite" onchange="applyFilters()">
-      <option value="">Toutes spécialités/séries</option>
+      <option value="">Toutes spÃ©cialitÃ©s/sÃ©ries</option>
     </select>
     <select class="filter-select" id="filterMatiere" onchange="applyFilters()">
-      <option value="">Toutes matières</option>
+      <option value="">Toutes matiÃ¨res</option>
     </select>
-    <button class="filter-reset" onclick="resetFilters()">Réinitialiser</button>
+    <button class="filter-reset" onclick="resetFilters()">RÃ©initialiser</button>
     <span class="filter-count" id="filterCount">0 cours</span>
     <select class="filter-select" id="sortBy" onchange="renderCourses()" style="min-width:120px;">
-      <option value="date-desc">Plus récents</option>
+      <option value="date-desc">Plus rÃ©cents</option>
       <option value="date-asc">Plus anciens</option>
-      <option value="title">A–Z</option>
-      <option value="matiere">Matière</option>
+      <option value="title">Aâ€“Z</option>
+      <option value="matiere">MatiÃ¨re</option>
     </select>
   </div>
 
@@ -771,28 +852,28 @@
   <div class="cours-grid" id="coursGrid"></div>
 
   <!-- OUTILS -->
-  <div class="section-title">Accès rapide aux outils</div>
+  <div class="section-title">AccÃ¨s rapide aux outils</div>
   <div class="tools-row">
     <a class="tool-pill" href="../tools/Calculatrice_Scientifique.html">
-      <span class="pill-icon">🧮</span> Calculatrice
+      <span class="pill-icon">ðŸ§®</span> Calculatrice
     </a>
     <a class="tool-pill" href="../tools/Convertisseur_Unites.html">
-      <span class="pill-icon">📊</span> Convertisseur
+      <span class="pill-icon">ðŸ“Š</span> Convertisseur
     </a>
     <a class="tool-pill" href="../tools/Fabricateur_Fiches.html">
-      <span class="pill-icon">🗂️</span> Fiches
+      <span class="pill-icon">ðŸ—‚ï¸</span> Fiches
     </a>
     <a class="tool-pill" href="../tools/Generateur_QCM.html">
-      <span class="pill-icon">📋</span> QCM
+      <span class="pill-icon">ðŸ“‹</span> QCM
     </a>
     <a class="tool-pill" href="../tools/Minuteur_Pomodoro.html">
-      <span class="pill-icon">⏱️</span> Pomodoro
+      <span class="pill-icon">â±ï¸</span> Pomodoro
     </a>
     <a class="tool-pill" href="../tools/Redacteur_Plan.html">
-      <span class="pill-icon">📝</span> Plan
+      <span class="pill-icon">ðŸ“</span> Plan
     </a>
     <a class="tool-pill" href="../tools/Tableau_Blanc.html">
-      <span class="pill-icon">🎨</span> Tableau Blanc
+      <span class="pill-icon">ðŸŽ¨</span> Tableau Blanc
     </a>
   </div>
 
@@ -801,43 +882,43 @@
     <div class="modal">
       <div class="modal-header">
         <h2 id="modalTitle">Ajouter un cours</h2>
-        <button class="modal-close" onclick="closeModal()">✕</button>
+        <button class="modal-close" onclick="closeModal()">âœ•</button>
       </div>
       <div class="form-group">
         <label>Titre du cours</label>
-        <input type="text" id="formTitle" placeholder="Ex: Thème 7 — Vecteurs" required>
+        <input type="text" id="formTitle" placeholder="Ex: ThÃ¨me 7 â€” Vecteurs" required>
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label>Filière</label>
+          <label>FiliÃ¨re</label>
           <select id="formFiliere" onchange="updateFormSpecialite()">
-            <option value="">Sélectionner…</option>
-            <option value="generale">Générale</option>
+            <option value="">SÃ©lectionnerâ€¦</option>
+            <option value="generale">GÃ©nÃ©rale</option>
             <option value="technologique">Technologique</option>
           </select>
         </div>
         <div class="form-group">
-          <label>Année</label>
+          <label>AnnÃ©e</label>
           <select id="formAnnee" onchange="updateFormSpecialite()">
-            <option value="">Sélectionner…</option>
+            <option value="">SÃ©lectionnerâ€¦</option>
             <option value="2nde">2nde</option>
-            <option value="1ere">1ère</option>
+            <option value="1ere">1Ã¨re</option>
             <option value="terminale">Terminale</option>
           </select>
         </div>
       </div>
       <div class="form-group conditional-field" id="formSpecialiteGroup">
-        <label id="formSpecialiteLabel">Spécialité / Série</label>
+        <label id="formSpecialiteLabel">SpÃ©cialitÃ© / SÃ©rie</label>
         <select id="formSpecialite"></select>
       </div>
       <div class="form-group">
-        <label>Matière</label>
+        <label>MatiÃ¨re</label>
         <select id="formMatiere">
-          <option value="">Sélectionner…</option>
-          <option value="mathematiques">Mathématiques</option>
+          <option value="">SÃ©lectionnerâ€¦</option>
+          <option value="mathematiques">MathÃ©matiques</option>
           <option value="physique-chimie">Physique-Chimie</option>
-          <option value="francais">Français</option>
-          <option value="histoire-geo">Histoire-Géographie</option>
+          <option value="francais">FranÃ§ais</option>
+          <option value="histoire-geo">Histoire-GÃ©ographie</option>
           <option value="anglais">Anglais</option>
           <option value="espagnol">Espagnol</option>
           <option value="allemand">Allemand</option>
@@ -852,7 +933,7 @@
       </div>
       <div class="form-group">
         <label>Description (optionnelle)</label>
-        <textarea id="formDescription" placeholder="Description du cours…"></textarea>
+        <textarea id="formDescription" placeholder="Description du coursâ€¦"></textarea>
       </div>
       <div class="form-group">
         <label>URL du fichier (optionnelle)</label>
@@ -885,14 +966,19 @@
 </main>
 
 <!-- Firebase SDK (compat) -->
-<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js">
+</script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js">
+</script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js">
+</script>
 
-<script src="../js/firebase-config.js"></script>
+<script src="../js/firebase-config.js">
+</script>
 
 <script>
   // Auth check
+  document.getElementById('loadingOverlay').classList.add('hidden');
   const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
   if (!user.email) window.location.href = '../auth/Login_Internate.html';
 
@@ -945,34 +1031,34 @@
 
   const SPECIALITES_GENERALE = {
     '1ere': [
-      'Histoire Géographie, Géopolitique et Sciences politiques',
-      'Humanités, Littérature et Philosophie',
-      'Langues, Littératures et Cultures Étrangères',
-      'Littérature, Langues et Cultures de l\'Antiquité',
-      'Mathématiques',
-      'Numérique et Sciences Informatiques',
+      'Histoire GÃ©ographie, GÃ©opolitique et Sciences politiques',
+      'HumanitÃ©s, LittÃ©rature et Philosophie',
+      'Langues, LittÃ©ratures et Cultures Ã‰trangÃ¨res',
+      'LittÃ©rature, Langues et Cultures de l\'AntiquitÃ©',
+      'MathÃ©matiques',
+      'NumÃ©rique et Sciences Informatiques',
       'Sciences de la vie et de la Terre',
-      'Sciences de l\'ingénieur',
-      'Sciences Économiques et Sociales',
+      'Sciences de l\'ingÃ©nieur',
+      'Sciences Ã‰conomiques et Sociales',
       'Physique Chimie',
-      'Arts : Histoire des arts, Théâtre, Arts Plastiques, Arts du Spectacle',
-      'Biologie Écologie (uniquement dans les lycées agricoles)',
-      'Éducation Physique, Pratiques et Culture Sportives'
+      'Arts : Histoire des arts, ThÃ©Ã¢tre, Arts Plastiques, Arts du Spectacle',
+      'Biologie Ã‰cologie (uniquement dans les lycÃ©es agricoles)',
+      'Ã‰ducation Physique, Pratiques et Culture Sportives'
     ],
     'terminale': [
-      'Histoire Géographie, Géopolitique et Sciences politiques',
-      'Humanités, Littérature et Philosophie',
-      'Langues, Littératures et Cultures Étrangères',
-      'Littérature, Langues et Cultures de l\'Antiquité',
-      'Mathématiques',
-      'Numérique et Sciences Informatiques',
+      'Histoire GÃ©ographie, GÃ©opolitique et Sciences politiques',
+      'HumanitÃ©s, LittÃ©rature et Philosophie',
+      'Langues, LittÃ©ratures et Cultures Ã‰trangÃ¨res',
+      'LittÃ©rature, Langues et Cultures de l\'AntiquitÃ©',
+      'MathÃ©matiques',
+      'NumÃ©rique et Sciences Informatiques',
       'Sciences de la vie et de la Terre',
-      'Sciences de l\'ingénieur',
-      'Sciences Économiques et Sociales',
+      'Sciences de l\'ingÃ©nieur',
+      'Sciences Ã‰conomiques et Sociales',
       'Physique Chimie',
-      'Arts : Histoire des arts, Théâtre, Arts Plastiques, Arts du Spectacle',
-      'Biologie Écologie (uniquement dans les lycées agricoles)',
-      'Éducation Physique, Pratiques et Culture Sportives'
+      'Arts : Histoire des arts, ThÃ©Ã¢tre, Arts Plastiques, Arts du Spectacle',
+      'Biologie Ã‰cologie (uniquement dans les lycÃ©es agricoles)',
+      'Ã‰ducation Physique, Pratiques et Culture Sportives'
     ]
   };
 
@@ -982,20 +1068,20 @@
   };
 
   const MATIERES = [
-    { value: 'mathematiques', label: 'Mathématiques', icon: '📐', color: '#6c63ff' },
-    { value: 'physique-chimie', label: 'Physique-Chimie', icon: '🧪', color: '#00d4aa' },
-    { value: 'francais', label: 'Français', icon: '📖', color: '#ffa94d' },
-    { value: 'histoire-geo', label: 'Histoire-Géographie', icon: '🌍', color: '#a78bfa' },
-    { value: 'anglais', label: 'Anglais', icon: '🇬🇧', color: '#ff6b6b' },
-    { value: 'espagnol', label: 'Espagnol', icon: '🇪🇸', color: '#f97316' },
-    { value: 'allemand', label: 'Allemand', icon: '🇩🇪', color: '#eab308' },
-    { value: 'svt', label: 'SVT', icon: '🌿', color: '#22c55e' },
-    { value: 'nsi', label: 'NSI', icon: '💻', color: '#3b82f6' },
-    { value: 'ses', label: 'SES', icon: '📊', color: '#ec4899' },
-    { value: 'philosophie', label: 'Philosophie', icon: '🤔', color: '#8b5cf6' },
-    { value: 'arts', label: 'Arts', icon: '🎨', color: '#f472b6' },
-    { value: 'eps', label: 'EPS', icon: '🏃', color: '#14b8a6' },
-    { value: 'autre', label: 'Autre', icon: '📁', color: '#6b7280' }
+    { value: 'mathematiques', label: 'MathÃ©matiques', icon: 'ðŸ“', color: '#6c63ff' },
+    { value: 'physique-chimie', label: 'Physique-Chimie', icon: 'ðŸ§ª', color: '#00d4aa' },
+    { value: 'francais', label: 'FranÃ§ais', icon: 'ðŸ“–', color: '#ffa94d' },
+    { value: 'histoire-geo', label: 'Histoire-GÃ©ographie', icon: 'ðŸŒ', color: '#a78bfa' },
+    { value: 'anglais', label: 'Anglais', icon: 'ðŸ‡¬ðŸ‡§', color: '#ff6b6b' },
+    { value: 'espagnol', label: 'Espagnol', icon: 'ðŸ‡ªðŸ‡¸', color: '#f97316' },
+    { value: 'allemand', label: 'Allemand', icon: 'ðŸ‡©ðŸ‡ª', color: '#eab308' },
+    { value: 'svt', label: 'SVT', icon: 'ðŸŒ¿', color: '#22c55e' },
+    { value: 'nsi', label: 'NSI', icon: 'ðŸ’»', color: '#3b82f6' },
+    { value: 'ses', label: 'SES', icon: 'ðŸ“Š', color: '#ec4899' },
+    { value: 'philosophie', label: 'Philosophie', icon: 'ðŸ¤”', color: '#8b5cf6' },
+    { value: 'arts', label: 'Arts', icon: 'ðŸŽ¨', color: '#f472b6' },
+    { value: 'eps', label: 'EPS', icon: 'ðŸƒ', color: '#14b8a6' },
+    { value: 'autre', label: 'Autre', icon: 'ðŸ“', color: '#6b7280' }
   ];
 
   function getCourses() {
@@ -1067,15 +1153,15 @@
     let options = [];
     if (filiere === 'generale' && SPECIALITES_GENERALE[annee]) {
       options = SPECIALITES_GENERALE[annee];
-      label.textContent = 'Spécialité';
+      label.textContent = 'SpÃ©cialitÃ©';
     } else if (filiere === 'technologique' && SERIES_TECHNOLOGIQUE[annee]) {
       options = SERIES_TECHNOLOGIQUE[annee];
-      label.textContent = 'Série';
+      label.textContent = 'SÃ©rie';
     }
 
     if (options.length) {
       group.classList.add('show');
-      select.innerHTML = '<option value="">Sélectionner…</option>' +
+      select.innerHTML = '<option value="">SÃ©lectionnerâ€¦</option>' +
         options.map(o => `<option value="${o}">${o}</option>`).join('');
     }
   }
@@ -1092,14 +1178,14 @@
     const fileName = document.getElementById('formFileName').value.trim();
 
     if (!title) { showToast('Veuillez saisir un titre.', 'error'); return; }
-    if (!filiere) { showToast('Veuillez sélectionner une filière.', 'error'); return; }
-    if (!annee) { showToast('Veuillez sélectionner une année.', 'error'); return; }
-    if (!matiere) { showToast('Veuillez sélectionner une matière.', 'error'); return; }
+    if (!filiere) { showToast('Veuillez sÃ©lectionner une filiÃ¨re.', 'error'); return; }
+    if (!annee) { showToast('Veuillez sÃ©lectionner une annÃ©e.', 'error'); return; }
+    if (!matiere) { showToast('Veuillez sÃ©lectionner une matiÃ¨re.', 'error'); return; }
 
     const specialiteGroup = document.getElementById('formSpecialiteGroup');
     if (specialiteGroup.classList.contains('show') && !specialite) {
       const label = document.getElementById('formSpecialiteLabel').textContent;
-      showToast(`Veuillez sélectionner une ${label.toLowerCase()}.`, 'error');
+      showToast(`Veuillez sÃ©lectionner une ${label.toLowerCase()}.`, 'error');
       return;
     }
 
@@ -1113,7 +1199,7 @@
       saveCourses(courses);
       closeModal();
       renderCourses();
-      showToast('Cours modifié !', 'success');
+      showToast('Cours modifiÃ© !', 'success');
     } else {
       courses.push({
         id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
@@ -1128,7 +1214,7 @@
       saveCourses(courses);
       closeModal();
       renderCourses();
-      showToast('Cours ajouté !', 'success');
+      showToast('Cours ajoutÃ© !', 'success');
     }
   }
 
@@ -1137,7 +1223,7 @@
       const courses = getCourses().filter(c => c.id !== id);
       saveCourses(courses);
       renderCourses();
-      showToast('Cours supprimé.', 'success');
+      showToast('Cours supprimÃ©.', 'success');
     });
   }
 
@@ -1153,7 +1239,7 @@
     const select = document.getElementById('filterSpecialite');
     const currentVal = select.value;
 
-    select.innerHTML = '<option value="">Toutes spécialités/séries</option>';
+    select.innerHTML = '<option value="">Toutes spÃ©cialitÃ©s/sÃ©ries</option>';
 
     if (filiere === 'generale' && annee && annee !== '2nde' && SPECIALITES_GENERALE[annee]) {
       select.innerHTML += SPECIALITES_GENERALE[annee].map(s => `<option value="${s}">${s}</option>`).join('');
@@ -1167,7 +1253,7 @@
   function resetFilters() {
     document.getElementById('filterFiliere').value = '';
     document.getElementById('filterAnnee').value = '';
-    document.getElementById('filterSpecialite').innerHTML = '<option value="">Toutes spécialités/séries</option>';
+    document.getElementById('filterSpecialite').innerHTML = '<option value="">Toutes spÃ©cialitÃ©s/sÃ©ries</option>';
     document.getElementById('filterMatiere').value = '';
     renderCourses();
   }
@@ -1200,8 +1286,8 @@
     if (!filtered.length) {
       grid.innerHTML = `
         <div class="empty-state" style="grid-column: 1 / -1; text-align:center; padding:60px 20px; color:var(--muted);">
-          <div style="font-size:3rem; margin-bottom:16px;">📭</div>
-          <p style="font-size:0.9rem;">Aucun cours trouvé.</p>
+          <div style="font-size:3rem; margin-bottom:16px;">ðŸ“­</div>
+          <p style="font-size:0.9rem;">Aucun cours trouvÃ©.</p>
           <p style="font-size:0.85rem; margin-top:8px;">Ajoute un cours ou modifie tes filtres.</p>
         </div>`;
       return;
@@ -1210,12 +1296,12 @@
     const matiereColors = {};
     MATIERES.forEach(m => { matiereColors[m.value] = m.color; });
 
-    let filiereLabel = { 'generale': 'Générale', 'technologique': 'Technologique' };
-    let anneeLabel = { '2nde': '2nde', '1ere': '1ère', 'terminale': 'Terminale' };
+    let filiereLabel = { 'generale': 'GÃ©nÃ©rale', 'technologique': 'Technologique' };
+    let anneeLabel = { '2nde': '2nde', '1ere': '1Ã¨re', 'terminale': 'Terminale' };
 
     grid.innerHTML = filtered.map(c => {
       const color = matiereColors[c.matiere] || '#6c63ff';
-      const icon = c.matiereIcon || '📁';
+      const icon = c.matiereIcon || 'ðŸ“';
       const fl = filiereLabel[c.filiere] || c.filiere;
       const al = anneeLabel[c.annee] || c.annee;
       const spec = c.specialite ? `<span class="meta-tag">${c.specialite}</span>` : '';
@@ -1225,7 +1311,7 @@
       const fileSection = c.fileUrl
         ? `<div class="cours-footer">
              <span style="font-size:0.75rem; color:var(--muted);">${c.fileName || 'Fichier'}</span>
-             <a href="${c.fileUrl}" target="_blank" class="dl-btn" onclick="event.stopPropagation()">Télécharger →</a>
+             <a href="${c.fileUrl}" target="_blank" class="dl-btn" onclick="event.stopPropagation()">TÃ©lÃ©charger â†’</a>
            </div>`
         : '';
 
@@ -1233,8 +1319,8 @@
 
       return `
         <div class="cours-card" style="cursor:default;">
-          <button class="edit-btn" onclick="openModal(getCourses().find(x => x.id === '${c.id}'))" title="Modifier">✎</button>
-          <button class="delete-btn" onclick="deleteCourse('${c.id}')" title="Supprimer">✕</button>
+          <button class="edit-btn" onclick="openModal(getCourses().find(x => x.id === '${c.id}'))" title="Modifier">âœŽ</button>
+          <button class="delete-btn" onclick="deleteCourse('${c.id}')" title="Supprimer">âœ•</button>
           <div class="cours-thumb" style="background: linear-gradient(135deg, ${color}22, ${color}44);">
             <div class="cours-thumb-bg"></div>
             <span style="position:relative; z-index:1;">${icon}</span>
@@ -1254,7 +1340,7 @@
   // ---- INIT ----
   document.querySelector('.btn-upload').addEventListener('click', openModal);
 
-  // Populate matière filter
+  // Populate matiÃ¨re filter
   const matiereFilter = document.getElementById('filterMatiere');
   MATIERES.forEach(m => {
     const opt = document.createElement('option');
@@ -1264,6 +1350,19 @@
   });
 
   renderCourses();
+
+
+
+function toggleSidebar() {
+  document.querySelector('.sidebar').classList.toggle('open');
+}
+document.addEventListener('click', function(e) {
+  const sidebar = document.querySelector('.sidebar');
+  const toggle = document.querySelector('.menu-toggle');
+  if (window.innerWidth <= 900 && !sidebar.contains(e.target) && !toggle.contains(e.target)) {
+    sidebar.classList.remove('open');
+  }
+});
 </script>
 <div style="text-align:center;padding:20px;font-size:0.78rem;color:var(--muted);border-top:1px solid var(--border);margin-top:40px;">
   Des retours ? <a href="mailto:gc05122008@gmail.com" style="color:var(--accent2);text-decoration:none;font-weight:500;">gc05122008@gmail.com</a>

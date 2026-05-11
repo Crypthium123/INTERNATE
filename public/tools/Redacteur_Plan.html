@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rédacteur de Plan — Internate</title>
+<title>RÃ©dacteur de Plan â€” Internate</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
@@ -191,46 +191,81 @@
     body { grid-template-columns: 1fr; }
     .sidebar { position: static; }
   }
+
+  @media (max-width: 768px) {
+    body { padding: 52px 12px 12px; }
+    .tool-topbar { padding: 10px 16px; font-size: 0.8rem; }
+    .tool-topbar a, .tool-topbar .current { font-size: 0.75rem; }
+  }
+  @media (max-width: 480px) {
+    body { padding: 48px 8px 8px; }
+    .tool-topbar { padding: 8px 12px; gap: 8px; }
+    .tool-topbar a, .tool-topbar .current { font-size: 0.7rem; }
+  }
+  .loading-overlay {
+    position: fixed; inset: 0;
+    background: var(--bg);
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.4s ease;
+  }
+  .loading-overlay.hidden { opacity: 0; pointer-events: none; }
+  .spinner {
+    width: 40px; height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-overlay p { color: var(--muted); font-size: 0.85rem; margin-top: 16px; }
 </style>
 </head>
 <body>
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <p>Chargement...</p>
+</div>
 <div class="tool-topbar">
   <a href="../dashboard/Connected_internate.html">Internate</a>
-  <span class="sep">›</span>
+  <span class="sep">â€º</span>
   <a href="../courses/Ressources_ex.html">Cours</a>
-  <span class="sep">›</span>
+  <span class="sep">â€º</span>
   <span class="current">Plan</span>
 </div>
 
 <div class="sidebar">
-  <h2>📝 Modèles</h2>
+  <h2>ðŸ“ ModÃ¨les</h2>
   <div class="template-list">
-    <button class="template-btn active" onclick="loadTemplate('dissertation')">📚 Dissertation</button>
-    <button class="template-btn" onclick="loadTemplate('compte_rendu')">📋 Compte-rendu</button>
-    <button class="template-btn" onclick="loadTemplate('rapport_tp')">🔬 Rapport de TP</button>
-    <button class="template-btn" onclick="loadTemplate('expose')">🎤 Exposé</button>
-    <button class="template-btn" onclick="loadTemplate('analyse')">📊 Analyse</button>
+    <button class="template-btn active" onclick="loadTemplate('dissertation')">ðŸ“š Dissertation</button>
+    <button class="template-btn" onclick="loadTemplate('compte_rendu')">ðŸ“‹ Compte-rendu</button>
+    <button class="template-btn" onclick="loadTemplate('rapport_tp')">ðŸ”¬ Rapport de TP</button>
+    <button class="template-btn" onclick="loadTemplate('expose')">ðŸŽ¤ ExposÃ©</button>
+    <button class="template-btn" onclick="loadTemplate('analyse')">ðŸ“Š Analyse</button>
   </div>
 </div>
 
 <div class="editor">
-  <h1>Rédacteur de Plan</h1>
-  <input type="text" id="title" placeholder="Titre de votre travail…" value="">
+  <h1>RÃ©dacteur de Plan</h1>
+  <input type="text" id="title" placeholder="Titre de votre travailâ€¦" value="">
   
   <div class="plan-container" id="planContainer"></div>
   
   <div class="btn-group">
-    <button onclick="addItem()">➕ Ajouter une section</button>
-    <button class="secondary" onclick="removeLastItem()">❌ Supprimer la dernière</button>
-    <button class="secondary" onclick="clearAll()">🗑️ Vider le plan</button>
+    <button onclick="addItem()">âž• Ajouter une section</button>
+    <button class="secondary" onclick="removeLastItem()">âŒ Supprimer la derniÃ¨re</button>
+    <button class="secondary" onclick="clearAll()">ðŸ—‘ï¸ Vider le plan</button>
   </div>
   
-  <h3 style="margin-top: 32px; margin-bottom: 12px;">📥 Exporter</h3>
+  <h3 style="margin-top: 32px; margin-bottom: 12px;">ðŸ“¥ Exporter</h3>
   <div class="btn-group">
-    <button onclick="exportTXT()">📄 Télécharger .TXT</button>
-    <button onclick="exportMarkdown()">📝 Télécharger .MD</button>
-    <button onclick="exportPDF()">📕 Télécharger .PDF</button>
-    <button class="secondary" onclick="goBack()">← Retour au dashboard</button>
+    <button onclick="exportTXT()">ðŸ“„ TÃ©lÃ©charger .TXT</button>
+    <button onclick="exportMarkdown()">ðŸ“ TÃ©lÃ©charger .MD</button>
+    <button onclick="exportPDF()">ðŸ“• TÃ©lÃ©charger .PDF</button>
+    <button class="secondary" onclick="goBack()">â† Retour au dashboard</button>
   </div>
 </div>
 
@@ -241,19 +276,19 @@ const templates = {
     'I. Premier argument',
     '  A. Sous-point 1',
     '  B. Sous-point 2',
-    'II. Deuxième argument',
+    'II. DeuxiÃ¨me argument',
     '  A. Sous-point 1',
     '  B. Sous-point 2',
-    'III. Troisième argument',
+    'III. TroisiÃ¨me argument',
     '  A. Sous-point 1',
     '  B. Sous-point 2',
     'Conclusion'
   ],
   compte_rendu: [
     'Objectif',
-    'Matériel utilisé',
+    'MatÃ©riel utilisÃ©',
     'Protocole',
-    'Résultats',
+    'RÃ©sultats',
     '  A. Observation 1',
     '  B. Observation 2',
     'Analyse',
@@ -263,34 +298,34 @@ const templates = {
     'Titre du TP',
     'Date et groupe',
     'Objectifs',
-    'Théorie',
-    'Protocole expérimental',
+    'ThÃ©orie',
+    'Protocole expÃ©rimental',
     'Observations et mesures',
-    'Résultats',
+    'RÃ©sultats',
     'Discussion',
     'Conclusion',
-    'Références'
+    'RÃ©fÃ©rences'
   ],
   expose: [
     'Introduction / Accroche',
-    'Contexte et définitions',
+    'Contexte et dÃ©finitions',
     'I. Point principal 1',
     'II. Point principal 2',
     'III. Point principal 3',
-    'Conclusion et synthèse',
+    'Conclusion et synthÃ¨se',
     'Questions/Discussion'
   ],
   analyse: [
-    'Présentation du sujet',
+    'PrÃ©sentation du sujet',
     'Contexte historique/scientifique',
     'I. Premier axe d\'analyse',
     '  A. Aspect 1',
     '  B. Aspect 2',
-    'II. Deuxième axe d\'analyse',
+    'II. DeuxiÃ¨me axe d\'analyse',
     '  A. Aspect 1',
     '  B. Aspect 2',
-    'III. Troisième axe d\'analyse',
-    'Synthèse et perspectives'
+    'III. TroisiÃ¨me axe d\'analyse',
+    'SynthÃ¨se et perspectives'
   ]
 };
 
@@ -332,7 +367,7 @@ function removeLastItem() {
 }
 
 function clearAll() {
-  if (confirm('Êtes-vous sûr ? Cette action est irréversible.')) {
+  if (confirm('ÃŠtes-vous sÃ»r ? Cette action est irrÃ©versible.')) {
     plan = [];
     renderPlan();
   }
@@ -356,7 +391,7 @@ function exportMarkdown() {
 }
 
 function exportPDF() {
-  alert('📕 Fonctionnalité PDF : utilisez votre navigateur (Ctrl+P) pour imprimer en PDF, ou installez une extension PDF.');
+  alert('ðŸ“• FonctionnalitÃ© PDF : utilisez votre navigateur (Ctrl+P) pour imprimer en PDF, ou installez une extension PDF.');
 }
 
 function downloadFile(content, filename, type) {
@@ -373,9 +408,13 @@ function goBack() {
   window.location.href = '../dashboard/Connected_internate.html';
 }
 
-// Auth check
+const loadingOverlay = document.getElementById('loadingOverlay');
 const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
-if (!user.email) window.location.href = '../auth/Login_Internate.html';
+if (user.email) {
+  loadingOverlay.classList.add('hidden');
+} else {
+  window.location.href = '../auth/Login_Internate.html';
+}
 
 loadTemplate('dissertation');
 </script>
