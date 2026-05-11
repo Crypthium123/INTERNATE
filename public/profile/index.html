@@ -33,9 +33,10 @@
     background: var(--surface); border-right: 1px solid var(--border);
     position: fixed; height: 100vh;
     display: flex; flex-direction: column;
-    padding: 24px 14px; overflow-y: auto;
+    padding: 24px 14px; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none;
     z-index: 50; transition: transform 0.3s ease;
   }
+  .sidebar::-webkit-scrollbar { display: none; }
   .sidebar-logo {
     font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5rem;
     letter-spacing: -0.04em;

@@ -44,9 +44,12 @@
     position: fixed;
     height: 100vh;
     overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
     z-index: 10;
     animation: slideRight 0.4s ease both;
   }
+  .sidebar::-webkit-scrollbar { display: none; }
 
   @keyframes slideRight {
     from { transform: translateX(-100%); opacity: 0; }

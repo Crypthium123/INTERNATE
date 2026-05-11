@@ -43,7 +43,10 @@
     position: fixed;
     height: 100vh;
     overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
+  .sidebar::-webkit-scrollbar { display: none; }
 
   .sidebar-logo {
     font-family: 'Syne', sans-serif;
@@ -438,9 +441,12 @@
     max-width: 94vw;
     max-height: 90vh;
     overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
     padding: 32px;
     animation: modalIn 0.25s ease both;
   }
+  .modal::-webkit-scrollbar { display: none; }
 
   @keyframes modalIn {
     from { opacity: 0; transform: scale(0.95) translateY(10px); }

@@ -162,8 +162,11 @@
     padding: 60px 80px;
     position: relative;
     overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
     animation: fadeIn 0.6s ease both;
   }
+  .right-panel::-webkit-scrollbar { display: none; }
 
   .right-panel::before {
     content: '';
@@ -422,7 +425,8 @@
   }
 
   @media (max-width: 900px) {
-    body { grid-template-columns: 1fr; overflow-y: auto; }
+    body { grid-template-columns: 1fr; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; }
+    body::-webkit-scrollbar { display: none; }
     .left-panel { display: none; }
     .right-panel { padding: 40px 24px; }
     .right-panel::before { display: none; }

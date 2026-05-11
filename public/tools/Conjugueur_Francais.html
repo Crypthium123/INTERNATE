@@ -65,9 +65,8 @@
     display:flex; flex-direction:column; gap:4px;
     max-height:60vh; overflow-y:auto;
   }
-  .verb-list::-webkit-scrollbar { width:4px; }
-  .verb-list::-webkit-scrollbar-track { background:transparent; }
-  .verb-list::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
+  .verb-list::-webkit-scrollbar { display:none; }
+  .verb-list { scrollbar-width:none; -ms-overflow-style:none; }
   .verb-btn {
     padding:8px 14px; background:transparent; border:none;
     border-radius:6px; color:var(--text); cursor:pointer;
