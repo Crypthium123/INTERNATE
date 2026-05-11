@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fabricateur de Fiches â€” Internate</title>
+<title>Fabricateur de Fiches — Internate</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
@@ -310,31 +310,31 @@
 </div>
 <div class="tool-topbar">
   <a href="../dashboard/Connected_internate.html">Internate</a>
-  <span class="sep">â€º</span>
+  <span class="sep">›</span>
   <a href="../courses/Ressources_ex.html">Cours</a>
-  <span class="sep">â€º</span>
+  <span class="sep">›</span>
   <span class="current">Fiches</span>
 </div>
 
 <div class="container">
-  <h1>ðŸ—‚ï¸ Fabricateur de Fiches de RÃ©vision</h1>
+  <h1>🗂️ Fabricateur de Fiches de Révision</h1>
   
   <div class="creator">
     <div class="form-row">
       <div class="form-group">
         <label>Titre de la fiche</label>
-        <input type="text" id="ficheName" placeholder="ex: PhotosynthÃ¨se">
+        <input type="text" id="ficheName" placeholder="ex: Photosynthèse">
       </div>
       <div class="form-group">
-        <label>MatiÃ¨re</label>
+        <label>Matière</label>
         <select id="subject">
-          <option>MathÃ©matiques</option>
+          <option>Mathématiques</option>
           <option>Physique</option>
           <option>Chimie</option>
           <option>SVT</option>
           <option>Histoire</option>
-          <option>GÃ©ographie</option>
-          <option>FranÃ§ais</option>
+          <option>Géographie</option>
+          <option>Français</option>
           <option>Anglais</option>
           <option>Espagnol</option>
           <option>Philosophie</option>
@@ -355,17 +355,17 @@
     
     <div class="form-group" style="margin-bottom: 16px;">
       <label>Contenu (recto-verso)</label>
-      <textarea id="fichContent" placeholder="Ã‰cris ton contenu ici. Utilise | pour sÃ©parer recto et verso.&#10;&#10;Exemple:&#10;Recto: DÃ©finition du photosynthÃ¨se | Verso: Processus de transformation de la lumiÃ¨re en Ã©nergie chimique"></textarea>
+      <textarea id="fichContent" placeholder="Écris ton contenu ici. Utilise | pour séparer recto et verso.&#10;&#10;Exemple:&#10;Recto: Définition du photosynthèse | Verso: Processus de transformation de la lumière en énergie chimique"></textarea>
     </div>
     
     <div class="btn-group">
-      <button class="btn" onclick="createFiche()">âž• CrÃ©er la fiche</button>
-      <button class="btn secondary" onclick="exportAllPDF()">ðŸ“• Exporter en PDF</button>
-      <button class="btn secondary" onclick="goBack()">â† Retour au dashboard</button>
+      <button class="btn" onclick="createFiche()">➕ Créer la fiche</button>
+      <button class="btn secondary" onclick="exportAllPDF()">📕 Exporter en PDF</button>
+      <button class="btn secondary" onclick="goBack()">← Retour au dashboard</button>
     </div>
   </div>
   
-  <div class="section-title">ðŸ“š Vos fiches</div>
+  <div class="section-title">📚 Vos fiches</div>
   <div class="fiches-grid" id="fichesContainer"></div>
 </div>
 
@@ -385,7 +385,7 @@ function createFiche() {
   const content = document.getElementById('fichContent').value;
   
   if (!name || !content) {
-    alert('âš ï¸ Remplis le titre et le contenu');
+    alert('⚠️ Remplis le titre et le contenu');
     return;
   }
   
@@ -416,12 +416,12 @@ function renderFiches() {
     div.style.background = fiche.color;
     div.style.color = 'white';
     div.innerHTML = `
-      <button class="fiche-delete" onclick="deleteFiche(${fiche.id})">âœ•</button>
+      <button class="fiche-delete" onclick="deleteFiche(${fiche.id})">✕</button>
       <div class="fiche-back">
         <div class="fiche-subject">${fiche.subject}</div>
         <div class="fiche-title">${fiche.name}</div>
         <div class="fiche-content">${fiche.recto}</div>
-        <div class="fiche-hint">Cliquez pour retourner â†’</div>
+        <div class="fiche-hint">Cliquez pour retourner →</div>
       </div>
       <div class="fiche-front">
         <div class="fiche-content">${fiche.verso}</div>
@@ -446,10 +446,10 @@ function deleteFiche(id) {
 
 function exportAllPDF() {
   if (fiches.length === 0) {
-    alert('ðŸ“š Vous n\'avez pas de fiches Ã  exporter');
+    alert('📚 Vous n\'avez pas de fiches à exporter');
     return;
   }
-  alert('ðŸ“• FonctionnalitÃ© PDF : appuyez sur Ctrl+P (ou Cmd+P) pour imprimer vos fiches en PDF depuis cette page.');
+  alert('📕 Fonctionnalité PDF : appuyez sur Ctrl+P (ou Cmd+P) pour imprimer vos fiches en PDF depuis cette page.');
 }
 
 function goBack() {

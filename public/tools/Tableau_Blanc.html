@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tableau Blanc â€” Internate</title>
+<title>Tableau Blanc — Internate</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
@@ -198,20 +198,20 @@
 </div>
 <div class="tool-topbar">
   <a href="../dashboard/Connected_internate.html">Internate</a>
-  <span class="sep">â€º</span>
+  <span class="sep">›</span>
   <a href="../courses/Ressources_ex.html">Cours</a>
-  <span class="sep">â€º</span>
+  <span class="sep">›</span>
   <span class="current">Tableau Blanc</span>
 </div>
 
 <div class="toolbar">
-  <h1>ðŸŽ¨ Tableau Blanc</h1>
+  <h1>🎨 Tableau Blanc</h1>
   
-  <div class="tool" onclick="selectTool('pen')" id="penTool">âœï¸ Crayon</div>
-  <div class="tool" onclick="selectTool('line')">ðŸ“ Ligne</div>
-  <div class="tool" onclick="selectTool('rect')">â–­ Rectangle</div>
-  <div class="tool" onclick="selectTool('circle')">â— Cercle</div>
-  <div class="tool" onclick="selectTool('eraser')">ðŸ§¹ Gomme</div>
+  <div class="tool" onclick="selectTool('pen')" id="penTool">✏️ Crayon</div>
+  <div class="tool" onclick="selectTool('line')">📐 Ligne</div>
+  <div class="tool" onclick="selectTool('rect')">▭ Rectangle</div>
+  <div class="tool" onclick="selectTool('circle')">● Cercle</div>
+  <div class="tool" onclick="selectTool('eraser')">🧹 Gomme</div>
   
   <div class="tool-separator"></div>
   
@@ -226,10 +226,10 @@
   
   <div class="tool-separator"></div>
   
-  <button onclick="undo()">â†¶ Annuler</button>
-  <button onclick="clearCanvas()" class="danger">ðŸ—‘ï¸ Effacer tout</button>
-  <button onclick="downloadDrawing()">ðŸ’¾ TÃ©lÃ©charger</button>
-  <button onclick="goBack()">â† Retour au dashboard</button>
+  <button onclick="undo()">↶ Annuler</button>
+  <button onclick="clearCanvas()" class="danger">🗑️ Effacer tout</button>
+  <button onclick="downloadDrawing()">💾 Télécharger</button>
+  <button onclick="goBack()">← Retour au dashboard</button>
 </div>
 
 <canvas id="canvas"></canvas>
@@ -323,7 +323,7 @@ function undo() {
 }
 
 function clearCanvas() {
-  if (confirm('ÃŠtes-vous sÃ»r ?')) {
+  if (confirm('Êtes-vous sûr ?')) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     states = [];
   }
