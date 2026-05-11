@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cours & Ressources — Internate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #09090f;
+    --surface: #11111c;
+    --surface2: #1a1a2e;
+    --border: rgba(255,255,255,0.07);
+    --accent: #6c63ff;
+    --accent2: #00d4aa;
+    --accent3: #ff6b6b;
+    --accent4: #ffa94d;
+    --text: #e8e8f0;
+    --muted: #6b6b8a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 28px 16px;
+    position: fixed;
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  .sidebar-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.4rem;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, #6c63ff, #00d4aa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    padding: 0 12px;
+    margin-bottom: 36px;
+    text-decoration: none;
+  }
+
+  .nav-section-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0 12px;
+    margin-bottom: 8px;
+    margin-top: 24px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--muted);
+    font-size: 0.88rem;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+
+  .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+  .nav-item.active { color: var(--accent); background: rgba(108,99,255,0.1); }
+  .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .avatar {
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .user-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+  }
+
+  .user-info strong { display: block; font-size: 0.85rem; font-weight: 600; }
+  .user-info span { font-size: 0.72rem; color: var(--muted); }
+
+  .logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    color: var(--muted);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 4px;
+    border: none;
+    background: none;
+    width: 100%;
+  }
+  .logout-btn:hover { color: var(--accent3); background: rgba(255,107,107,0.08); }
+
+  /* MAIN */
+  .main {
+    margin-left: 240px;
+    flex: 1;
+    padding: 40px 48px;
+    animation: fadeIn 0.5s ease both;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* PAGE HEADER */
+  .page-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 40px;
+  }
+
+  .page-header h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 2rem;
+    letter-spacing: -0.03em;
+    margin-bottom: 6px;
+  }
+
+  .page-header p { color: var(--muted); font-size: 0.9rem; }
+
+  .btn-upload {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 20px;
+    background: var(--accent);
+    border: none;
+    border-radius: 9px;
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.87rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 0 20px rgba(108,99,255,0.3);
+  }
+  .btn-upload:hover {
+    background: #7c74ff;
+    box-shadow: 0 0 30px rgba(108,99,255,0.5);
+    transform: translateY(-1px);
+  }
+
+  /* FILTER TABS */
+  .filter-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+  }
+
+  .tab {
+    padding: 7px 16px;
+    border-radius: 100px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .tab:hover { color: var(--text); border-color: rgba(255,255,255,0.15); }
+  .tab.active { background: var(--accent); border-color: var(--accent); color: white; }
+
+  /* GRID */
+  .cours-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+
+  .cours-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.25s;
+    display: block;
+    cursor: pointer;
+    animation: cardIn 0.4s ease both;
+  }
+
+  @keyframes cardIn {
+    from { opacity: 0; transform: scale(0.97); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .cours-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+    border-color: rgba(255,255,255,0.12);
+  }
+
+  .cours-thumb {
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cours-thumb-bg {
+    position: absolute;
+    inset: 0;
+    opacity: 0.15;
+    background-size: 20px 20px;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px);
+  }
+
+  .download-badge {
+    position: absolute;
+    top: 12px; right: 12px;
+    padding: 4px 10px;
+    background: rgba(0,0,0,0.6);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 100px;
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.8);
+    backdrop-filter: blur(8px);
+  }
+
+  .cours-body { padding: 18px 20px; }
+
+  .cours-matiere {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .cours-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    font-size: 0.92rem;
+    margin-bottom: 14px;
+    line-height: 1.35;
+  }
+
+  .cours-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .meta-tag {
+    padding: 3px 9px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 100px;
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+
+  .cours-footer {
+    padding: 12px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .dl-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--accent);
+    text-decoration: none;
+    transition: gap 0.2s;
+  }
+  .cours-card:hover .dl-btn { gap: 8px; }
+
+  /* SECTION TOOLS */
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: -0.02em;
+    margin-bottom: 18px;
+    margin-top: 48px;
+  }
+
+  .tools-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+  }
+
+  .tool-pill {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--text);
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+
+  .tool-pill:hover {
+    background: var(--surface2);
+    border-color: rgba(255,255,255,0.12);
+    transform: translateX(3px);
+  }
+
+  .tool-pill .pill-icon {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+
+  /* ---- FILTER DROPDOWNS ---- */
+  .filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 28px;
+    align-items: center;
+  }
+
+  .filter-select {
+    padding: 9px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    cursor: pointer;
+    min-width: 150px;
+    transition: border-color 0.2s;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%236b6b8a' d='M1.41.59L6 5.17 10.59.59 12 2l-6 6-6-6z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 34px;
+  }
+  .filter-select:hover { border-color: rgba(255,255,255,0.15); }
+  .filter-select:focus { outline: none; border-color: var(--accent); }
+
+  .filter-select option { background: var(--surface); color: var(--text); }
+
+  .filter-reset {
+    padding: 9px 16px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .filter-reset:hover { color: var(--text); border-color: rgba(255,255,255,0.15); }
+
+  .filter-count {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-left: auto;
+  }
+
+  /* ---- MODAL ---- */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(6px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.show { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    width: 520px;
+    max-width: 94vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 32px;
+    animation: modalIn 0.25s ease both;
+  }
+
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+
+  .modal-header h2 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.2rem;
+  }
+
+  .modal-close {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 1.4rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: all 0.2s;
+  }
+  .modal-close:hover { color: var(--text); background: rgba(255,255,255,0.06); }
+
+  .form-group {
+    margin-bottom: 16px;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 10px 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.87rem;
+    transition: border-color 0.2s;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .form-group textarea {
+    resize: vertical;
+    min-height: 70px;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 24px;
+  }
+
+  .btn-primary {
+    padding: 10px 22px;
+    background: var(--accent);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.87rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-primary:hover { background: #7c74ff; transform: translateY(-1px); }
+
+  .btn-secondary {
+    padding: 10px 22px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.87rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-secondary:hover { color: var(--text); border-color: rgba(255,255,255,0.15); }
+
+  /* ---- DELETE BTN ON CARD ---- */
+  .cours-card { position: relative; }
+  .delete-btn {
+    position: absolute;
+    top: 10px; right: 10px;
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--accent3);
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.2s;
+    z-index: 2;
+    backdrop-filter: blur(4px);
+  }
+  .cours-card:hover .delete-btn { opacity: 1; }
+  .delete-btn:hover { background: rgba(255,107,107,0.2); border-color: var(--accent3); }
+
+  /* ---- CONDITIONAL FIELDS ---- */
+  .conditional-field {
+    display: none;
+  }
+  .conditional-field.show {
+    display: block;
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <a href="../dashboard/Connected_internate.html" class="sidebar-logo">Internate</a>
+
+  <div class="nav-section-label">Principal</div>
+  <a class="nav-item" href="../dashboard/Connected_internate.html">
+    <span class="nav-icon">🏠</span> Dashboard
+  </a>
+  <a class="nav-item active" href="#">
+    <span class="nav-icon">📚</span> Mes cours
+  </a>
+
+  <div class="nav-section-label">Outils</div>
+  <a class="nav-item" href="../tools/Calculatrice_Scientifique.html">
+    <span class="nav-icon">🧮</span> Calculatrice
+  </a>
+  <a class="nav-item" href="../tools/Convertisseur_Unites.html">
+    <span class="nav-icon">📊</span> Convertisseur
+  </a>
+  <a class="nav-item" href="../tools/Fabricateur_Fiches.html">
+    <span class="nav-icon">🗂️</span> Fiches
+  </a>
+  <a class="nav-item" href="../tools/Generateur_QCM.html">
+    <span class="nav-icon">📋</span> QCM
+  </a>
+  <a class="nav-item" href="../tools/Minuteur_Pomodoro.html">
+    <span class="nav-icon">⏱️</span> Pomodoro
+  </a>
+  <a class="nav-item" href="../tools/Redacteur_Plan.html">
+    <span class="nav-icon">📝</span> Plan
+  </a>
+  <a class="nav-item" href="../tools/Tableau_Blanc.html">
+    <span class="nav-icon">🎨</span> Tableau Blanc
+  </a>
+
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="avatar" id="avatarEl">?</div>
+      <div class="user-info">
+        <strong id="userNameEl">Utilisateur</strong>
+        <span id="userEmailEl">—</span>
+      </div>
+    </div>
+    <button class="logout-btn" onclick="logout()">
+      <span>🚪</span> Se déconnecter
+    </button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="page-header">
+    <div>
+      <h1>Cours & Ressources</h1>
+      <p>Tous les cours mis à disposition par ta classe</p>
+    </div>
+    <button class="btn-upload">
+      ＋ Ajouter un cours
+    </button>
+  </div>
+
+  <!-- FILTRES -->
+  <div class="filter-bar">
+    <select class="filter-select" id="filterFiliere" onchange="applyFilters()">
+      <option value="">Toutes filières</option>
+      <option value="generale">Générale</option>
+      <option value="technologique">Technologique</option>
+    </select>
+    <select class="filter-select" id="filterAnnee" onchange="applyFilters()">
+      <option value="">Toutes années</option>
+      <option value="2nde">2nde</option>
+      <option value="1ere">1ère</option>
+      <option value="terminale">Terminale</option>
+    </select>
+    <select class="filter-select" id="filterSpecialite" onchange="applyFilters()">
+      <option value="">Toutes spécialités/séries</option>
+    </select>
+    <select class="filter-select" id="filterMatiere" onchange="applyFilters()">
+      <option value="">Toutes matières</option>
+    </select>
+    <button class="filter-reset" onclick="resetFilters()">Réinitialiser</button>
+    <span class="filter-count" id="filterCount">0 cours</span>
+  </div>
+
+  <!-- COURS -->
+  <div class="cours-grid" id="coursGrid"></div>
+
+  <!-- OUTILS -->
+  <div class="section-title">Accès rapide aux outils</div>
+  <div class="tools-row">
+    <a class="tool-pill" href="../tools/Calculatrice_Scientifique.html">
+      <span class="pill-icon">🧮</span> Calculatrice
+    </a>
+    <a class="tool-pill" href="../tools/Convertisseur_Unites.html">
+      <span class="pill-icon">📊</span> Convertisseur
+    </a>
+    <a class="tool-pill" href="../tools/Fabricateur_Fiches.html">
+      <span class="pill-icon">🗂️</span> Fiches
+    </a>
+    <a class="tool-pill" href="../tools/Generateur_QCM.html">
+      <span class="pill-icon">📋</span> QCM
+    </a>
+    <a class="tool-pill" href="../tools/Minuteur_Pomodoro.html">
+      <span class="pill-icon">⏱️</span> Pomodoro
+    </a>
+    <a class="tool-pill" href="../tools/Redacteur_Plan.html">
+      <span class="pill-icon">📝</span> Plan
+    </a>
+    <a class="tool-pill" href="../tools/Tableau_Blanc.html">
+      <span class="pill-icon">🎨</span> Tableau Blanc
+    </a>
+  </div>
+
+  <!-- MODAL AJOUTER COURS -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Ajouter un cours</h2>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <div class="form-group">
+        <label>Titre du cours</label>
+        <input type="text" id="formTitle" placeholder="Ex: Thème 7 — Vecteurs" required>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Filière</label>
+          <select id="formFiliere" onchange="updateFormSpecialite()">
+            <option value="">Sélectionner…</option>
+            <option value="generale">Générale</option>
+            <option value="technologique">Technologique</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Année</label>
+          <select id="formAnnee" onchange="updateFormSpecialite()">
+            <option value="">Sélectionner…</option>
+            <option value="2nde">2nde</option>
+            <option value="1ere">1ère</option>
+            <option value="terminale">Terminale</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group conditional-field" id="formSpecialiteGroup">
+        <label id="formSpecialiteLabel">Spécialité / Série</label>
+        <select id="formSpecialite"></select>
+      </div>
+      <div class="form-group">
+        <label>Matière</label>
+        <select id="formMatiere">
+          <option value="">Sélectionner…</option>
+          <option value="mathematiques">Mathématiques</option>
+          <option value="physique-chimie">Physique-Chimie</option>
+          <option value="francais">Français</option>
+          <option value="histoire-geo">Histoire-Géographie</option>
+          <option value="anglais">Anglais</option>
+          <option value="espagnol">Espagnol</option>
+          <option value="allemand">Allemand</option>
+          <option value="svt">SVT</option>
+          <option value="nsi">NSI</option>
+          <option value="ses">SES</option>
+          <option value="philosophie">Philosophie</option>
+          <option value="arts">Arts</option>
+          <option value="eps">EPS</option>
+          <option value="autre">Autre</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Description (optionnelle)</label>
+        <textarea id="formDescription" placeholder="Description du cours…"></textarea>
+      </div>
+      <div class="form-group">
+        <label>URL du fichier (optionnelle)</label>
+        <input type="text" id="formFileUrl" placeholder="https://exemple.com/cours.pdf">
+      </div>
+      <div class="form-group">
+        <label>Nom du fichier (optionnel)</label>
+        <input type="text" id="formFileName" placeholder="cours-vecteurs.pdf">
+      </div>
+      <div class="form-actions">
+        <button class="btn-secondary" onclick="closeModal()">Annuler</button>
+        <button class="btn-primary" onclick="addCourse()">Ajouter le cours</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Firebase SDK (compat) -->
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+
+<script src="../js/firebase-config.js"></script>
+
+<script>
+  // Auth check
+  const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+  if (!user.email) window.location.href = '../auth/Login_Internate.html';
+
+  const initials = (user.prenom?.[0] || '?') + (user.nom?.[0] || '');
+  document.getElementById('avatarEl').textContent = initials.toUpperCase();
+  document.getElementById('userNameEl').textContent = `${user.prenom || ''} ${user.nom || ''}`.trim();
+  document.getElementById('userEmailEl').textContent = user.email || '';
+
+  function logout() {
+    auth.signOut().then(() => {
+      localStorage.removeItem('currentUser');
+      window.location.href = '../auth/Login_Internate.html';
+    });
+  }
+
+  // ---- DATA ----
+  const STORAGE_KEY = 'internate_courses';
+
+  const SPECIALITES_GENERALE = {
+    '1ere': [
+      'Histoire Géographie, Géopolitique et Sciences politiques',
+      'Humanités, Littérature et Philosophie',
+      'Langues, Littératures et Cultures Étrangères',
+      'Littérature, Langues et Cultures de l\'Antiquité',
+      'Mathématiques',
+      'Numérique et Sciences Informatiques',
+      'Sciences de la vie et de la Terre',
+      'Sciences de l\'ingénieur',
+      'Sciences Économiques et Sociales',
+      'Physique Chimie',
+      'Arts : Histoire des arts, Théâtre, Arts Plastiques, Arts du Spectacle',
+      'Biologie Écologie (uniquement dans les lycées agricoles)',
+      'Éducation Physique, Pratiques et Culture Sportives'
+    ],
+    'terminale': [
+      'Histoire Géographie, Géopolitique et Sciences politiques',
+      'Humanités, Littérature et Philosophie',
+      'Langues, Littératures et Cultures Étrangères',
+      'Littérature, Langues et Cultures de l\'Antiquité',
+      'Mathématiques',
+      'Numérique et Sciences Informatiques',
+      'Sciences de la vie et de la Terre',
+      'Sciences de l\'ingénieur',
+      'Sciences Économiques et Sociales',
+      'Physique Chimie',
+      'Arts : Histoire des arts, Théâtre, Arts Plastiques, Arts du Spectacle',
+      'Biologie Écologie (uniquement dans les lycées agricoles)',
+      'Éducation Physique, Pratiques et Culture Sportives'
+    ]
+  };
+
+  const SERIES_TECHNOLOGIQUE = {
+    '1ere': ['STMG', 'ST2S', 'STHR', 'STI2D', 'STL', 'STD2A', 'S2TMD', 'STAV'],
+    'terminale': ['STMG', 'ST2S', 'STHR', 'STI2D', 'STL', 'STD2A', 'S2TMD', 'STAV']
+  };
+
+  const MATIERES = [
+    { value: 'mathematiques', label: 'Mathématiques', icon: '📐', color: '#6c63ff' },
+    { value: 'physique-chimie', label: 'Physique-Chimie', icon: '🧪', color: '#00d4aa' },
+    { value: 'francais', label: 'Français', icon: '📖', color: '#ffa94d' },
+    { value: 'histoire-geo', label: 'Histoire-Géographie', icon: '🌍', color: '#a78bfa' },
+    { value: 'anglais', label: 'Anglais', icon: '🇬🇧', color: '#ff6b6b' },
+    { value: 'espagnol', label: 'Espagnol', icon: '🇪🇸', color: '#f97316' },
+    { value: 'allemand', label: 'Allemand', icon: '🇩🇪', color: '#eab308' },
+    { value: 'svt', label: 'SVT', icon: '🌿', color: '#22c55e' },
+    { value: 'nsi', label: 'NSI', icon: '💻', color: '#3b82f6' },
+    { value: 'ses', label: 'SES', icon: '📊', color: '#ec4899' },
+    { value: 'philosophie', label: 'Philosophie', icon: '🤔', color: '#8b5cf6' },
+    { value: 'arts', label: 'Arts', icon: '🎨', color: '#f472b6' },
+    { value: 'eps', label: 'EPS', icon: '🏃', color: '#14b8a6' },
+    { value: 'autre', label: 'Autre', icon: '📁', color: '#6b7280' }
+  ];
+
+  function getCourses() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch { return []; }
+  }
+
+  function saveCourses(courses) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(courses));
+  }
+
+  // ---- MODAL ----
+  function openModal() {
+    document.getElementById('modalOverlay').classList.add('show');
+    document.getElementById('formTitle').focus();
+  }
+
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('show');
+    document.getElementById('formTitle').value = '';
+    document.getElementById('formFiliere').value = '';
+    document.getElementById('formAnnee').value = '';
+    document.getElementById('formSpecialite').innerHTML = '';
+    document.getElementById('formSpecialiteGroup').classList.remove('show');
+    document.getElementById('formMatiere').value = '';
+    document.getElementById('formDescription').value = '';
+    document.getElementById('formFileUrl').value = '';
+    document.getElementById('formFileName').value = '';
+  }
+
+  document.getElementById('modalOverlay').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) closeModal();
+  });
+
+  function updateFormSpecialite() {
+    const filiere = document.getElementById('formFiliere').value;
+    const annee = document.getElementById('formAnnee').value;
+    const group = document.getElementById('formSpecialiteGroup');
+    const select = document.getElementById('formSpecialite');
+    const label = document.getElementById('formSpecialiteLabel');
+
+    select.innerHTML = '';
+    group.classList.remove('show');
+
+    if (!filiere || !annee || annee === '2nde') return;
+
+    let options = [];
+    if (filiere === 'generale' && SPECIALITES_GENERALE[annee]) {
+      options = SPECIALITES_GENERALE[annee];
+      label.textContent = 'Spécialité';
+    } else if (filiere === 'technologique' && SERIES_TECHNOLOGIQUE[annee]) {
+      options = SERIES_TECHNOLOGIQUE[annee];
+      label.textContent = 'Série';
+    }
+
+    if (options.length) {
+      group.classList.add('show');
+      select.innerHTML = '<option value="">Sélectionner…</option>' +
+        options.map(o => `<option value="${o}">${o}</option>`).join('');
+    }
+  }
+
+  // ---- CRUD ----
+  function addCourse() {
+    const title = document.getElementById('formTitle').value.trim();
+    const filiere = document.getElementById('formFiliere').value;
+    const annee = document.getElementById('formAnnee').value;
+    const specialite = document.getElementById('formSpecialite').value;
+    const matiere = document.getElementById('formMatiere').value;
+    const description = document.getElementById('formDescription').value.trim();
+    const fileUrl = document.getElementById('formFileUrl').value.trim();
+    const fileName = document.getElementById('formFileName').value.trim();
+
+    if (!title) { alert('Veuillez saisir un titre.'); return; }
+    if (!filiere) { alert('Veuillez sélectionner une filière.'); return; }
+    if (!annee) { alert('Veuillez sélectionner une année.'); return; }
+    if (!matiere) { alert('Veuillez sélectionner une matière.'); return; }
+
+    const specialiteGroup = document.getElementById('formSpecialiteGroup');
+    if (specialiteGroup.classList.contains('show') && !specialite) {
+      const label = document.getElementById('formSpecialiteLabel').textContent;
+      alert(`Veuillez sélectionner une ${label.toLowerCase()}.`);
+      return;
+    }
+
+    const courses = getCourses();
+    const matiereObj = MATIERES.find(m => m.value === matiere) || MATIERES[MATIERES.length - 1];
+
+    courses.push({
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      title,
+      filiere,
+      annee,
+      specialite,
+      matiere,
+      matiereLabel: matiereObj.label,
+      matiereIcon: matiereObj.icon,
+      matiereColor: matiereObj.color,
+      description,
+      fileUrl,
+      fileName: fileName || (fileUrl ? fileUrl.split('/').pop() : ''),
+      dateAdded: new Date().toISOString()
+    });
+
+    saveCourses(courses);
+    closeModal();
+    renderCourses();
+  }
+
+  function deleteCourse(id) {
+    if (!confirm('Supprimer ce cours ?')) return;
+    const courses = getCourses().filter(c => c.id !== id);
+    saveCourses(courses);
+    renderCourses();
+  }
+
+  // ---- FILTERS ----
+  function applyFilters() {
+    renderCourses();
+    updateFilterSpecialite();
+  }
+
+  function updateFilterSpecialite() {
+    const filiere = document.getElementById('filterFiliere').value;
+    const annee = document.getElementById('filterAnnee').value;
+    const select = document.getElementById('filterSpecialite');
+    const currentVal = select.value;
+
+    select.innerHTML = '<option value="">Toutes spécialités/séries</option>';
+
+    if (filiere === 'generale' && annee && annee !== '2nde' && SPECIALITES_GENERALE[annee]) {
+      select.innerHTML += SPECIALITES_GENERALE[annee].map(s => `<option value="${s}">${s}</option>`).join('');
+    } else if (filiere === 'technologique' && annee && annee !== '2nde' && SERIES_TECHNOLOGIQUE[annee]) {
+      select.innerHTML += SERIES_TECHNOLOGIQUE[annee].map(s => `<option value="${s}">${s}</option>`).join('');
+    }
+
+    if (currentVal) select.value = currentVal;
+  }
+
+  function resetFilters() {
+    document.getElementById('filterFiliere').value = '';
+    document.getElementById('filterAnnee').value = '';
+    document.getElementById('filterSpecialite').innerHTML = '<option value="">Toutes spécialités/séries</option>';
+    document.getElementById('filterMatiere').value = '';
+    renderCourses();
+  }
+
+  // ---- RENDER ----
+  function renderCourses() {
+    const grid = document.getElementById('coursGrid');
+    const countEl = document.getElementById('filterCount');
+    const allCourses = getCourses();
+
+    const filiere = document.getElementById('filterFiliere').value;
+    const annee = document.getElementById('filterAnnee').value;
+    const specialite = document.getElementById('filterSpecialite').value;
+    const matiere = document.getElementById('filterMatiere').value;
+
+    let filtered = allCourses;
+    if (filiere) filtered = filtered.filter(c => c.filiere === filiere);
+    if (annee) filtered = filtered.filter(c => c.annee === annee);
+    if (specialite) filtered = filtered.filter(c => c.specialite === specialite);
+    if (matiere) filtered = filtered.filter(c => c.matiere === matiere);
+
+    countEl.textContent = `${filtered.length} cours`;
+
+    if (!filtered.length) {
+      grid.innerHTML = `
+        <div class="empty-state" style="grid-column: 1 / -1; text-align:center; padding:60px 20px; color:var(--muted);">
+          <div style="font-size:3rem; margin-bottom:16px;">📭</div>
+          <p style="font-size:0.9rem;">Aucun cours trouvé.</p>
+          <p style="font-size:0.85rem; margin-top:8px;">Ajoute un cours ou modifie tes filtres.</p>
+        </div>`;
+      return;
+    }
+
+    const matiereColors = {};
+    MATIERES.forEach(m => { matiereColors[m.value] = m.color; });
+
+    let filiereLabel = { 'generale': 'Générale', 'technologique': 'Technologique' };
+    let anneeLabel = { '2nde': '2nde', '1ere': '1ère', 'terminale': 'Terminale' };
+
+    grid.innerHTML = filtered.map(c => {
+      const color = matiereColors[c.matiere] || '#6c63ff';
+      const icon = c.matiereIcon || '📁';
+      const fl = filiereLabel[c.filiere] || c.filiere;
+      const al = anneeLabel[c.annee] || c.annee;
+      const spec = c.specialite ? `<span class="meta-tag">${c.specialite}</span>` : '';
+
+      const metaTags = `<span class="meta-tag">${fl}</span><span class="meta-tag">${al}</span>${spec}`;
+
+      const fileSection = c.fileUrl
+        ? `<div class="cours-footer">
+             <span style="font-size:0.75rem; color:var(--muted);">${c.fileName || 'Fichier'}</span>
+             <a href="${c.fileUrl}" target="_blank" class="dl-btn" onclick="event.stopPropagation()">Télécharger →</a>
+           </div>`
+        : '';
+
+      return `
+        <div class="cours-card" style="cursor:default;">
+          <button class="delete-btn" onclick="deleteCourse('${c.id}')" title="Supprimer">✕</button>
+          <div class="cours-thumb" style="background: linear-gradient(135deg, ${color}22, ${color}44);">
+            <div class="cours-thumb-bg"></div>
+            <span style="position:relative; z-index:1;">${icon}</span>
+            <div class="download-badge">${fl}</div>
+          </div>
+          <div class="cours-body">
+            <div class="cours-matiere" style="color:${color}">${c.matiereLabel || c.matiere}</div>
+            <div class="cours-title">${c.title}</div>
+            ${c.description ? `<p style="font-size:0.78rem; color:var(--muted); margin-bottom:12px; line-height:1.4;">${c.description}</p>` : ''}
+            <div class="cours-meta">${metaTags}</div>
+          </div>
+          ${fileSection}
+        </div>`;
+    }).join('');
+  }
+
+  // ---- INIT ----
+  document.querySelector('.btn-upload').addEventListener('click', openModal);
+
+  // Populate matière filter
+  const matiereFilter = document.getElementById('filterMatiere');
+  MATIERES.forEach(m => {
+    const opt = document.createElement('option');
+    opt.value = m.value;
+    opt.textContent = m.label;
+    matiereFilter.appendChild(opt);
+  });
+
+  renderCourses();
+</script>
+</body>
+</html>

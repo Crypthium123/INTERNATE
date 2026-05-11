@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Convertisseur d'Unités — Internate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #09090f;
+    --surface: #11111c;
+    --surface2: #1a1a2e;
+    --border: rgba(255,255,255,0.07);
+    --accent: #6c63ff;
+    --accent2: #00d4aa;
+    --text: #e8e8f0;
+    --muted: #6b6b8a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    padding: 40px 20px;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.2rem;
+    margin-bottom: 32px;
+  }
+
+  .converters {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 24px;
+  }
+
+  .converter {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+
+  .converter h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.2rem;
+    margin-bottom: 16px;
+    color: var(--accent);
+  }
+
+  .converter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .input-group {
+    display: flex;
+    gap: 8px;
+  }
+
+  input {
+    flex: 1;
+    padding: 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 0.95rem;
+  }
+
+  input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(108,99,255,0.1);
+  }
+
+  select {
+    padding: 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 0.95rem;
+    cursor: pointer;
+  }
+
+  select:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .result {
+    background: rgba(108,99,255,0.1);
+    border: 1px solid rgba(108,99,255,0.2);
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--accent);
+  }
+
+  .back-btn {
+    margin-top: 32px;
+    padding: 12px 24px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+
+  .back-btn:hover {
+    background: rgba(255,255,255,0.05);
+  }
+
+  @media (max-width: 600px) {
+    .converters { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>📊 Convertisseur d'Unités</h1>
+  
+  <div class="converters">
+    <!-- Longueur -->
+    <div class="converter">
+      <h2>📏 Longueur</h2>
+      <div class="converter-group">
+        <div class="input-group">
+          <input type="number" id="length1" placeholder="Valeur" oninput="convertLength()">
+          <select id="lengthFrom" onchange="convertLength()">
+            <option>m</option>
+            <option>cm</option>
+            <option>mm</option>
+            <option>km</option>
+            <option>mi</option>
+            <option>yd</option>
+            <option>ft</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <input type="number" id="length2" placeholder="Résultat" readonly>
+          <select id="lengthTo" onchange="convertLength()">
+            <option>cm</option>
+            <option>m</option>
+            <option>mm</option>
+            <option>km</option>
+            <option>mi</option>
+            <option>yd</option>
+            <option>ft</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Masse -->
+    <div class="converter">
+      <h2>⚖️ Masse</h2>
+      <div class="converter-group">
+        <div class="input-group">
+          <input type="number" id="mass1" placeholder="Valeur" oninput="convertMass()">
+          <select id="massFrom" onchange="convertMass()">
+            <option>kg</option>
+            <option>g</option>
+            <option>mg</option>
+            <option>lb</option>
+            <option>oz</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <input type="number" id="mass2" placeholder="Résultat" readonly>
+          <select id="massTo" onchange="convertMass()">
+            <option>g</option>
+            <option>kg</option>
+            <option>mg</option>
+            <option>lb</option>
+            <option>oz</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Température -->
+    <div class="converter">
+      <h2>🌡️ Température</h2>
+      <div class="converter-group">
+        <div class="input-group">
+          <input type="number" id="temp1" placeholder="Valeur" oninput="convertTemp()">
+          <select id="tempFrom" onchange="convertTemp()">
+            <option>°C</option>
+            <option>°F</option>
+            <option>K</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <input type="number" id="temp2" placeholder="Résultat" readonly>
+          <select id="tempTo" onchange="convertTemp()">
+            <option>°F</option>
+            <option>°C</option>
+            <option>K</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vitesse -->
+    <div class="converter">
+      <h2>🚀 Vitesse</h2>
+      <div class="converter-group">
+        <div class="input-group">
+          <input type="number" id="speed1" placeholder="Valeur" oninput="convertSpeed()">
+          <select id="speedFrom" onchange="convertSpeed()">
+            <option>m/s</option>
+            <option>km/h</option>
+            <option>mi/h</option>
+            <option>ft/s</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <input type="number" id="speed2" placeholder="Résultat" readonly>
+          <select id="speedTo" onchange="convertSpeed()">
+            <option>km/h</option>
+            <option>m/s</option>
+            <option>mi/h</option>
+            <option>ft/s</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Volume -->
+    <div class="converter">
+      <h2>🧪 Volume</h2>
+      <div class="converter-group">
+        <div class="input-group">
+          <input type="number" id="volume1" placeholder="Valeur" oninput="convertVolume()">
+          <select id="volumeFrom" onchange="convertVolume()">
+            <option>L</option>
+            <option>mL</option>
+            <option>m³</option>
+            <option>gal</option>
+            <option>fl oz</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <input type="number" id="volume2" placeholder="Résultat" readonly>
+          <select id="volumeTo" onchange="convertVolume()">
+            <option>mL</option>
+            <option>L</option>
+            <option>m³</option>
+            <option>gal</option>
+            <option>fl oz</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Énergie -->
+    <div class="converter">
+      <h2>⚡ Énergie</h2>
+      <div class="converter-group">
+        <div class="input-group">
+          <input type="number" id="energy1" placeholder="Valeur" oninput="convertEnergy()">
+          <select id="energyFrom" onchange="convertEnergy()">
+            <option>J</option>
+            <option>kJ</option>
+            <option>cal</option>
+            <option>kcal</option>
+            <option>Wh</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <input type="number" id="energy2" placeholder="Résultat" readonly>
+          <select id="energyTo" onchange="convertEnergy()">
+            <option>kJ</option>
+            <option>J</option>
+            <option>cal</option>
+            <option>kcal</option>
+            <option>Wh</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <button class="back-btn" onclick="goBack()">← Retour au dashboard</button>
+</div>
+
+<script>
+const lengthFactors = { m: 1, cm: 0.01, mm: 0.001, km: 1000, mi: 1609.34, yd: 0.9144, ft: 0.3048 };
+const massFactors = { kg: 1, g: 0.001, mg: 0.000001, lb: 0.453592, oz: 0.0283495 };
+const speedFactors = { 'm/s': 1, 'km/h': 0.277778, 'mi/h': 0.44704, 'ft/s': 0.3048 };
+const volumeFactors = { L: 1, mL: 0.001, m³: 1000, gal: 3.78541, 'fl oz': 0.0295735 };
+const energyFactors = { J: 1, kJ: 1000, cal: 4.184, kcal: 4184, Wh: 3600 };
+
+function convert(val, fromFactor, toFactor) {
+  return val * fromFactor / toFactor;
+}
+
+function convertLength() {
+  const val = parseFloat(document.getElementById('length1').value);
+  if (!isNaN(val)) {
+    const from = lengthFactors[document.getElementById('lengthFrom').value];
+    const to = lengthFactors[document.getElementById('lengthTo').value];
+    document.getElementById('length2').value = (convert(val, from, to)).toFixed(4);
+  }
+}
+
+function convertMass() {
+  const val = parseFloat(document.getElementById('mass1').value);
+  if (!isNaN(val)) {
+    const from = massFactors[document.getElementById('massFrom').value];
+    const to = massFactors[document.getElementById('massTo').value];
+    document.getElementById('mass2').value = (convert(val, from, to)).toFixed(4);
+  }
+}
+
+function convertTemp() {
+  const val = parseFloat(document.getElementById('temp1').value);
+  if (!isNaN(val)) {
+    const from = document.getElementById('tempFrom').value;
+    const to = document.getElementById('tempTo').value;
+    let result = val;
+    
+    if (from === '°C' && to === '°F') result = val * 9/5 + 32;
+    else if (from === '°F' && to === '°C') result = (val - 32) * 5/9;
+    else if (from === '°C' && to === 'K') result = val + 273.15;
+    else if (from === 'K' && to === '°C') result = val - 273.15;
+    else if (from === '°F' && to === 'K') result = (val - 32) * 5/9 + 273.15;
+    else if (from === 'K' && to === '°F') result = (val - 273.15) * 9/5 + 32;
+    
+    document.getElementById('temp2').value = result.toFixed(2);
+  }
+}
+
+function convertSpeed() {
+  const val = parseFloat(document.getElementById('speed1').value);
+  if (!isNaN(val)) {
+    const from = speedFactors[document.getElementById('speedFrom').value];
+    const to = speedFactors[document.getElementById('speedTo').value];
+    document.getElementById('speed2').value = (convert(val, from, to)).toFixed(4);
+  }
+}
+
+function convertVolume() {
+  const val = parseFloat(document.getElementById('volume1').value);
+  if (!isNaN(val)) {
+    const from = volumeFactors[document.getElementById('volumeFrom').value];
+    const to = volumeFactors[document.getElementById('volumeTo').value];
+    document.getElementById('volume2').value = (convert(val, from, to)).toFixed(4);
+  }
+}
+
+function convertEnergy() {
+  const val = parseFloat(document.getElementById('energy1').value);
+  if (!isNaN(val)) {
+    const from = energyFactors[document.getElementById('energyFrom').value];
+    const to = energyFactors[document.getElementById('energyTo').value];
+    document.getElementById('energy2').value = (convert(val, from, to)).toFixed(4);
+  }
+}
+
+function goBack() {
+  window.location.href = '../dashboard/Connected_internate.html';
+}
+
+// Auth check
+const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+if (!user.email) window.location.href = '../auth/Login_Internate.html';
+</script>
+</body>
+</html>

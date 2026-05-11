@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculatrice Scientifique — Internate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #09090f;
+    --surface: #11111c;
+    --surface2: #1a1a2e;
+    --border: rgba(255,255,255,0.07);
+    --accent: #6c63ff;
+    --accent2: #00d4aa;
+    --text: #e8e8f0;
+    --muted: #6b6b8a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .calc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    max-width: 400px;
+    width: 100%;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .display {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+    text-align: right;
+    font-size: 1.8rem;
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    color: var(--accent);
+    word-break: break-all;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  .buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+
+  button {
+    padding: 14px 8px;
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    font-family: 'Syne', sans-serif;
+  }
+
+  button:hover {
+    background: rgba(108,99,255,0.15);
+    border-color: var(--accent);
+  }
+
+  button.operator {
+    background: rgba(108,99,255,0.2);
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  button.operator:hover {
+    background: rgba(108,99,255,0.35);
+  }
+
+  button.equals {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+    grid-column: span 2;
+  }
+
+  button.equals:hover {
+    background: #7c74ff;
+  }
+
+  button.clear {
+    background: rgba(255,107,107,0.2);
+    color: #ff6b6b;
+    border-color: #ff6b6b;
+    grid-column: span 2;
+  }
+
+  button.clear:hover {
+    background: rgba(255,107,107,0.35);
+  }
+
+  .back-btn {
+    width: 100%;
+    margin-top: 16px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  .back-btn:hover {
+    background: rgba(255,255,255,0.05);
+  }
+</style>
+</head>
+<body>
+
+<div class="calc">
+  <h1>🧮 Calculatrice Scientifique</h1>
+  <div class="display" id="display">0</div>
+  
+  <div class="buttons">
+    <button onclick="clear()">C</button>
+    <button class="operator" onclick="append('(')">( )</button>
+    <button class="operator" onclick="append('%')">%</button>
+    <button class="operator" onclick="append('/')">/</button>
+    
+    <button onclick="append('7')">7</button>
+    <button onclick="append('8')">8</button>
+    <button onclick="append('9')">9</button>
+    <button class="operator" onclick="append('*')">×</button>
+    
+    <button onclick="append('4')">4</button>
+    <button onclick="append('5')">5</button>
+    <button onclick="append('6')">6</button>
+    <button class="operator" onclick="append('-')">−</button>
+    
+    <button onclick="append('1')">1</button>
+    <button onclick="append('2')">2</button>
+    <button onclick="append('3')">3</button>
+    <button class="operator" onclick="append('+')">+</button>
+    
+    <button onclick="append('0')">0</button>
+    <button onclick="append('.')">.</button>
+    <button class="equals" onclick="calculate()">=</button>
+    
+    <button class="operator" onclick="appendFunc('sqrt')">√</button>
+    <button class="operator" onclick="appendFunc('pow')">x²</button>
+    <button class="operator" onclick="appendFunc('pow3')">x³</button>
+    <button class="operator" onclick="appendFunc('sin')">sin</button>
+    
+    <button class="operator" onclick="appendFunc('cos')">cos</button>
+    <button class="operator" onclick="appendFunc('tan')">tan</button>
+    <button class="operator" onclick="appendFunc('log')">log</button>
+    <button class="operator" onclick="appendFunc('ln')">ln</button>
+    
+    <button class="operator" onclick="append('π')" style="grid-column: span 2;">π</button>
+    <button class="operator" onclick="append('e')" style="grid-column: span 2;">e</button>
+    
+    <button class="clear" onclick="backspace()">← Effacer</button>
+    <button class="clear" onclick="goBack()">← Retour au dashboard</button>
+  </div>
+</div>
+
+<script>
+let display = document.getElementById('display');
+let current = '0';
+
+function updateDisplay() {
+  display.textContent = current.substring(0, 30) || '0';
+}
+
+function append(char) {
+  if (current === '0' && char !== '.') current = '';
+  if (char === '*') char = '×';
+  if (char === '-' && current.endsWith('(')) char = '−';
+  current += char;
+  updateDisplay();
+}
+
+function appendFunc(func) {
+  if (func === 'sqrt') current += '√(';
+  else if (func === 'pow') current += '^2';
+  else if (func === 'pow3') current += '^3';
+  else if (func === 'sin') current += 'sin(';
+  else if (func === 'cos') current += 'cos(';
+  else if (func === 'tan') current += 'tan(';
+  else if (func === 'log') current += 'log(';
+  else if (func === 'ln') current += 'ln(';
+  updateDisplay();
+}
+
+function backspace() {
+  current = current.slice(0, -1) || '0';
+  updateDisplay();
+}
+
+function clear() {
+  current = '0';
+  updateDisplay();
+}
+
+function calculate() {
+  try {
+    let expr = current
+      .replace(/×/g, '*')
+      .replace(/−/g, '-')
+      .replace(/√\(/g, 'Math.sqrt(')
+      .replace(/sin\(/g, 'Math.sin(')
+      .replace(/cos\(/g, 'Math.cos(')
+      .replace(/tan\(/g, 'Math.tan(')
+      .replace(/log\(/g, 'Math.log10(')
+      .replace(/ln\(/g, 'Math.log(')
+      .replace(/π/g, 'Math.PI')
+      .replace(/e/g, 'Math.E')
+      .replace(/\^2/g, '**2')
+      .replace(/\^3/g, '**3')
+      .replace(/\^/g, '**');
+    
+    const result = eval(expr);
+    current = String(result.toFixed(8)).replace(/\.?0+$/, '');
+    updateDisplay();
+  } catch (e) {
+    current = 'Erreur';
+    updateDisplay();
+    setTimeout(() => { current = '0'; updateDisplay(); }, 1500);
+  }
+}
+
+function goBack() {
+  window.location.href = '../dashboard/Connected_internate.html';
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key >= '0' && e.key <= '9') append(e.key);
+  if (e.key === '+' || e.key === '-' || e.key === '*' || e.key === '/') append(e.key);
+  if (e.key === '.') append(e.key);
+  if (e.key === 'Enter') calculate();
+  if (e.key === 'Backspace') backspace();
+  if (e.key === 'Escape') clear();
+});
+
+// Auth check
+const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+if (!user.email) window.location.href = '../auth/Login_Internate.html';
+
+updateDisplay();
+</script>
+</body>
+</html>

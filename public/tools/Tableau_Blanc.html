@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tableau Blanc — Internate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #09090f;
+    --surface: #11111c;
+    --surface2: #1a1a2e;
+    --border: rgba(255,255,255,0.07);
+    --accent: #6c63ff;
+    --text: #e8e8f0;
+    --muted: #6b6b8a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .toolbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 20px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .toolbar h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.3rem;
+    margin-right: auto;
+  }
+
+  .tool {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+  }
+
+  .tool:hover {
+    background: rgba(108,99,255,0.15);
+    border-color: var(--accent);
+  }
+
+  .tool.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
+
+  .tool-separator {
+    width: 1px;
+    height: 24px;
+    background: var(--border);
+  }
+
+  input[type="color"] {
+    width: 40px;
+    height: 32px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  input[type="range"] {
+    width: 100px;
+  }
+
+  .size-display {
+    font-size: 0.8rem;
+    color: var(--muted);
+    width: 40px;
+    text-align: center;
+  }
+
+  button {
+    padding: 8px 14px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  button:hover {
+    background: rgba(255,255,255,0.05);
+  }
+
+  button.danger {
+    color: #ff6b6b;
+    border-color: #ff6b6b;
+  }
+
+  button.danger:hover {
+    background: rgba(255,107,107,0.1);
+  }
+
+  #canvas {
+    flex: 1;
+    background: white;
+    cursor: crosshair;
+  }
+
+  @media (max-width: 768px) {
+    .toolbar {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .toolbar h1 {
+      margin-right: 0;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <h1>🎨 Tableau Blanc</h1>
+  
+  <div class="tool" onclick="selectTool('pen')" id="penTool">✏️ Crayon</div>
+  <div class="tool" onclick="selectTool('line')">📐 Ligne</div>
+  <div class="tool" onclick="selectTool('rect')">▭ Rectangle</div>
+  <div class="tool" onclick="selectTool('circle')">● Cercle</div>
+  <div class="tool" onclick="selectTool('eraser')">🧹 Gomme</div>
+  
+  <div class="tool-separator"></div>
+  
+  <label>Couleur:
+    <input type="color" id="colorPicker" value="#000000" onchange="setColor(this.value)">
+  </label>
+  
+  <label>Taille:
+    <input type="range" id="sizePicker" min="1" max="20" value="3" onchange="setSize(this.value)">
+    <span class="size-display" id="sizeDisplay">3</span>
+  </label>
+  
+  <div class="tool-separator"></div>
+  
+  <button onclick="undo()">↶ Annuler</button>
+  <button onclick="clearCanvas()" class="danger">🗑️ Effacer tout</button>
+  <button onclick="downloadDrawing()">💾 Télécharger</button>
+  <button onclick="goBack()">← Retour au dashboard</button>
+</div>
+
+<canvas id="canvas"></canvas>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight - 70;
+
+let isDrawing = false;
+let currentTool = 'pen';
+let currentColor = '#000000';
+let currentSize = 3;
+let lastX, lastY;
+let states = [];
+
+function saveState() {
+  states.push(canvas.toDataURL());
+}
+
+function selectTool(tool) {
+  currentTool = tool;
+  document.querySelectorAll('.tool').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  canvas.style.cursor = tool === 'eraser' ? 'grab' : 'crosshair';
+}
+
+function setColor(color) {
+  currentColor = color;
+}
+
+function setSize(size) {
+  currentSize = size;
+  document.getElementById('sizeDisplay').textContent = size;
+}
+
+canvas.addEventListener('mousedown', (e) => {
+  isDrawing = true;
+  saveState();
+  lastX = e.offsetX;
+  lastY = e.offsetY;
+});
+
+canvas.addEventListener('mousemove', (e) => {
+  if (!isDrawing) return;
+  
+  const x = e.offsetX;
+  const y = e.offsetY;
+  
+  ctx.strokeStyle = currentTool === 'eraser' ? 'white' : currentColor;
+  ctx.fillStyle = currentColor;
+  ctx.lineWidth = currentSize;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  
+  if (currentTool === 'pen' || currentTool === 'eraser') {
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+  }
+  
+  lastX = x;
+  lastY = y;
+});
+
+canvas.addEventListener('mouseup', () => {
+  isDrawing = false;
+});
+
+canvas.addEventListener('mouseleave', () => {
+  isDrawing = false;
+});
+
+function undo() {
+  if (states.length > 0) {
+    states.pop();
+    if (states.length > 0) {
+      const img = new Image();
+      img.src = states[states.length - 1];
+      img.onload = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0);
+      };
+    } else {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  }
+}
+
+function clearCanvas() {
+  if (confirm('Êtes-vous sûr ?')) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    states = [];
+  }
+}
+
+function downloadDrawing() {
+  const link = document.createElement('a');
+  link.download = `dessin-${Date.now()}.png`;
+  link.href = canvas.toDataURL();
+  link.click();
+}
+
+function goBack() {
+  window.location.href = '../dashboard/Connected_internate.html';
+}
+
+// Auth check
+const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+if (!user.email) window.location.href = '../auth/Login_Internate.html';
+
+window.addEventListener('resize', () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight - 70;
+});
+
+selectTool('pen');
+</script>
+</body>
+</html>

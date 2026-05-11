@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rédacteur de Plan — Internate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #09090f;
+    --surface: #11111c;
+    --surface2: #1a1a2e;
+    --border: rgba(255,255,255,0.07);
+    --accent: #6c63ff;
+    --accent2: #00d4aa;
+    --text: #e8e8f0;
+    --muted: #6b6b8a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 20px;
+    padding: 20px;
+  }
+
+  .sidebar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    height: fit-content;
+    position: sticky;
+    top: 20px;
+  }
+
+  .sidebar h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.2rem;
+    margin-bottom: 16px;
+    color: var(--accent);
+  }
+
+  .template-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .template-btn {
+    padding: 12px 16px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+    font-size: 0.9rem;
+  }
+
+  .template-btn:hover, .template-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+
+  .editor {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+
+  .editor h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.8rem;
+    margin-bottom: 12px;
+  }
+
+  .editor input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    margin-bottom: 24px;
+    font-size: 1rem;
+  }
+
+  .plan-container {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 16px;
+    min-height: 400px;
+    margin-bottom: 24px;
+  }
+
+  .plan-item {
+    padding: 12px;
+    margin: 8px 0 8px 20px;
+    border-left: 2px solid var(--accent);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .plan-item:hover {
+    background: rgba(108,99,255,0.1);
+    border-left-width: 4px;
+  }
+
+  .plan-item input {
+    background: transparent;
+    border: none;
+    color: var(--text);
+    width: 100%;
+    font-size: 0.95rem;
+    padding: 0;
+  }
+
+  .btn-group {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  button {
+    padding: 12px 20px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+
+  button:hover {
+    background: #7c74ff;
+    transform: translateY(-2px);
+  }
+
+  button.secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  button.secondary:hover {
+    background: rgba(255,255,255,0.05);
+  }
+
+  .export-options {
+    display: flex;
+    gap: 8px;
+  }
+
+  @media (max-width: 768px) {
+    body { grid-template-columns: 1fr; }
+    .sidebar { position: static; }
+  }
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <h2>📝 Modèles</h2>
+  <div class="template-list">
+    <button class="template-btn active" onclick="loadTemplate('dissertation')">📚 Dissertation</button>
+    <button class="template-btn" onclick="loadTemplate('compte_rendu')">📋 Compte-rendu</button>
+    <button class="template-btn" onclick="loadTemplate('rapport_tp')">🔬 Rapport de TP</button>
+    <button class="template-btn" onclick="loadTemplate('expose')">🎤 Exposé</button>
+    <button class="template-btn" onclick="loadTemplate('analyse')">📊 Analyse</button>
+  </div>
+</div>
+
+<div class="editor">
+  <h1>Rédacteur de Plan</h1>
+  <input type="text" id="title" placeholder="Titre de votre travail…" value="">
+  
+  <div class="plan-container" id="planContainer"></div>
+  
+  <div class="btn-group">
+    <button onclick="addItem()">➕ Ajouter une section</button>
+    <button class="secondary" onclick="removeLastItem()">❌ Supprimer la dernière</button>
+    <button class="secondary" onclick="clearAll()">🗑️ Vider le plan</button>
+  </div>
+  
+  <h3 style="margin-top: 32px; margin-bottom: 12px;">📥 Exporter</h3>
+  <div class="btn-group">
+    <button onclick="exportTXT()">📄 Télécharger .TXT</button>
+    <button onclick="exportMarkdown()">📝 Télécharger .MD</button>
+    <button onclick="exportPDF()">📕 Télécharger .PDF</button>
+    <button class="secondary" onclick="goBack()">← Retour au dashboard</button>
+  </div>
+</div>
+
+<script>
+const templates = {
+  dissertation: [
+    'Introduction',
+    'I. Premier argument',
+    '  A. Sous-point 1',
+    '  B. Sous-point 2',
+    'II. Deuxième argument',
+    '  A. Sous-point 1',
+    '  B. Sous-point 2',
+    'III. Troisième argument',
+    '  A. Sous-point 1',
+    '  B. Sous-point 2',
+    'Conclusion'
+  ],
+  compte_rendu: [
+    'Objectif',
+    'Matériel utilisé',
+    'Protocole',
+    'Résultats',
+    '  A. Observation 1',
+    '  B. Observation 2',
+    'Analyse',
+    'Conclusion'
+  ],
+  rapport_tp: [
+    'Titre du TP',
+    'Date et groupe',
+    'Objectifs',
+    'Théorie',
+    'Protocole expérimental',
+    'Observations et mesures',
+    'Résultats',
+    'Discussion',
+    'Conclusion',
+    'Références'
+  ],
+  expose: [
+    'Introduction / Accroche',
+    'Contexte et définitions',
+    'I. Point principal 1',
+    'II. Point principal 2',
+    'III. Point principal 3',
+    'Conclusion et synthèse',
+    'Questions/Discussion'
+  ],
+  analyse: [
+    'Présentation du sujet',
+    'Contexte historique/scientifique',
+    'I. Premier axe d\'analyse',
+    '  A. Aspect 1',
+    '  B. Aspect 2',
+    'II. Deuxième axe d\'analyse',
+    '  A. Aspect 1',
+    '  B. Aspect 2',
+    'III. Troisième axe d\'analyse',
+    'Synthèse et perspectives'
+  ]
+};
+
+let plan = [];
+
+function loadTemplate(type) {
+  plan = [...templates[type]];
+  document.querySelectorAll('.template-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  renderPlan();
+}
+
+function renderPlan() {
+  const container = document.getElementById('planContainer');
+  container.innerHTML = '';
+  plan.forEach((item, idx) => {
+    const div = document.createElement('div');
+    const level = (item.match(/^ */)[0].length) / 2;
+    div.className = 'plan-item';
+    div.style.marginLeft = (level * 20) + 'px';
+    div.innerHTML = `<input type="text" value="${item.trim()}" onchange="updateItem(${idx}, this.value)">`;
+    container.appendChild(div);
+  });
+}
+
+function updateItem(idx, value) {
+  const indent = plan[idx].match(/^ */)[0];
+  plan[idx] = indent + value;
+}
+
+function addItem() {
+  plan.push('Nouvelle section');
+  renderPlan();
+}
+
+function removeLastItem() {
+  plan.pop();
+  renderPlan();
+}
+
+function clearAll() {
+  if (confirm('Êtes-vous sûr ? Cette action est irréversible.')) {
+    plan = [];
+    renderPlan();
+  }
+}
+
+function exportTXT() {
+  const title = document.getElementById('title').value || 'Plan';
+  let content = title + '\n' + '='.repeat(title.length) + '\n\n';
+  content += plan.join('\n');
+  downloadFile(content, title + '.txt', 'text/plain');
+}
+
+function exportMarkdown() {
+  const title = document.getElementById('title').value || 'Plan';
+  let content = '# ' + title + '\n\n';
+  content += plan.map(item => {
+    const level = (item.match(/^ */)[0].length) / 2 + 1;
+    return '#'.repeat(level) + ' ' + item.trim();
+  }).join('\n');
+  downloadFile(content, title + '.md', 'text/markdown');
+}
+
+function exportPDF() {
+  alert('📕 Fonctionnalité PDF : utilisez votre navigateur (Ctrl+P) pour imprimer en PDF, ou installez une extension PDF.');
+}
+
+function downloadFile(content, filename, type) {
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function goBack() {
+  window.location.href = '../dashboard/Connected_internate.html';
+}
+
+// Auth check
+const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+if (!user.email) window.location.href = '../auth/Login_Internate.html';
+
+loadTemplate('dissertation');
+</script>
+</body>
+</html>

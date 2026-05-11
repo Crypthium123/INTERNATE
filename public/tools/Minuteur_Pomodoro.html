@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minuteur Pomodoro — Internate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #09090f;
+    --surface: #11111c;
+    --surface2: #1a1a2e;
+    --border: rgba(255,255,255,0.07);
+    --accent: #6c63ff;
+    --accent2: #00d4aa;
+    --accent3: #ff6b6b;
+    --text: #e8e8f0;
+    --muted: #6b6b8a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .container {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px;
+    max-width: 500px;
+    width: 100%;
+    text-align: center;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    margin-bottom: 32px;
+  }
+
+  .timer-display {
+    font-family: 'Syne', sans-serif;
+    font-size: 4rem;
+    font-weight: 700;
+    margin: 32px 0;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .status {
+    font-size: 1rem;
+    color: var(--accent2);
+    font-weight: 600;
+    margin-bottom: 24px;
+  }
+
+  .controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  button {
+    padding: 14px 20px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+  }
+
+  button:hover {
+    background: #7c74ff;
+    transform: translateY(-2px);
+  }
+
+  button.stop {
+    background: var(--accent3);
+  }
+
+  button.stop:hover {
+    background: #ff7c7c;
+  }
+
+  button.secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+    grid-column: 1 / -1;
+  }
+
+  button.secondary:hover {
+    background: rgba(255,255,255,0.05);
+  }
+
+  .settings {
+    background: var(--surface2);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+    border: 1px solid var(--border);
+  }
+
+  .setting-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 12px;
+  }
+
+  .setting-row:last-child {
+    margin-bottom: 0;
+  }
+
+  .setting-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  input {
+    padding: 10px 12px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-size: 0.9rem;
+  }
+
+  input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .stats {
+    background: rgba(108,99,255,0.08);
+    border: 1px solid rgba(108,99,255,0.15);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  .stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    font-size: 0.95rem;
+  }
+
+  .stat-value {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  @media (max-width: 600px) {
+    .container { padding: 24px; }
+    .timer-display { font-size: 3rem; }
+    .controls { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>⏱️ Minuteur Pomodoro</h1>
+  <p class="subtitle">Optimise ton temps d'étude</p>
+  
+  <div class="settings">
+    <div class="setting-row">
+      <div class="setting-group">
+        <label>Travail (min)</label>
+        <input type="number" id="workTime" value="25" min="1" max="60">
+      </div>
+      <div class="setting-group">
+        <label>Pause (min)</label>
+        <input type="number" id="breakTime" value="5" min="1" max="30">
+      </div>
+    </div>
+    <div class="setting-row">
+      <div class="setting-group">
+        <label>Pause longue (min)</label>
+        <input type="number" id="longBreakTime" value="15" min="1" max="60">
+      </div>
+      <div class="setting-group">
+        <label>Sessions avant pause</label>
+        <input type="number" id="sessionsBeforeLong" value="4" min="1" max="10">
+      </div>
+    </div>
+  </div>
+  
+  <div class="timer-display" id="timerDisplay">25:00</div>
+  <div class="status" id="status">⏸️ Prêt à démarrer</div>
+  
+  <div class="controls">
+    <button onclick="startTimer()">▶️ Démarrer</button>
+    <button onclick="pauseTimer()">⏸️ Pause</button>
+    <button class="stop" onclick="resetTimer()">🔄 Réinitialiser</button>
+  </div>
+  
+  <div class="stats">
+    <div class="stat-item">
+      <span>Sessions complétées</span>
+      <span class="stat-value" id="sessionsCompleted">0</span>
+    </div>
+    <div class="stat-item">
+      <span>Temps total travaillé</span>
+      <span class="stat-value" id="totalWorked">0h</span>
+    </div>
+  </div>
+  
+  <button class="secondary" onclick="goBack()">← Retour au dashboard</button>
+</div>
+
+<script>
+let timeLeft = 25 * 60;
+let isRunning = false;
+let isWorkTime = true;
+let sessionCount = 0;
+let totalMinutesWorked = 0;
+let timerInterval;
+
+const settings = {
+  workTime: 25,
+  breakTime: 5,
+  longBreakTime: 15,
+  sessionsBeforeLong: 4
+};
+
+function updateSettings() {
+  settings.workTime = parseInt(document.getElementById('workTime').value);
+  settings.breakTime = parseInt(document.getElementById('breakTime').value);
+  settings.longBreakTime = parseInt(document.getElementById('longBreakTime').value);
+  settings.sessionsBeforeLong = parseInt(document.getElementById('sessionsBeforeLong').value);
+  updateDisplay();
+}
+
+function updateDisplay() {
+  const mins = Math.floor(timeLeft / 60);
+  const secs = timeLeft % 60;
+  document.getElementById('timerDisplay').textContent = 
+    `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+}
+
+function startTimer() {
+  if (isRunning) return;
+  isRunning = true;
+  document.getElementById('status').textContent = isWorkTime ? '📚 En travail...' : '☕ En pause...';
+  
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateDisplay();
+    
+    if (timeLeft <= 0) {
+      completePhase();
+    }
+  }, 1000);
+}
+
+function pauseTimer() {
+  isRunning = false;
+  clearInterval(timerInterval);
+  document.getElementById('status').textContent = '⏸️ En pause';
+}
+
+function resetTimer() {
+  pauseTimer();
+  isWorkTime = true;
+  timeLeft = settings.workTime * 60;
+  updateDisplay();
+  document.getElementById('status').textContent = '🔄 Réinitialisé';
+}
+
+function completePhase() {
+  clearInterval(timerInterval);
+  isRunning = false;
+  
+  if (isWorkTime) {
+    sessionCount++;
+    totalMinutesWorked += settings.workTime;
+    document.getElementById('sessionsCompleted').textContent = sessionCount;
+    document.getElementById('totalWorked').textContent = Math.floor(totalMinutesWorked / 60) + 'h';
+    
+    // Déterminer le type de pause
+    const isLongBreak = sessionCount % settings.sessionsBeforeLong === 0;
+    const breakDuration = isLongBreak ? settings.longBreakTime : settings.breakTime;
+    
+    playSound();
+    alert(`✅ Bonne session ! ${isLongBreak ? 'Pause longue de ' + breakDuration + ' min' : 'Pause courte de ' + breakDuration + ' min'}`);
+    
+    isWorkTime = false;
+    timeLeft = breakDuration * 60;
+  } else {
+    playSound();
+    alert('☕ Pause terminée ! Nouvelle session ?');
+    isWorkTime = true;
+    timeLeft = settings.workTime * 60;
+  }
+  
+  updateDisplay();
+  document.getElementById('status').textContent = isWorkTime ? '📚 Prêt pour une session' : '☕ Pause terminée';
+}
+
+function playSound() {
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.frequency.value = 800;
+  osc.type = 'sine';
+  gain.gain.setValueAtTime(0.3, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+  osc.start(ctx.currentTime);
+  osc.stop(ctx.currentTime + 0.5);
+}
+
+function goBack() {
+  window.location.href = '../dashboard/Connected_internate.html';
+}
+
+// Auth check
+const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+if (!user.email) window.location.href = '../auth/Login_Internate.html';
+
+// Charger statistiques depuis localStorage
+const saved = JSON.parse(localStorage.getItem('pomodoroStats') || '{}');
+if (saved.sessions) {
+  sessionCount = saved.sessions;
+  totalMinutesWorked = saved.totalMinutes;
+  document.getElementById('sessionsCompleted').textContent = sessionCount;
+  document.getElementById('totalWorked').textContent = Math.floor(totalMinutesWorked / 60) + 'h';
+}
+
+window.addEventListener('beforeunload', () => {
+  localStorage.setItem('pomodoroStats', JSON.stringify({ sessions: sessionCount, totalMinutes: totalMinutesWorked }));
+});
+
+document.querySelectorAll('input').forEach(inp => {
+  inp.addEventListener('change', updateSettings);
+});
+
+updateDisplay();
+</script>
+</body>
+</html>

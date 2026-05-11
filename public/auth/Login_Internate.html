@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connexion — Internate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #09090f;
+    --surface: #11111c;
+    --surface2: #1a1a2e;
+    --border: rgba(255,255,255,0.08);
+    --accent: #6c63ff;
+    --accent2: #00d4aa;
+    --text: #e8e8f0;
+    --muted: #6b6b8a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    overflow: hidden;
+  }
+
+  /* ---- LEFT PANEL ---- */
+  .left-panel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 40px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .left-panel::before {
+    content: '';
+    position: absolute;
+    top: -200px; left: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(108,99,255,0.15), transparent 70%);
+    pointer-events: none;
+    animation: orbFloat 12s ease-in-out infinite;
+  }
+
+  .left-panel::after {
+    content: '';
+    position: absolute;
+    bottom: -150px; right: -100px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(0,212,170,0.1), transparent 70%);
+    pointer-events: none;
+    animation: orbFloat 15s ease-in-out infinite reverse;
+  }
+
+  @keyframes orbFloat {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(20px, -20px); }
+  }
+
+  .panel-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.6rem;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, #6c63ff, #00d4aa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    position: relative;
+    z-index: 1;
+    text-decoration: none;
+  }
+
+  .panel-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+    padding: 60px 20px;
+  }
+
+  .panel-content h2 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 2.4rem;
+    letter-spacing: -0.04em;
+    line-height: 1.2;
+    margin-bottom: 20px;
+  }
+
+  .panel-content h2 em {
+    font-style: normal;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .panel-content p {
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    margin-bottom: 48px;
+  }
+
+  .feature-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .feature-pill {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 0.88rem;
+    color: var(--text);
+    transition: all 0.3s;
+    animation: slideRight 0.6s ease both;
+  }
+
+  .feature-pill:nth-child(1) { animation-delay: 0.1s; }
+  .feature-pill:nth-child(2) { animation-delay: 0.2s; }
+  .feature-pill:nth-child(3) { animation-delay: 0.3s; }
+
+  @keyframes slideRight {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .feature-pill .pill-icon {
+    font-size: 1.1rem;
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(108,99,255,0.12);
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+
+  /* ---- RIGHT PANEL (FORM) ---- */
+  .right-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 80px;
+    position: relative;
+    animation: fadeIn 0.6s ease both;
+  }
+
+  .right-panel::before {
+    content: '';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(108,99,255,0.06), transparent 70%);
+    pointer-events: none;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .form-container {
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .form-header {
+    margin-bottom: 48px;
+  }
+
+  .form-header h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 2rem;
+    letter-spacing: -0.03em;
+    margin-bottom: 8px;
+  }
+
+  .form-header p {
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  .form-header p a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  input[type="email"],
+  input[type="password"],
+  input[type="text"] {
+    width: 100%;
+    padding: 14px 18px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    transition: all 0.25s;
+    outline: none;
+  }
+
+  input[type="email"]:focus,
+  input[type="password"]:focus,
+  input[type="text"]:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(108,99,255,0.15);
+    background: var(--surface2);
+  }
+
+  input::placeholder { color: var(--muted); opacity: 0.7; }
+
+  .input-hint {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  .forgot-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 6px;
+  }
+
+  .forgot-row a {
+    font-size: 0.8rem;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .forgot-row a:hover { color: var(--accent); }
+
+  .btn-submit {
+    width: 100%;
+    padding: 15px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s;
+    margin-top: 32px;
+    box-shadow: 0 0 30px rgba(108,99,255,0.4);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-submit::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent, rgba(255,255,255,0.1), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.4s;
+  }
+
+  .btn-submit:hover {
+    background: #7c74ff;
+    box-shadow: 0 0 50px rgba(108,99,255,0.7);
+    transform: translateY(-2px);
+  }
+
+  .btn-submit:hover::before {
+    transform: translateX(100%);
+  }
+
+  .btn-submit:active { transform: translateY(0); }
+
+  .btn-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+
+  .error-message {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: rgba(255,107,107,0.1);
+    border: 1px solid rgba(255,107,107,0.2);
+    border-radius: 8px;
+    color: #ff6b6b;
+    font-size: 0.85rem;
+    margin-top: 16px;
+    animation: shake 0.4s ease;
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    75% { transform: translateX(8px); }
+  }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 32px 0;
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .register-btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    text-align: center;
+    text-decoration: none;
+    font-size: 0.88rem;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+  .register-btn:hover {
+    background: rgba(255,255,255,0.04);
+    border-color: rgba(255,255,255,0.15);
+  }
+
+  .success-banner {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 18px;
+    background: rgba(0,212,170,0.1);
+    border: 1px solid rgba(0,212,170,0.25);
+    border-radius: 10px;
+    color: var(--accent2);
+    font-size: 0.88rem;
+    margin-bottom: 24px;
+    animation: slideDown 0.5s ease;
+  }
+  .success-banner .check-icon {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: rgba(0,212,170,0.2);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-size: 1rem;
+  }
+
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .btn-google {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 14px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 12px;
+  }
+  .btn-google:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.2);
+    transform: translateY(-1px);
+  }
+  .btn-google .g-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 768px) {
+    body { grid-template-columns: 1fr; }
+    .left-panel { display: none; }
+    .right-panel { padding: 40px 30px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LEFT -->
+<div class="left-panel">
+  <a href="index.html" class="panel-logo">Internate</a>
+  <div class="panel-content">
+    <h2>Bon retour<br>sur <em>Internate</em> 👋</h2>
+    <p>Connecte-toi pour accéder à tes cours, tes outils de révision et l'espace de partage de ta classe.</p>
+    <div class="feature-list">
+      <div class="feature-pill">
+        <div class="pill-icon">📚</div>
+        Accès à tous tes cours & ressources PDF
+      </div>
+      <div class="feature-pill">
+        <div class="pill-icon">🔧</div>
+        Outils de révision intégrés
+      </div>
+      <div class="feature-pill">
+        <div class="pill-icon">🤝</div>
+        Espace collaboratif avec ta classe
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RIGHT (FORM) -->
+<div class="right-panel">
+  <div class="form-container">
+    <div class="form-header">
+      <h1>Connexion</h1>
+      <p>Pas encore de compte ? <a href="Register_internate.html">S'inscrire →</a></p>
+    </div>
+
+    <div id="loginForm">
+      <div class="success-banner" id="successBanner">
+        <span class="check-icon">✅</span>
+        <span>Compte créé avec succès ! Connecte-toi avec tes identifiants.</span>
+      </div>
+
+      <div class="form-group">
+        <label>Adresse email</label>
+        <input type="email" id="email" placeholder="ton@email.com" required>
+      </div>
+      <div class="form-group">
+        <label>Mot de passe</label>
+        <input type="password" id="password" placeholder="••••••••" required>
+        <div class="forgot-row"><a href="#">Mot de passe oublié ?</a></div>
+      </div>
+
+      <button class="btn-submit" onclick="handleLogin()">Se connecter</button>
+
+      <div class="error-message" id="errorMessage">
+        <span>⚠️</span>
+        <span>Email ou mot de passe incorrect. Vérifie tes identifiants.</span>
+      </div>
+    </div>
+
+    <div class="divider">ou</div>
+    <button class="btn-google" onclick="handleGoogleLogin()">
+      <svg class="g-icon" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.54 28.59A14.5 14.5 0 0 1 9.5 24c0-1.59.28-3.14.76-4.59l-7.98-6.19A23.99 23.99 0 0 0 0 24c0 3.77.87 7.35 2.56 10.56l7.98-5.97z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 5.97C6.51 42.62 14.62 48 24 48z"/></svg>
+      Continuer avec Google
+    </button>
+    <a href="Register_internate.html" class="register-btn">Créer un compte Internate</a>
+  </div>
+</div>
+
+<!-- Firebase SDK (compat) -->
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+
+<script src="../js/firebase-config.js"></script>
+
+<script>
+  async function handleLogin() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const errorDiv = document.getElementById("errorMessage");
+
+    if (!email || !password) return;
+
+    try {
+      const userCredential = await auth.signInWithEmailAndPassword(email, password);
+
+      localStorage.setItem("currentUser", JSON.stringify({
+        uid: userCredential.user.uid,
+        email: userCredential.user.email
+      }));
+
+      try {
+        const userDoc = await db.collection("users").doc(userCredential.user.uid).get();
+        if (userDoc.exists) {
+          localStorage.setItem("currentUser", JSON.stringify({
+            uid: userCredential.user.uid,
+            email: userCredential.user.email,
+            ...userDoc.data()
+          }));
+        }
+      } catch (e) {
+        console.warn("Firestore indisponible, connexion sans profil:", e.message);
+      }
+
+      window.location.href = "../dashboard/Connected_internate.html";
+    } catch (error) {
+      if (error.code === "auth/user-not-found" || error.code === "auth/wrong-password" || error.code === "auth/invalid-credential") {
+        errorDiv.style.display = "flex";
+      } else {
+        alert("Erreur de connexion: " + error.message);
+      }
+      console.error("Erreur de connexion:", error.message);
+    }
+  }
+
+  async function handleGoogleLogin() {
+    try {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      const result = await auth.signInWithPopup(provider);
+      const user = result.user;
+
+      localStorage.setItem("currentUser", JSON.stringify({
+        uid: user.uid,
+        email: user.email,
+        prenom: user.displayName ? user.displayName.split(' ')[0] : '',
+        nom: user.displayName ? user.displayName.split(' ').slice(1).join(' ') : ''
+      }));
+
+      try {
+        const userDoc = await db.collection("users").doc(user.uid).get();
+        if (userDoc.exists) {
+          const data = userDoc.data();
+          localStorage.setItem("currentUser", JSON.stringify({
+            uid: user.uid, email: user.email, ...data
+          }));
+        } else {
+          await db.collection("users").doc(user.uid).set({
+            email: user.email,
+            prenom: user.displayName ? user.displayName.split(' ')[0] : '',
+            nom: user.displayName ? user.displayName.split(' ').slice(1).join(' ') : '',
+            photoURL: user.photoURL || '',
+            createdAt: new Date(),
+            role: "student"
+          });
+        }
+      } catch (e) {
+        console.warn("Firestore indisponible, connexion sans profil:", e.message);
+      }
+
+      window.location.href = "../dashboard/Connected_internate.html";
+    } catch (error) {
+      console.error("Erreur Google:", error.message);
+      alert("Erreur lors de la connexion avec Google: " + error.message);
+    }
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') handleLogin();
+  });
+
+  document.querySelectorAll('input').forEach(inp => {
+    inp.addEventListener('input', () => {
+      document.getElementById("errorMessage").style.display = "none";
+    });
+  });
+
+  if (new URLSearchParams(window.location.search).get('registered') === 'true') {
+    document.getElementById('successBanner').style.display = 'flex';
+  }
+</script>
+</body>
+</html>

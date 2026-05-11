@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Internate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #09090f;
+    --surface: #11111c;
+    --surface2: #1a1a2e;
+    --surface3: rgba(255,255,255,0.03);
+    --border: rgba(255,255,255,0.07);
+    --accent: #6c63ff;
+    --accent2: #00d4aa;
+    --accent3: #ff6b6b;
+    --accent4: #ffa94d;
+    --text: #e8e8f0;
+    --muted: #6b6b8a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+  }
+
+  /* ---- SIDEBAR ---- */
+  .sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 28px 16px;
+    position: fixed;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 10;
+    animation: slideRight 0.4s ease both;
+  }
+
+  @keyframes slideRight {
+    from { transform: translateX(-100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+
+  .sidebar-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.4rem;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, #6c63ff, #00d4aa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    padding: 0 12px;
+    margin-bottom: 36px;
+  }
+
+  .nav-section-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0 12px;
+    margin-bottom: 8px;
+    margin-top: 24px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--muted);
+    font-size: 0.88rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    cursor: pointer;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+  }
+
+  .nav-item:hover {
+    color: var(--text);
+    background: rgba(255,255,255,0.05);
+  }
+
+  .nav-item.active {
+    color: var(--accent);
+    background: rgba(108,99,255,0.1);
+  }
+
+  .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .user-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .user-card:hover { background: rgba(255,255,255,0.04); }
+
+  .avatar {
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .user-info strong {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .user-info span {
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+
+  .logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    color: var(--muted);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 4px;
+    border: none;
+    background: none;
+    width: 100%;
+  }
+  .logout-btn:hover { color: var(--accent3); background: rgba(255,107,107,0.08); }
+
+  /* ---- MAIN ---- */
+  .main {
+    margin-left: 240px;
+    flex: 1;
+    padding: 40px 48px;
+    max-width: calc(100vw - 240px);
+    animation: fadeIn 0.5s ease 0.2s both;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ---- TOPBAR ---- */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 48px;
+  }
+
+  .greeting h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.8rem;
+    letter-spacing: -0.03em;
+    margin-bottom: 4px;
+  }
+
+  .greeting p { color: var(--muted); font-size: 0.9rem; }
+
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .search-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    width: 260px;
+    transition: border-color 0.2s;
+  }
+  .search-bar:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(108,99,255,0.12);
+  }
+
+  .search-bar input {
+    background: none;
+    border: none;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.87rem;
+    outline: none;
+    width: 100%;
+  }
+  .search-bar input::placeholder { color: var(--muted); }
+
+  /* ---- SECTION TITLE ---- */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .section-header h2 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.15rem;
+    letter-spacing: -0.02em;
+  }
+
+  .see-all {
+    font-size: 0.8rem;
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+    transition: opacity 0.2s;
+  }
+  .see-all:hover { opacity: 0.7; }
+
+  /* ---- STATS CARDS ---- */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 22px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .stat-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255,255,255,0.12);
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--card-accent, var(--accent));
+  }
+
+  .stat-card .card-icon {
+    font-size: 1.3rem;
+    margin-bottom: 12px;
+  }
+
+  .stat-card .card-value {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.7rem;
+    letter-spacing: -0.03em;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .stat-card .card-label {
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  /* ---- TOOLS GRID ---- */
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 40px;
+  }
+
+  .tool-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 22px;
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.25s;
+    display: block;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  .tool-card::after {
+    content: '→';
+    position: absolute;
+    top: 20px; right: 20px;
+    color: var(--muted);
+    font-size: 1rem;
+    transition: all 0.2s;
+  }
+
+  .tool-card:hover {
+    background: var(--surface2);
+    border-color: var(--tool-color, var(--accent));
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+  }
+
+  .tool-card:hover::after {
+    transform: translateX(4px);
+    color: var(--tool-color, var(--accent));
+  }
+
+  .tool-card-icon {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+    margin-bottom: 16px;
+    background: var(--tool-bg, rgba(108,99,255,0.12));
+  }
+
+  .tool-card-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 6px;
+  }
+
+  .tool-card-desc {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* ---- COURS GRID ---- */
+  .cours-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+
+  .cours-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.25s;
+    display: block;
+    cursor: pointer;
+  }
+
+  .cours-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+    border-color: rgba(255,255,255,0.12);
+  }
+
+  .cours-thumb {
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    background: var(--thumb-bg, linear-gradient(135deg, #1a1a2e, #2a2040));
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cours-thumb::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--thumb-overlay, rgba(108,99,255,0.08));
+  }
+
+  .cours-body {
+    padding: 16px 18px;
+  }
+
+  .cours-matiere {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--subject-color, var(--accent));
+    margin-bottom: 6px;
+  }
+
+  .cours-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+    line-height: 1.3;
+  }
+
+  .cours-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  .cours-badge {
+    padding: 3px 8px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 100px;
+    font-size: 0.7rem;
+  }
+
+  /* ---- EMPTY STATE ---- */
+  .empty-state {
+    text-align: center;
+    padding: 60px 40px;
+    grid-column: 1 / -1;
+    color: var(--muted);
+  }
+
+  .empty-state .empty-icon { font-size: 3rem; margin-bottom: 16px; }
+  .empty-state p { font-size: 0.9rem; line-height: 1.6; }
+
+  /* ---- DASHBOARD COURSE CARD OVERRIDE ---- */
+  #dashboardCoursGrid .cours-card {
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">Internate</div>
+
+  <div class="nav-section-label">Principal</div>
+  <a class="nav-item active" href="#">
+    <span class="nav-icon">🏠</span> Dashboard
+  </a>
+  <a class="nav-item" href="../courses/Ressources_ex.html">
+    <span class="nav-icon">📚</span> Mes cours
+  </a>
+
+  <div class="nav-section-label">Outils</div>
+  <a class="nav-item" href="../tools/Calculatrice_Scientifique.html">
+    <span class="nav-icon">🧮</span> Calculatrice
+  </a>
+  <a class="nav-item" href="../tools/Convertisseur_Unites.html">
+    <span class="nav-icon">📊</span> Convertisseur
+  </a>
+  <a class="nav-item" href="../tools/Fabricateur_Fiches.html">
+    <span class="nav-icon">🗂️</span> Fiches
+  </a>
+  <a class="nav-item" href="../tools/Generateur_QCM.html">
+    <span class="nav-icon">📋</span> QCM
+  </a>
+  <a class="nav-item" href="../tools/Minuteur_Pomodoro.html">
+    <span class="nav-icon">⏱️</span> Pomodoro
+  </a>
+  <a class="nav-item" href="../tools/Redacteur_Plan.html">
+    <span class="nav-icon">📝</span> Plan
+  </a>
+  <a class="nav-item" href="../tools/Tableau_Blanc.html">
+    <span class="nav-icon">🎨</span> Tableau Blanc
+  </a>
+
+  <div class="sidebar-footer">
+    <div class="user-card" id="userCard">
+      <div class="avatar" id="avatarEl">?</div>
+      <div class="user-info">
+        <strong id="userNameEl">Utilisateur</strong>
+        <span id="userEmailEl">—</span>
+      </div>
+    </div>
+    <button class="logout-btn" onclick="logout()">
+      <span>🚪</span> Se déconnecter
+    </button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="greeting">
+      <h1 id="greetingTitle">Bonjour 👋</h1>
+      <p id="greetingDate">Chargement…</p>
+    </div>
+    <div class="topbar-right">
+      <div class="search-bar">
+        <span>🔍</span>
+        <input type="text" placeholder="Rechercher un cours, un outil…">
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card" style="--card-accent: var(--accent);">
+      <div class="card-icon">📚</div>
+      <div class="card-value">3</div>
+      <div class="card-label">Cours disponibles</div>
+    </div>
+    <div class="stat-card" style="--card-accent: var(--accent2);">
+      <div class="card-icon">🔧</div>
+      <div class="card-value">7</div>
+      <div class="card-label">Outils intégrés</div>
+    </div>
+    <div class="stat-card" style="--card-accent: var(--accent4);">
+      <div class="card-icon">⚡</div>
+      <div class="card-value">100%</div>
+      <div class="card-label">Accès gratuit</div>
+    </div>
+    <div class="stat-card" style="--card-accent: var(--accent3);">
+      <div class="card-icon">🤝</div>
+      <div class="card-value">∞</div>
+      <div class="card-label">Ressources partagées</div>
+    </div>
+  </div>
+
+  <!-- OUTILS -->
+  <div class="section-header">
+    <h2>Outils de révision</h2>
+    <span></span>
+  </div>
+  <div class="tools-grid" style="margin-bottom:48px;">
+    <a class="tool-card" href="../tools/Calculatrice_Scientifique.html" style="--tool-color: #6c63ff; --tool-bg: rgba(108,99,255,0.12);">
+      <div class="tool-card-icon">🧮</div>
+      <div class="tool-card-name">Calculatrice Scientifique</div>
+      <div class="tool-card-desc">Calculs avancés avec fonctions trigonométriques et scientifiques</div>
+    </a>
+    <a class="tool-card" href="../tools/Convertisseur_Unites.html" style="--tool-color: #00d4aa; --tool-bg: rgba(0,212,170,0.12);">
+      <div class="tool-card-icon">📊</div>
+      <div class="tool-card-name">Convertisseur d'Unités</div>
+      <div class="tool-card-desc">Convertit longueur, masse, température, vitesse et volume</div>
+    </a>
+    <a class="tool-card" href="../tools/Fabricateur_Fiches.html" style="--tool-color: #ffa94d; --tool-bg: rgba(255,169,77,0.12);">
+      <div class="tool-card-icon">🗂️</div>
+      <div class="tool-card-name">Fabricateur de Fiches</div>
+      <div class="tool-card-desc">Crée des fiches de révision recto-verso personnalisées</div>
+    </a>
+    <a class="tool-card" href="../tools/Generateur_QCM.html" style="--tool-color: #a78bfa; --tool-bg: rgba(167,139,250,0.12);">
+      <div class="tool-card-icon">📋</div>
+      <div class="tool-card-name">Générateur de QCM</div>
+      <div class="tool-card-desc">Crée et joue à des QCM personnalisés</div>
+    </a>
+    <a class="tool-card" href="../tools/Minuteur_Pomodoro.html" style="--tool-color: #ff6b6b; --tool-bg: rgba(255,107,107,0.12);">
+      <div class="tool-card-icon">⏱️</div>
+      <div class="tool-card-name">Minuteur Pomodoro</div>
+      <div class="tool-card-desc">Optimise ton temps d'étude avec la méthode Pomodoro</div>
+    </a>
+    <a class="tool-card" href="../tools/Redacteur_Plan.html" style="--tool-color: #34d399; --tool-bg: rgba(52,211,153,0.12);">
+      <div class="tool-card-icon">📝</div>
+      <div class="tool-card-name">Rédacteur de Plan</div>
+      <div class="tool-card-desc">Structure tes dissertations et comptes-rendus</div>
+    </a>
+    <a class="tool-card" href="../tools/Tableau_Blanc.html" style="--tool-color: #f472b6; --tool-bg: rgba(244,114,182,0.12);">
+      <div class="tool-card-icon">🎨</div>
+      <div class="tool-card-name">Tableau Blanc</div>
+      <div class="tool-card-desc">Dessine, annoté et exporte tes schémas</div>
+    </a>
+  </div>
+
+  <!-- COURS -->
+  <div class="section-header">
+    <h2>Derniers cours</h2>
+    <a href="../courses/Ressources_ex.html" class="see-all">Tous les cours →</a>
+  </div>
+  <div class="cours-grid" id="dashboardCoursGrid"></div>
+</main>
+
+<!-- Firebase SDK (compat) -->
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+
+<!-- Votre configuration Firebase -->
+<script src="../js/firebase-config.js"></script>
+
+<script>
+  auth.onAuthStateChanged(async (user) => {
+    if (user) {
+      let userData = {};
+
+      try {
+        const userDoc = await db.collection("users").doc(user.uid).get();
+        if (userDoc.exists) userData = userDoc.data();
+      } catch (e) {
+        console.warn("Firestore indisponible, affichage avec les données locales:", e.message);
+        const local = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        userData = local;
+      }
+
+      localStorage.setItem("currentUser", JSON.stringify({
+        uid: user.uid,
+        email: user.email,
+        ...userData
+      }));
+
+      const name = userData.prenom || user.displayName || "Utilisateur";
+      const initials = (userData.prenom?.[0] || (user.displayName?.[0]) || "?");
+
+      document.getElementById("avatarEl").textContent = initials.toUpperCase();
+      document.getElementById("userNameEl").textContent = `${userData.prenom || ""} ${userData.nom || ""}`.trim() || name;
+      document.getElementById("userEmailEl").textContent = userData.email || user.email || "";
+
+      const hour = new Date().getHours();
+      const greeting = hour < 12 ? "Bonjour" : hour < 18 ? "Bon après-midi" : "Bonsoir";
+      document.getElementById("greetingTitle").textContent = `${greeting}, ${name} 👋`;
+
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+      document.getElementById('greetingDate').textContent = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+    } else {
+      window.location.href = "../auth/Login_Internate.html";
+    }
+  });
+
+  function logout() {
+    auth.signOut().then(() => {
+      localStorage.removeItem("currentUser");
+      window.location.href = "../auth/Login_Internate.html";
+    });
+  }
+</script>
+</body>
+</html>

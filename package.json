@@ -1,0 +1,11 @@
+{
+  "name": "internate",
+  "version": "2.0.0",
+  "description": "Plateforme web éducative — outils de révision, cours, QCM",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": ["education", "revision", "firebase", "outils-scolaires"],
+  "license": "MIT"
+}

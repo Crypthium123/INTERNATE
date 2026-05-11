@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fabricateur de Fiches — Internate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #09090f;
+    --surface: #11111c;
+    --surface2: #1a1a2e;
+    --border: rgba(255,255,255,0.07);
+    --accent: #6c63ff;
+    --text: #e8e8f0;
+    --muted: #6b6b8a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    padding: 40px 20px;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.2rem;
+    margin-bottom: 32px;
+  }
+
+  .creator {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 40px;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  input, textarea, select {
+    padding: 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.9rem;
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 120px;
+  }
+
+  input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(108,99,255,0.1);
+  }
+
+  .color-picker {
+    display: flex;
+    gap: 8px;
+  }
+
+  .color-option {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+  }
+
+  .color-option:hover, .color-option.selected {
+    border-color: white;
+    transform: scale(1.1);
+  }
+
+  .btn {
+    padding: 12px 24px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn:hover {
+    background: #7c74ff;
+    transform: translateY(-2px);
+  }
+
+  .btn.secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  .btn.secondary:hover {
+    background: rgba(255,255,255,0.05);
+  }
+
+  .btn-group {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .fiches-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+
+  .fiche {
+    aspect-ratio: 3/2;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .fiche:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+  }
+
+  .fiche-front {
+    display: none;
+    text-align: center;
+    z-index: 1;
+  }
+
+  .fiche-back {
+    display: flex;
+    flex-direction: column;
+    z-index: 1;
+  }
+
+  .fiche.flipped .fiche-front {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .fiche.flipped .fiche-back {
+    display: none;
+  }
+
+  .fiche-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+  }
+
+  .fiche-subject {
+    font-size: 0.75rem;
+    opacity: 0.8;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .fiche-content {
+    font-size: 0.9rem;
+    line-height: 1.4;
+    opacity: 0.9;
+    flex-grow: 1;
+  }
+
+  .fiche-hint {
+    font-size: 0.75rem;
+    opacity: 0.6;
+    margin-top: 12px;
+    text-align: center;
+  }
+
+  .fiche-delete {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(255,107,107,0.2);
+    border: none;
+    color: #ff6b6b;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.2s;
+    z-index: 2;
+  }
+
+  .fiche-delete:hover {
+    background: rgba(255,107,107,0.4);
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.4rem;
+    margin: 32px 0 16px;
+  }
+
+  .export-btn {
+    background: linear-gradient(135deg, var(--accent), #00d4aa);
+  }
+
+  @media (max-width: 768px) {
+    .form-row { grid-template-columns: 1fr; }
+    .fiches-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>🗂️ Fabricateur de Fiches de Révision</h1>
+  
+  <div class="creator">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Titre de la fiche</label>
+        <input type="text" id="ficheName" placeholder="ex: Photosynthèse">
+      </div>
+      <div class="form-group">
+        <label>Matière</label>
+        <select id="subject">
+          <option>Mathématiques</option>
+          <option>Physique</option>
+          <option>Chimie</option>
+          <option>SVT</option>
+          <option>Histoire</option>
+          <option>Géographie</option>
+          <option>Français</option>
+          <option>Anglais</option>
+          <option>Espagnol</option>
+          <option>Philosophie</option>
+          <option>Autre</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Couleur</label>
+        <div class="color-picker">
+          <div class="color-option selected" style="background: #6c63ff;" onclick="selectColor(this, '#6c63ff')"></div>
+          <div class="color-option" style="background: #00d4aa;" onclick="selectColor(this, '#00d4aa')"></div>
+          <div class="color-option" style="background: #ff6b6b;" onclick="selectColor(this, '#ff6b6b')"></div>
+          <div class="color-option" style="background: #ffa94d;" onclick="selectColor(this, '#ffa94d')"></div>
+          <div class="color-option" style="background: #a78bfa;" onclick="selectColor(this, '#a78bfa')"></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="form-group" style="margin-bottom: 16px;">
+      <label>Contenu (recto-verso)</label>
+      <textarea id="fichContent" placeholder="Écris ton contenu ici. Utilise | pour séparer recto et verso.&#10;&#10;Exemple:&#10;Recto: Définition du photosynthèse | Verso: Processus de transformation de la lumière en énergie chimique"></textarea>
+    </div>
+    
+    <div class="btn-group">
+      <button class="btn" onclick="createFiche()">➕ Créer la fiche</button>
+      <button class="btn secondary" onclick="exportAllPDF()">📕 Exporter en PDF</button>
+      <button class="btn secondary" onclick="goBack()">← Retour au dashboard</button>
+    </div>
+  </div>
+  
+  <div class="section-title">📚 Vos fiches</div>
+  <div class="fiches-grid" id="fichesContainer"></div>
+</div>
+
+<script>
+let fiches = JSON.parse(localStorage.getItem('fiches') || '[]');
+let currentColor = '#6c63ff';
+
+function selectColor(el, color) {
+  document.querySelectorAll('.color-option').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+  currentColor = color;
+}
+
+function createFiche() {
+  const name = document.getElementById('ficheName').value;
+  const subject = document.getElementById('subject').value;
+  const content = document.getElementById('fichContent').value;
+  
+  if (!name || !content) {
+    alert('⚠️ Remplis le titre et le contenu');
+    return;
+  }
+  
+  const fiche = {
+    id: Date.now(),
+    name,
+    subject,
+    color: currentColor,
+    recto: content.includes('|') ? content.split('|')[0].trim() : content,
+    verso: content.includes('|') ? content.split('|')[1].trim() : 'Voir recto'
+  };
+  
+  fiches.push(fiche);
+  localStorage.setItem('fiches', JSON.stringify(fiches));
+  
+  document.getElementById('ficheName').value = '';
+  document.getElementById('fichContent').value = '';
+  renderFiches();
+}
+
+function renderFiches() {
+  const container = document.getElementById('fichesContainer');
+  container.innerHTML = '';
+  
+  fiches.forEach(fiche => {
+    const div = document.createElement('div');
+    div.className = 'fiche';
+    div.style.background = fiche.color;
+    div.style.color = 'white';
+    div.innerHTML = `
+      <button class="fiche-delete" onclick="deleteFiche(${fiche.id})">✕</button>
+      <div class="fiche-back">
+        <div class="fiche-subject">${fiche.subject}</div>
+        <div class="fiche-title">${fiche.name}</div>
+        <div class="fiche-content">${fiche.recto}</div>
+        <div class="fiche-hint">Cliquez pour retourner →</div>
+      </div>
+      <div class="fiche-front">
+        <div class="fiche-content">${fiche.verso}</div>
+      </div>
+    `;
+    div.addEventListener('click', (e) => {
+      if (!e.target.classList.contains('fiche-delete')) {
+        div.classList.toggle('flipped');
+      }
+    });
+    container.appendChild(div);
+  });
+}
+
+function deleteFiche(id) {
+  if (confirm('Supprimer cette fiche ?')) {
+    fiches = fiches.filter(f => f.id !== id);
+    localStorage.setItem('fiches', JSON.stringify(fiches));
+    renderFiches();
+  }
+}
+
+function exportAllPDF() {
+  if (fiches.length === 0) {
+    alert('📚 Vous n\'avez pas de fiches à exporter');
+    return;
+  }
+  alert('📕 Fonctionnalité PDF : appuyez sur Ctrl+P (ou Cmd+P) pour imprimer vos fiches en PDF depuis cette page.');
+}
+
+function goBack() {
+  window.location.href = '../dashboard/Connected_internate.html';
+}
+
+// Auth check
+const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+if (!user.email) window.location.href = '../auth/Login_Internate.html';
+
+renderFiches();
+</script>
+</body>
+</html>
