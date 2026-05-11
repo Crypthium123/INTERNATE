@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cours & Ressources — Internate</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <style>
@@ -571,8 +572,29 @@
     z-index: 2;
     backdrop-filter: blur(4px);
   }
-  .cours-card:hover .delete-btn { opacity: 1; }
+  .cours-card:hover .delete-btn,
+  .cours-card:hover .edit-btn { opacity: 1; }
   .delete-btn:hover { background: rgba(255,107,107,0.2); border-color: var(--accent3); }
+
+  .edit-btn {
+    position: absolute;
+    top: 10px; right: 44px;
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--accent2);
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.2s;
+    z-index: 2;
+    backdrop-filter: blur(4px);
+  }
+  .edit-btn:hover { background: rgba(0,212,170,0.2); border-color: var(--accent2); }
 
   /* ---- CONDITIONAL FIELDS ---- */
   .conditional-field {
@@ -580,6 +602,83 @@
   }
   .conditional-field.show {
     display: block;
+  }
+
+  /* ---- TOAST ---- */
+  .toast-container {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+  }
+
+  .toast {
+    padding: 14px 20px;
+    border-radius: 10px;
+    font-size: 0.87rem;
+    font-weight: 500;
+    color: white;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    backdrop-filter: blur(8px);
+    animation: toastIn 0.3s ease both;
+    max-width: 380px;
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .toast-success { background: rgba(0,212,170,0.9); }
+  .toast-error { background: rgba(255,107,107,0.9); }
+  .toast-info { background: rgba(108,99,255,0.9); }
+
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateX(40px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes toastOut {
+    from { opacity: 1; transform: translateX(0); }
+    to { opacity: 0; transform: translateX(40px); }
+  }
+
+  /* ---- CONFIRM MODAL ---- */
+  .confirm-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    z-index: 9998;
+    align-items: center;
+    justify-content: center;
+  }
+  .confirm-overlay.show { display: flex; }
+
+  .confirm-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px 32px;
+    width: 360px;
+    max-width: 90vw;
+    animation: modalIn 0.2s ease both;
+  }
+
+  .confirm-box p {
+    font-size: 0.92rem;
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+
+  .confirm-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
   }
 </style>
 </head>
@@ -631,19 +730,12 @@
     <button class="logout-btn" onclick="logout()">
       <span>🚪</span> Se déconnecter
     </button>
-  </div>
-</aside>
-
-<!-- MAIN -->
-<main class="main">
-  <div class="page-header">
-    <div>
-      <h1>Cours & Ressources</h1>
-      <p>Tous les cours mis à disposition par ta classe</p>
-    </div>
-    <button class="btn-upload">
-      ＋ Ajouter un cours
+    <button class="logout-btn" onclick="logout()">
+      <span>🚪</span> Se déconnecter
     </button>
+    <a href="../contact.html" class="logout-btn" style="text-decoration:none;margin-top:2px;">
+      <span>💬</span> Contact & retours
+    </a>
   </div>
 
   <!-- FILTRES -->
@@ -667,6 +759,12 @@
     </select>
     <button class="filter-reset" onclick="resetFilters()">Réinitialiser</button>
     <span class="filter-count" id="filterCount">0 cours</span>
+    <select class="filter-select" id="sortBy" onchange="renderCourses()" style="min-width:120px;">
+      <option value="date-desc">Plus récents</option>
+      <option value="date-asc">Plus anciens</option>
+      <option value="title">A–Z</option>
+      <option value="matiere">Matière</option>
+    </select>
   </div>
 
   <!-- COURS -->
@@ -702,7 +800,7 @@
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
       <div class="modal-header">
-        <h2>Ajouter un cours</h2>
+        <h2 id="modalTitle">Ajouter un cours</h2>
         <button class="modal-close" onclick="closeModal()">✕</button>
       </div>
       <div class="form-group">
@@ -770,6 +868,20 @@
       </div>
     </div>
   </div>
+
+  <!-- TOAST -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- CONFIRM -->
+  <div class="confirm-overlay" id="confirmOverlay">
+    <div class="confirm-box">
+      <p id="confirmMessage">Supprimer ce cours ?</p>
+      <div class="confirm-actions">
+        <button class="btn-secondary" onclick="closeConfirm()">Annuler</button>
+        <button class="btn-primary" style="background:var(--accent3);" id="confirmBtn" onclick="">Supprimer</button>
+      </div>
+    </div>
+  </div>
 </main>
 
 <!-- Firebase SDK (compat) -->
@@ -795,6 +907,38 @@
       window.location.href = '../auth/Login_Internate.html';
     });
   }
+
+  // ---- TOAST ----
+  function showToast(msg, type) {
+    const container = document.getElementById('toastContainer');
+    const el = document.createElement('div');
+    el.className = `toast toast-${type || 'info'}`;
+    el.textContent = msg;
+    container.appendChild(el);
+    setTimeout(() => {
+      el.style.animation = 'toastOut 0.3s ease both';
+      setTimeout(() => el.remove(), 300);
+    }, 3500);
+  }
+
+  // ---- CONFIRM ----
+  let confirmCallback = null;
+  function showConfirm(msg, cb) {
+    confirmCallback = cb;
+    document.getElementById('confirmMessage').textContent = msg;
+    document.getElementById('confirmOverlay').classList.add('show');
+  }
+  function closeConfirm() {
+    document.getElementById('confirmOverlay').classList.remove('show');
+    confirmCallback = null;
+  }
+  document.getElementById('confirmBtn').addEventListener('click', () => {
+    if (confirmCallback) confirmCallback();
+    closeConfirm();
+  });
+  document.getElementById('confirmOverlay').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) closeConfirm();
+  });
 
   // ---- DATA ----
   const STORAGE_KEY = 'internate_courses';
@@ -863,13 +1007,36 @@
   }
 
   // ---- MODAL ----
-  function openModal() {
+  let editId = null;
+
+  function openModal(course) {
     document.getElementById('modalOverlay').classList.add('show');
+    if (course) {
+      editId = course.id;
+      document.getElementById('modalTitle').textContent = 'Modifier le cours';
+      document.getElementById('formTitle').value = course.title;
+      document.getElementById('formFiliere').value = course.filiere;
+      document.getElementById('formAnnee').value = course.annee;
+      updateFormSpecialite();
+      setTimeout(() => {
+        if (course.specialite) document.getElementById('formSpecialite').value = course.specialite;
+      }, 50);
+      document.getElementById('formMatiere').value = course.matiere;
+      document.getElementById('formDescription').value = course.description || '';
+      document.getElementById('formFileUrl').value = course.fileUrl || '';
+      document.getElementById('formFileName').value = course.fileName || '';
+    } else {
+      editId = null;
+      document.getElementById('modalTitle').textContent = 'Ajouter un cours';
+      closeModal();
+      document.getElementById('modalOverlay').classList.add('show');
+    }
     document.getElementById('formTitle').focus();
   }
 
   function closeModal() {
     document.getElementById('modalOverlay').classList.remove('show');
+    editId = null;
     document.getElementById('formTitle').value = '';
     document.getElementById('formFiliere').value = '';
     document.getElementById('formAnnee').value = '';
@@ -924,47 +1091,54 @@
     const fileUrl = document.getElementById('formFileUrl').value.trim();
     const fileName = document.getElementById('formFileName').value.trim();
 
-    if (!title) { alert('Veuillez saisir un titre.'); return; }
-    if (!filiere) { alert('Veuillez sélectionner une filière.'); return; }
-    if (!annee) { alert('Veuillez sélectionner une année.'); return; }
-    if (!matiere) { alert('Veuillez sélectionner une matière.'); return; }
+    if (!title) { showToast('Veuillez saisir un titre.', 'error'); return; }
+    if (!filiere) { showToast('Veuillez sélectionner une filière.', 'error'); return; }
+    if (!annee) { showToast('Veuillez sélectionner une année.', 'error'); return; }
+    if (!matiere) { showToast('Veuillez sélectionner une matière.', 'error'); return; }
 
     const specialiteGroup = document.getElementById('formSpecialiteGroup');
     if (specialiteGroup.classList.contains('show') && !specialite) {
       const label = document.getElementById('formSpecialiteLabel').textContent;
-      alert(`Veuillez sélectionner une ${label.toLowerCase()}.`);
+      showToast(`Veuillez sélectionner une ${label.toLowerCase()}.`, 'error');
       return;
     }
 
-    const courses = getCourses();
+    let courses = getCourses();
     const matiereObj = MATIERES.find(m => m.value === matiere) || MATIERES[MATIERES.length - 1];
 
-    courses.push({
-      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-      title,
-      filiere,
-      annee,
-      specialite,
-      matiere,
-      matiereLabel: matiereObj.label,
-      matiereIcon: matiereObj.icon,
-      matiereColor: matiereObj.color,
-      description,
-      fileUrl,
-      fileName: fileName || (fileUrl ? fileUrl.split('/').pop() : ''),
-      dateAdded: new Date().toISOString()
-    });
+    const now = new Date().toISOString();
 
-    saveCourses(courses);
-    closeModal();
-    renderCourses();
+    if (editId) {
+      courses = courses.map(c => c.id === editId ? { ...c, title, filiere, annee, specialite, matiere, matiereLabel: matiereObj.label, matiereIcon: matiereObj.icon, matiereColor: matiereObj.color, description, fileUrl, fileName: fileName || (fileUrl ? fileUrl.split('/').pop() : '') } : c);
+      saveCourses(courses);
+      closeModal();
+      renderCourses();
+      showToast('Cours modifié !', 'success');
+    } else {
+      courses.push({
+        id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        title, filiere, annee, specialite, matiere,
+        matiereLabel: matiereObj.label,
+        matiereIcon: matiereObj.icon,
+        matiereColor: matiereObj.color,
+        description, fileUrl,
+        fileName: fileName || (fileUrl ? fileUrl.split('/').pop() : ''),
+        dateAdded: now
+      });
+      saveCourses(courses);
+      closeModal();
+      renderCourses();
+      showToast('Cours ajouté !', 'success');
+    }
   }
 
   function deleteCourse(id) {
-    if (!confirm('Supprimer ce cours ?')) return;
-    const courses = getCourses().filter(c => c.id !== id);
-    saveCourses(courses);
-    renderCourses();
+    showConfirm('Supprimer ce cours ?', () => {
+      const courses = getCourses().filter(c => c.id !== id);
+      saveCourses(courses);
+      renderCourses();
+      showToast('Cours supprimé.', 'success');
+    });
   }
 
   // ---- FILTERS ----
@@ -1003,6 +1177,7 @@
     const grid = document.getElementById('coursGrid');
     const countEl = document.getElementById('filterCount');
     const allCourses = getCourses();
+    const sortBy = document.getElementById('sortBy').value;
 
     const filiere = document.getElementById('filterFiliere').value;
     const annee = document.getElementById('filterAnnee').value;
@@ -1014,6 +1189,11 @@
     if (annee) filtered = filtered.filter(c => c.annee === annee);
     if (specialite) filtered = filtered.filter(c => c.specialite === specialite);
     if (matiere) filtered = filtered.filter(c => c.matiere === matiere);
+
+    if (sortBy === 'date-desc') filtered.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
+    else if (sortBy === 'date-asc') filtered.sort((a, b) => new Date(a.dateAdded) - new Date(b.dateAdded));
+    else if (sortBy === 'title') filtered.sort((a, b) => a.title.localeCompare(b.title));
+    else if (sortBy === 'matiere') filtered.sort((a, b) => (a.matiereLabel || '').localeCompare(b.matiereLabel || ''));
 
     countEl.textContent = `${filtered.length} cours`;
 
@@ -1049,8 +1229,11 @@
            </div>`
         : '';
 
+      const dateStr = c.dateAdded ? new Date(c.dateAdded).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) : '';
+
       return `
         <div class="cours-card" style="cursor:default;">
+          <button class="edit-btn" onclick="openModal(getCourses().find(x => x.id === '${c.id}'))" title="Modifier">✎</button>
           <button class="delete-btn" onclick="deleteCourse('${c.id}')" title="Supprimer">✕</button>
           <div class="cours-thumb" style="background: linear-gradient(135deg, ${color}22, ${color}44);">
             <div class="cours-thumb-bg"></div>
@@ -1061,7 +1244,7 @@
             <div class="cours-matiere" style="color:${color}">${c.matiereLabel || c.matiere}</div>
             <div class="cours-title">${c.title}</div>
             ${c.description ? `<p style="font-size:0.78rem; color:var(--muted); margin-bottom:12px; line-height:1.4;">${c.description}</p>` : ''}
-            <div class="cours-meta">${metaTags}</div>
+            <div class="cours-meta">${metaTags}${dateStr ? `<span style="margin-left:auto;font-size:0.7rem;color:var(--muted)">${dateStr}</span>` : ''}</div>
           </div>
           ${fileSection}
         </div>`;
@@ -1082,5 +1265,8 @@
 
   renderCourses();
 </script>
+<div style="text-align:center;padding:20px;font-size:0.78rem;color:var(--muted);border-top:1px solid var(--border);margin-top:40px;">
+  Des retours ? <a href="mailto:gc05122008@gmail.com" style="color:var(--accent2);text-decoration:none;font-weight:500;">gc05122008@gmail.com</a>
+</div>
 </body>
 </html>

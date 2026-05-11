@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard — Internate</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <style>
@@ -512,6 +513,9 @@
     <button class="logout-btn" onclick="logout()">
       <span>🚪</span> Se déconnecter
     </button>
+    <a href="../contact.html" class="logout-btn" style="text-decoration:none;margin-top:2px;">
+      <span>💬</span> Contact & retours
+    </a>
   </div>
 </aside>
 
@@ -526,7 +530,7 @@
     <div class="topbar-right">
       <div class="search-bar">
         <span>🔍</span>
-        <input type="text" placeholder="Rechercher un cours, un outil…">
+        <input type="text" id="dashboardSearch" placeholder="Rechercher un cours, un outil…" oninput="filterDashboard()">
       </div>
     </div>
   </div>
@@ -535,7 +539,7 @@
   <div class="stats-row">
     <div class="stat-card" style="--card-accent: var(--accent);">
       <div class="card-icon">📚</div>
-      <div class="card-value">3</div>
+      <div class="card-value" id="statsCoursCount">3</div>
       <div class="card-label">Cours disponibles</div>
     </div>
     <div class="stat-card" style="--card-accent: var(--accent2);">
@@ -615,10 +619,56 @@
 <script src="../js/firebase-config.js"></script>
 
 <script>
+  function logout() {
+    auth.signOut().then(() => {
+      localStorage.removeItem("currentUser");
+      window.location.href = "../auth/Login_Internate.html";
+    });
+  }
+
+  // ---- SEARCH ----
+  function filterDashboard() {
+    const q = document.getElementById('dashboardSearch').value.toLowerCase();
+    document.querySelectorAll('.tool-card, .cours-card').forEach(el => {
+      el.style.display = el.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+  }
+
+  // ---- DASHBOARD COURSES ----
+  function loadDashboardCourses() {
+    const grid = document.getElementById('dashboardCoursGrid');
+    const all = JSON.parse(localStorage.getItem('internate_courses') || '[]');
+    const recent = all.slice(-3).reverse();
+
+    document.querySelector('#statsCoursCount').textContent = all.length || '0';
+
+    if (!recent.length) {
+      grid.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><p>Aucun cours pour le moment.</p></div>';
+      return;
+    }
+
+    grid.innerHTML = recent.map(c => {
+      const colors = {
+        mathematiques: '#6c63ff', 'physique-chimie': '#00d4aa', francais: '#ffa94d',
+        'histoire-geo': '#a78bfa', anglais: '#ff6b6b', espagnol: '#f97316',
+        allemand: '#eab308', svt: '#22c55e', nsi: '#3b82f6', ses: '#ec4899',
+        philosophie: '#8b5cf6', arts: '#f472b6', eps: '#14b8a6'
+      };
+      const color = colors[c.matiere] || '#6b7280';
+      return `<a class="cours-card" href="../courses/Ressources_ex.html" style="--thumb-bg: linear-gradient(135deg, ${color}22, ${color}44); --thumb-overlay: rgba(0,0,0,0.1);">
+        <div class="cours-thumb">${c.matiereIcon || '📁'}</div>
+        <div class="cours-body">
+          <div class="cours-matiere" style="color:${color}">${c.matiereLabel || c.matiere}</div>
+          <div class="cours-title">${c.title}</div>
+          <div class="cours-meta"><span>${c.annee === '1ere' ? '1ère' : c.annee || ''}</span></div>
+        </div>
+      </a>`;
+    }).join('');
+  }
+
   auth.onAuthStateChanged(async (user) => {
     if (user) {
       let userData = {};
-
       try {
         const userDoc = await db.collection("users").doc(user.uid).get();
         if (userDoc.exists) userData = userDoc.data();
@@ -627,38 +677,24 @@
         const local = JSON.parse(localStorage.getItem('currentUser') || '{}');
         userData = local;
       }
-
-      localStorage.setItem("currentUser", JSON.stringify({
-        uid: user.uid,
-        email: user.email,
-        ...userData
-      }));
-
+      localStorage.setItem("currentUser", JSON.stringify({ uid: user.uid, email: user.email, ...userData }));
       const name = userData.prenom || user.displayName || "Utilisateur";
       const initials = (userData.prenom?.[0] || (user.displayName?.[0]) || "?");
-
       document.getElementById("avatarEl").textContent = initials.toUpperCase();
       document.getElementById("userNameEl").textContent = `${userData.prenom || ""} ${userData.nom || ""}`.trim() || name;
       document.getElementById("userEmailEl").textContent = userData.email || user.email || "";
-
       const hour = new Date().getHours();
-      const greeting = hour < 12 ? "Bonjour" : hour < 18 ? "Bon après-midi" : "Bonsoir";
-      document.getElementById("greetingTitle").textContent = `${greeting}, ${name} 👋`;
-
-      const now = new Date();
-      const dateStr = now.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+      document.getElementById("greetingTitle").textContent = `${hour < 12 ? "Bonjour" : hour < 18 ? "Bon après-midi" : "Bonsoir"}, ${name} 👋`;
+      const dateStr = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
       document.getElementById('greetingDate').textContent = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+      loadDashboardCourses();
     } else {
       window.location.href = "../auth/Login_Internate.html";
     }
   });
-
-  function logout() {
-    auth.signOut().then(() => {
-      localStorage.removeItem("currentUser");
-      window.location.href = "../auth/Login_Internate.html";
-    });
-  }
 </script>
+<div style="text-align:center;padding:20px;font-size:0.78rem;color:var(--muted);border-top:1px solid var(--border);margin-top:40px;">
+  Des retours ? <a href="mailto:gc05122008@gmail.com" style="color:var(--accent2);text-decoration:none;font-weight:500;">gc05122008@gmail.com</a>
+</div>
 </body>
 </html>
