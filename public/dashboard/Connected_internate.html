@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard â€” Internate</title>
+<title>Dashboard — Internate</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
@@ -327,7 +327,7 @@
   }
 
   .tool-card::after {
-    content: 'â†’';
+    content: '→';
     position: absolute;
     top: 20px; right: 20px;
     color: var(--muted);
@@ -563,33 +563,45 @@
 
   <div class="nav-section-label">Principal</div>
   <a class="nav-item active" href="#">
-    <span class="nav-icon">ðŸ </span> Dashboard
+    <span class="nav-icon">🏠</span> Dashboard
   </a>
   <a class="nav-item" href="../courses/Ressources_ex.html">
-    <span class="nav-icon">ðŸ“š</span> Mes cours
+    <span class="nav-icon">📚</span> Mes cours
   </a>
 
   <div class="nav-section-label">Outils</div>
   <a class="nav-item" href="../tools/Calculatrice_Scientifique.html">
-    <span class="nav-icon">ðŸ§®</span> Calculatrice
+    <span class="nav-icon">🧮</span> Calculatrice
   </a>
   <a class="nav-item" href="../tools/Convertisseur_Unites.html">
-    <span class="nav-icon">ðŸ“Š</span> Convertisseur
+    <span class="nav-icon">📊</span> Convertisseur
   </a>
   <a class="nav-item" href="../tools/Fabricateur_Fiches.html">
-    <span class="nav-icon">ðŸ—‚ï¸</span> Fiches
+    <span class="nav-icon">🗂️</span> Fiches
   </a>
   <a class="nav-item" href="../tools/Generateur_QCM.html">
-    <span class="nav-icon">ðŸ“‹</span> QCM
+    <span class="nav-icon">📋</span> QCM
   </a>
   <a class="nav-item" href="../tools/Minuteur_Pomodoro.html">
-    <span class="nav-icon">â±ï¸</span> Pomodoro
+    <span class="nav-icon">⏱️</span> Pomodoro
   </a>
   <a class="nav-item" href="../tools/Redacteur_Plan.html">
-    <span class="nav-icon">ðŸ“</span> Plan
+    <span class="nav-icon">📝</span> Plan
   </a>
   <a class="nav-item" href="../tools/Tableau_Blanc.html">
-    <span class="nav-icon">ðŸŽ¨</span> Tableau Blanc
+    <span class="nav-icon">🎨</span> Tableau Blanc
+  </a>
+  <a class="nav-item" href="../tools/Analyseur_Texte.html">
+    <span class="nav-icon">&#x1F50D;</span> Analyseur de Texte
+  </a>
+  <a class="nav-item" href="../tools/Calculateur_Moyenne.html">
+    <span class="nav-icon">&#x1F4C8;</span> Calculateur de Moyenne
+  </a>
+  <a class="nav-item" href="../tools/Conjugueur_Francais.html">
+    <span class="nav-icon">&#x1F4D6;</span> Conjugueur Français
+  </a>
+  <a class="nav-item" href="../tools/Generateur_Citations.html">
+    <span class="nav-icon">&#x1F4AC;</span> Générateur de Citations
   </a>
 
   <div class="sidebar-footer">
@@ -597,15 +609,15 @@
       <div class="avatar" id="avatarEl">?</div>
       <div class="user-info">
         <strong id="userNameEl">Utilisateur</strong>
-        <span id="userEmailEl">â€”</span>
+        <span id="userEmailEl">—</span>
       </div>
     </div>
     <a href="../profile/index.html" class="logout-btn" style="text-decoration:none;"><span>&#128100;</span> Mon profil</a>
     <button class="logout-btn" onclick="logout()">
-      <span>ðŸšª</span> Se dÃ©connecter
+      <span>🚪</span> Se déconnecter
     </button>
     <a href="../contact.html" class="logout-btn" style="text-decoration:none;margin-top:2px;">
-      <span>ðŸ’¬</span> Contact & retours
+      <span>💬</span> Contact & retours
     </a>
   </div>
 </aside>
@@ -616,13 +628,13 @@
   <!-- TOPBAR -->
   <div class="topbar">
     <div class="greeting">
-      <h1 id="greetingTitle">Bonjour ðŸ‘‹</h1>
-      <p id="greetingDate">Chargementâ€¦</p>
+      <h1 id="greetingTitle">Bonjour 👋</h1>
+      <p id="greetingDate">Chargement…</p>
     </div>
     <div class="topbar-right">
       <div class="search-bar">
-        <span>ðŸ”</span>
-        <input type="text" id="dashboardSearch" placeholder="Rechercher un cours, un outilâ€¦" oninput="filterDashboard()">
+        <span>🔍</span>
+        <input type="text" id="dashboardSearch" placeholder="Rechercher un cours, un outil…" oninput="filterDashboard()">
       </div>
     </div>
   </div>
@@ -630,74 +642,74 @@
   <!-- STATS -->
   <div class="stats-row">
     <div class="stat-card" style="--card-accent: var(--accent);">
-      <div class="card-icon">ðŸ“š</div>
+      <div class="card-icon">📚</div>
       <div class="card-value" id="statsCoursCount">3</div>
       <div class="card-label">Cours disponibles</div>
     </div>
     <div class="stat-card" style="--card-accent: var(--accent2);">
-      <div class="card-icon">ðŸ”§</div>
+      <div class="card-icon">🔧</div>
       <div class="card-value">7</div>
-      <div class="card-label">Outils intÃ©grÃ©s</div>
+      <div class="card-label">Outils intégrés</div>
     </div>
     <div class="stat-card" style="--card-accent: var(--accent4);">
-      <div class="card-icon">âš¡</div>
+      <div class="card-icon">⚡</div>
       <div class="card-value">100%</div>
-      <div class="card-label">AccÃ¨s gratuit</div>
+      <div class="card-label">Accès gratuit</div>
     </div>
     <div class="stat-card" style="--card-accent: var(--accent3);">
-      <div class="card-icon">ðŸ¤</div>
-      <div class="card-value">âˆž</div>
-      <div class="card-label">Ressources partagÃ©es</div>
+      <div class="card-icon">🤝</div>
+      <div class="card-value">∞</div>
+      <div class="card-label">Ressources partagées</div>
     </div>
   </div>
 
   <!-- OUTILS -->
   <div class="section-header">
-    <h2>Outils de rÃ©vision</h2>
+    <h2>Outils de révision</h2>
     <span></span>
   </div>
   <div class="tools-grid" style="margin-bottom:48px;">
     <a class="tool-card" href="../tools/Calculatrice_Scientifique.html" style="--tool-color: #6c63ff; --tool-bg: rgba(108,99,255,0.12);">
-      <div class="tool-card-icon">ðŸ§®</div>
+      <div class="tool-card-icon">🧮</div>
       <div class="tool-card-name">Calculatrice Scientifique</div>
-      <div class="tool-card-desc">Calculs avancÃ©s avec fonctions trigonomÃ©triques et scientifiques</div>
+      <div class="tool-card-desc">Calculs avancés avec fonctions trigonométriques et scientifiques</div>
     </a>
     <a class="tool-card" href="../tools/Convertisseur_Unites.html" style="--tool-color: #00d4aa; --tool-bg: rgba(0,212,170,0.12);">
-      <div class="tool-card-icon">ðŸ“Š</div>
-      <div class="tool-card-name">Convertisseur d'UnitÃ©s</div>
-      <div class="tool-card-desc">Convertit longueur, masse, tempÃ©rature, vitesse et volume</div>
+      <div class="tool-card-icon">📊</div>
+      <div class="tool-card-name">Convertisseur d'Unités</div>
+      <div class="tool-card-desc">Convertit longueur, masse, température, vitesse et volume</div>
     </a>
     <a class="tool-card" href="../tools/Fabricateur_Fiches.html" style="--tool-color: #ffa94d; --tool-bg: rgba(255,169,77,0.12);">
-      <div class="tool-card-icon">ðŸ—‚ï¸</div>
+      <div class="tool-card-icon">🗂️</div>
       <div class="tool-card-name">Fabricateur de Fiches</div>
-      <div class="tool-card-desc">CrÃ©e des fiches de rÃ©vision recto-verso personnalisÃ©es</div>
+      <div class="tool-card-desc">Crée des fiches de révision recto-verso personnalisées</div>
     </a>
     <a class="tool-card" href="../tools/Generateur_QCM.html" style="--tool-color: #a78bfa; --tool-bg: rgba(167,139,250,0.12);">
-      <div class="tool-card-icon">ðŸ“‹</div>
-      <div class="tool-card-name">GÃ©nÃ©rateur de QCM</div>
-      <div class="tool-card-desc">CrÃ©e et joue Ã  des QCM personnalisÃ©s</div>
+      <div class="tool-card-icon">📋</div>
+      <div class="tool-card-name">Générateur de QCM</div>
+      <div class="tool-card-desc">Crée et joue à des QCM personnalisés</div>
     </a>
     <a class="tool-card" href="../tools/Minuteur_Pomodoro.html" style="--tool-color: #ff6b6b; --tool-bg: rgba(255,107,107,0.12);">
-      <div class="tool-card-icon">â±ï¸</div>
+      <div class="tool-card-icon">⏱️</div>
       <div class="tool-card-name">Minuteur Pomodoro</div>
-      <div class="tool-card-desc">Optimise ton temps d'Ã©tude avec la mÃ©thode Pomodoro</div>
+      <div class="tool-card-desc">Optimise ton temps d'étude avec la méthode Pomodoro</div>
     </a>
     <a class="tool-card" href="../tools/Redacteur_Plan.html" style="--tool-color: #34d399; --tool-bg: rgba(52,211,153,0.12);">
-      <div class="tool-card-icon">ðŸ“</div>
-      <div class="tool-card-name">RÃ©dacteur de Plan</div>
+      <div class="tool-card-icon">📝</div>
+      <div class="tool-card-name">Rédacteur de Plan</div>
       <div class="tool-card-desc">Structure tes dissertations et comptes-rendus</div>
     </a>
     <a class="tool-card" href="../tools/Tableau_Blanc.html" style="--tool-color: #f472b6; --tool-bg: rgba(244,114,182,0.12);">
-      <div class="tool-card-icon">ðŸŽ¨</div>
+      <div class="tool-card-icon">🎨</div>
       <div class="tool-card-name">Tableau Blanc</div>
-      <div class="tool-card-desc">Dessine, annotÃ© et exporte tes schÃ©mas</div>
+      <div class="tool-card-desc">Dessine, annoté et exporte tes schémas</div>
     </a>
   </div>
 
   <!-- COURS -->
   <div class="section-header">
     <h2>Derniers cours</h2>
-    <a href="../courses/Ressources_ex.html" class="see-all">Tous les cours â†’</a>
+    <a href="../courses/Ressources_ex.html" class="see-all">Tous les cours →</a>
   </div>
   <div class="cours-grid" id="dashboardCoursGrid"></div>
 </main>
@@ -735,7 +747,7 @@
     document.querySelector('#statsCoursCount').textContent = all.length || '0';
 
     if (!recent.length) {
-      grid.innerHTML = '<div class="empty-state"><div class="empty-icon">ðŸ“­</div><p>Aucun cours pour le moment.</p></div>';
+      grid.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><p>Aucun cours pour le moment.</p></div>';
       return;
     }
 
@@ -748,11 +760,11 @@
       };
       const color = colors[c.matiere] || '#6b7280';
       return `<a class="cours-card" href="../courses/Ressources_ex.html" style="--thumb-bg: linear-gradient(135deg, ${color}22, ${color}44); --thumb-overlay: rgba(0,0,0,0.1);">
-        <div class="cours-thumb">${c.matiereIcon || 'ðŸ“'}</div>
+        <div class="cours-thumb">${c.matiereIcon || '📁'}</div>
         <div class="cours-body">
           <div class="cours-matiere" style="color:${color}">${c.matiereLabel || c.matiere}</div>
           <div class="cours-title">${c.title}</div>
-          <div class="cours-meta"><span>${c.annee === '1ere' ? '1Ã¨re' : c.annee || ''}</span></div>
+          <div class="cours-meta"><span>${c.annee === '1ere' ? '1ère' : c.annee || ''}</span></div>
         </div>
       </a>`;
     }).join('');
@@ -766,7 +778,7 @@
         const userDoc = await db.collection("users").doc(user.uid).get();
         if (userDoc.exists) userData = userDoc.data();
       } catch (e) {
-        console.warn("Firestore indisponible, affichage avec les donnÃ©es locales:", e.message);
+        console.warn("Firestore indisponible, affichage avec les données locales:", e.message);
         const local = JSON.parse(localStorage.getItem('currentUser') || '{}');
         userData = local;
       }
@@ -777,7 +789,7 @@
       document.getElementById("userNameEl").textContent = `${userData.prenom || ""} ${userData.nom || ""}`.trim() || name;
       document.getElementById("userEmailEl").textContent = userData.email || user.email || "";
       const hour = new Date().getHours();
-      document.getElementById("greetingTitle").textContent = `${hour < 12 ? "Bonjour" : hour < 18 ? "Bon aprÃ¨s-midi" : "Bonsoir"}, ${name} ðŸ‘‹`;
+      document.getElementById("greetingTitle").textContent = `${hour < 12 ? "Bonjour" : hour < 18 ? "Bon après-midi" : "Bonsoir"}, ${name} 👋`;
       const dateStr = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
       document.getElementById('greetingDate').textContent = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
       loadDashboardCourses();

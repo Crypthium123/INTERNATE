@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculateur de Moyenne — Internate</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #09090f;
+    --surface: #11111c;
+    --surface2: #1a1a2e;
+    --border: rgba(255,255,255,0.07);
+    --accent: #6c63ff;
+    --accent2: #00d4aa;
+    --text: #e8e8f0;
+    --muted: #6b6b8a;
+    --green: #00d4aa;
+    --orange: #ffa726;
+    --red: #ff6b6b;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  .tool-topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 24px;
+    background: rgba(17,17,28,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    z-index: 100;
+  }
+  .tool-topbar a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.82rem;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  .tool-topbar a:hover { color: var(--text); }
+  .tool-topbar .sep { color: var(--border); font-size: 0.7rem; }
+  .tool-topbar .current { color: var(--accent); font-size: 0.82rem; font-weight: 600; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 80px 20px 20px;
+  }
+
+  .container {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    max-width: 720px;
+    width: 100%;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.4rem;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+
+  .subtitle {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-bottom: 24px;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr auto;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  .row input {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 10px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .row input:focus {
+    border-color: var(--accent);
+  }
+  .row input[type="number"] { text-align: center; }
+  .row input::placeholder { color: var(--muted); }
+
+  .row .remove-btn {
+    background: rgba(255,107,107,0.15);
+    border: 1px solid var(--red);
+    color: var(--red);
+    border-radius: 6px;
+    width: 32px; height: 32px;
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+  .row .remove-btn:hover { background: rgba(255,107,107,0.3); }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  button {
+    padding: 10px 18px;
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+    font-family: 'Syne', sans-serif;
+  }
+
+  button:hover {
+    background: rgba(108,99,255,0.15);
+    border-color: var(--accent);
+  }
+
+  button.primary {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
+  button.primary:hover { background: #7c74ff; }
+
+  button.danger {
+    background: rgba(255,107,107,0.15);
+    border-color: var(--red);
+    color: var(--red);
+  }
+  button.danger:hover { background: rgba(255,107,107,0.3); }
+
+  .result-box {
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    display: none;
+  }
+  .result-box.show { display: block; }
+
+  .result-box .avg {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.4rem;
+    font-weight: 700;
+  }
+  .result-box .avg.green { color: var(--green); }
+  .result-box .avg.orange { color: var(--orange); }
+  .result-box .avg.red { color: var(--red); }
+
+  .result-box .label {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .target-section {
+    margin-top: 20px;
+    padding: 16px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  .target-section h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+    color: var(--accent2);
+  }
+
+  .target-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .target-row input {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 10px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    width: 100px;
+    outline: none;
+    text-align: center;
+  }
+  .target-row input:focus { border-color: var(--accent); }
+
+  .target-result {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: var(--accent2);
+    display: none;
+  }
+  .target-result.show { display: block; }
+
+  .loading-overlay {
+    position: fixed; inset: 0;
+    background: var(--bg);
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.4s ease;
+  }
+  .loading-overlay.hidden { opacity: 0; pointer-events: none; }
+  .spinner {
+    width: 40px; height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-overlay p { color: var(--muted); font-size: 0.85rem; margin-top: 16px; }
+
+  .header-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr auto;
+    gap: 10px;
+    padding: 0 12px 6px 12px;
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .coeff-label { text-align: center; }
+
+  @media (max-width: 768px) {
+    body { padding: 76px 12px 12px; }
+    .tool-topbar { padding: 10px 16px; font-size: 0.8rem; }
+    .tool-topbar a, .tool-topbar .current { font-size: 0.75rem; }
+    .container { padding: 18px; }
+    .row { grid-template-columns: 1fr 1fr 1fr auto; gap: 6px; padding: 10px; }
+    .header-row { display: none; }
+    .row input { font-size: 0.8rem; padding: 6px 8px; }
+    h1 { font-size: 1.1rem; }
+    .result-box .avg { font-size: 1.8rem; }
+  }
+  @media (max-width: 480px) {
+    body { padding: 70px 8px 8px; }
+    .tool-topbar { padding: 8px 12px; gap: 8px; }
+    .tool-topbar a, .tool-topbar .current { font-size: 0.7rem; }
+  }
+  @media (max-width: 400px) {
+    .container { padding: 14px; }
+    .row { grid-template-columns: 1fr 1fr; gap: 6px; }
+    .row .remove-btn { width: 28px; height: 28px; }
+    .actions { flex-direction: column; }
+    button { width: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <p>Chargement...</p>
+</div>
+
+<div class="tool-topbar">
+  <a href="../dashboard/Connected_internate.html">Internate</a>
+  <span class="sep">›</span>
+  <a href="../courses/Ressources_ex.html">Cours</a>
+  <span class="sep">›</span>
+  <span class="current">Calculateur de Moyenne</span>
+</div>
+
+<div class="container">
+  <h1>📊 Calculateur de Moyenne</h1>
+  <p class="subtitle">Calcule ta moyenne pondérée sur 20</p>
+
+  <div class="header-row">
+    <span>Matière</span>
+    <span class="coeff-label">Note</span>
+    <span class="coeff-label">Coeff.</span>
+    <span></span>
+  </div>
+
+  <div id="rowsContainer"></div>
+
+  <div class="actions">
+    <button id="addBtn">+ Ajouter une matière</button>
+    <button id="calcBtn" class="primary">📐 Calculer la moyenne</button>
+    <button id="clearBtn" class="danger">🗑️ Tout effacer</button>
+  </div>
+
+  <div class="result-box" id="resultBox">
+    <div class="label">Moyenne pondérée</div>
+    <div class="avg" id="avgDisplay">—</div>
+    <div class="label">sur 20</div>
+  </div>
+
+  <div class="target-section">
+    <h3>🎯 Objectif de moyenne</h3>
+    <div class="target-row">
+      <span style="font-size:0.85rem;color:var(--muted);">J'aimerais obtenir</span>
+      <input type="number" id="targetInput" step="0.1" min="0" max="20" placeholder="14">
+      <span style="font-size:0.85rem;color:var(--muted);">/20</span>
+      <button id="targetBtn" class="primary">Calculer</button>
+    </div>
+    <div class="target-result" id="targetResult"></div>
+  </div>
+</div>
+
+<div style="text-align:center;padding:16px;font-size:0.75rem;color:var(--muted);margin-top:12px;">
+  Des retours ? <a href="mailto:gc05122008@gmail.com" style="color:var(--accent2);text-decoration:none;">gc05122008@gmail.com</a>
+</div>
+
+<script>
+const STORAGE_KEY = 'internate_grades';
+const rowsContainer = document.getElementById('rowsContainer');
+const resultBox = document.getElementById('resultBox');
+const avgDisplay = document.getElementById('avgDisplay');
+const targetInput = document.getElementById('targetInput');
+const targetResult = document.getElementById('targetResult');
+
+function createRow(data) {
+  const div = document.createElement('div');
+  div.className = 'row';
+
+  const nameInput = document.createElement('input');
+  nameInput.type = 'text';
+  nameInput.placeholder = 'Matière';
+  nameInput.value = data?.name || '';
+
+  const noteInput = document.createElement('input');
+  noteInput.type = 'number';
+  noteInput.placeholder = 'Note';
+  noteInput.step = '0.1';
+  noteInput.min = '0';
+  noteInput.max = '20';
+  noteInput.value = data?.note !== undefined ? data.note : '';
+
+  const coeffInput = document.createElement('input');
+  coeffInput.type = 'number';
+  coeffInput.placeholder = 'Coeff.';
+  coeffInput.min = '1';
+  coeffInput.max = '10';
+  coeffInput.value = data?.coeff !== undefined ? data.coeff : '';
+
+  const removeBtn = document.createElement('button');
+  removeBtn.className = 'remove-btn';
+  removeBtn.textContent = '✕';
+  removeBtn.addEventListener('click', () => {
+    div.remove();
+    saveGrades();
+    autoCalculate();
+  });
+
+  div.appendChild(nameInput);
+  div.appendChild(noteInput);
+  div.appendChild(coeffInput);
+  div.appendChild(removeBtn);
+
+  [nameInput, noteInput, coeffInput].forEach(inp => {
+    inp.addEventListener('input', saveGrades);
+  });
+
+  return div;
+}
+
+function getGrades() {
+  const rows = rowsContainer.querySelectorAll('.row');
+  return Array.from(rows).map(row => {
+    const inputs = row.querySelectorAll('input');
+    return {
+      name: inputs[0].value,
+      note: parseFloat(inputs[1].value),
+      coeff: parseFloat(inputs[2].value)
+    };
+  });
+}
+
+function saveGrades() {
+  const data = getGrades();
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+function loadGrades() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return;
+  try {
+    const data = JSON.parse(raw);
+    if (!Array.isArray(data)) return;
+    data.forEach(item => {
+      const row = createRow({ name: item.name, note: item.note, coeff: item.coeff });
+      rowsContainer.appendChild(row);
+    });
+  } catch(e) {}
+}
+
+function addRow(data) {
+  const row = createRow(data);
+  rowsContainer.appendChild(row);
+}
+
+function calcAverage() {
+  const rows = rowsContainer.querySelectorAll('.row');
+  let totalNotes = 0, totalCoeffs = 0;
+
+  rows.forEach(row => {
+    const inputs = row.querySelectorAll('input');
+    const note = parseFloat(inputs[1].value);
+    const coeff = parseFloat(inputs[2].value);
+    if (!isNaN(note) && !isNaN(coeff) && inputs[0].value.trim()) {
+      totalNotes += note * coeff;
+      totalCoeffs += coeff;
+    }
+  });
+
+  if (totalCoeffs === 0) return null;
+  return totalNotes / totalCoeffs;
+}
+
+function autoCalculate() {
+  const avg = calcAverage();
+  if (avg === null) {
+    resultBox.classList.remove('show');
+    return;
+  }
+  resultBox.classList.add('show');
+  avgDisplay.textContent = avg.toFixed(2);
+  avgDisplay.className = 'avg';
+  if (avg >= 14) avgDisplay.classList.add('green');
+  else if (avg >= 10) avgDisplay.classList.add('orange');
+  else avgDisplay.classList.add('red');
+}
+
+document.getElementById('addBtn').addEventListener('click', () => {
+  addRow({});
+  saveGrades();
+});
+
+document.getElementById('calcBtn').addEventListener('click', autoCalculate);
+
+document.getElementById('clearBtn').addEventListener('click', () => {
+  if (!confirm('Voulez-vous vraiment effacer toutes les matières ?')) return;
+  rowsContainer.innerHTML = '';
+  resultBox.classList.remove('show');
+  targetResult.classList.remove('show');
+  saveGrades();
+});
+
+document.getElementById('targetBtn').addEventListener('click', () => {
+  const target = parseFloat(targetInput.value);
+  if (isNaN(target) || target < 0 || target > 20) {
+    targetResult.textContent = 'Veuillez entrer un objectif valide entre 0 et 20.';
+    targetResult.classList.add('show');
+    return;
+  }
+
+  const rows = rowsContainer.querySelectorAll('.row');
+  let totalNotes = 0, totalCoeffs = 0;
+
+  rows.forEach(row => {
+    const inputs = row.querySelectorAll('input');
+    const note = parseFloat(inputs[1].value);
+    const coeff = parseFloat(inputs[2].value);
+    if (!isNaN(note) && !isNaN(coeff) && inputs[0].value.trim()) {
+      totalNotes += note * coeff;
+      totalCoeffs += coeff;
+    }
+  });
+
+  if (totalCoeffs === 0) {
+    targetResult.textContent = 'Ajoute d\'abord des matières avec des notes.';
+    targetResult.classList.add('show');
+    return;
+  }
+
+  const needed = target * (totalCoeffs + 1) - totalNotes;
+  const neededClamped = Math.max(0, Math.min(20, needed));
+
+  if (needed > 20) {
+    targetResult.textContent = `❌ Même avec un 20/20, tu ne pourras pas atteindre ${target.toFixed(1)}/20.`;
+  } else if (needed <= 0) {
+    targetResult.textContent = `✅ Tu as déjà au moins ${target.toFixed(1)}/20 !`;
+  } else {
+    targetResult.textContent = `📝 Il te faut ${neededClamped.toFixed(2)}/20 au prochain devoir (coeff. 1) pour atteindre ${target.toFixed(1)}/20.`;
+  }
+  targetResult.classList.add('show');
+});
+
+const loadingOverlay = document.getElementById('loadingOverlay');
+const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+if (user.email) {
+  loadingOverlay.classList.add('hidden');
+} else {
+  window.location.href = '../auth/Login_Internate.html';
+}
+
+loadGrades();
+if (rowsContainer.children.length === 0) addRow({});
+</script>
+</body>
+</html>

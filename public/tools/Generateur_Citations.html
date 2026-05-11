@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Générateur de Citations — Internate</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #09090f;
+    --surface: #11111c;
+    --surface2: #1a1a2e;
+    --border: rgba(255,255,255,0.07);
+    --accent: #6c63ff;
+    --accent2: #00d4aa;
+    --text: #e8e8f0;
+    --muted: #6b6b8a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  .tool-topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 24px;
+    background: rgba(17,17,28,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    z-index: 100;
+  }
+  .tool-topbar a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.82rem;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  .tool-topbar a:hover { color: var(--text); }
+  .tool-topbar .sep { color: var(--border); font-size: 0.7rem; }
+  .tool-topbar .current { color: var(--accent); font-size: 0.82rem; font-weight: 600; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    padding: 52px 20px 40px;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.8rem;
+    margin-bottom: 24px;
+    text-align: center;
+  }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 28px;
+  }
+
+  .filter-btn {
+    padding: 8px 18px;
+    background: var(--surface);
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 500;
+    transition: all 0.25s;
+    font-family: inherit;
+  }
+
+  .filter-btn:hover {
+    background: var(--surface2);
+    color: var(--text);
+    border-color: rgba(108,99,255,0.3);
+  }
+
+  .filter-btn.active {
+    background: rgba(108,99,255,0.2);
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .quote-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px 36px;
+    margin-bottom: 20px;
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative;
+  }
+
+  .quote-text {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 400;
+    line-height: 1.6;
+    color: var(--text);
+    margin-bottom: 20px;
+    max-width: 95%;
+  }
+
+  .quote-text::before { content: "\201C"; }
+  .quote-text::after { content: "\201D"; }
+
+  .quote-author {
+    font-size: 0.95rem;
+    color: var(--accent2);
+    font-weight: 500;
+    margin-bottom: 12px;
+  }
+
+  .quote-author::before { content: "\2014 "; }
+
+  .theme-badge {
+    display: inline-block;
+    padding: 4px 14px;
+    background: rgba(108,99,255,0.15);
+    color: var(--accent);
+    border: 1px solid rgba(108,99,255,0.25);
+    border-radius: 12px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .quote-placeholder {
+    color: var(--muted);
+    font-size: 1rem;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 40px;
+  }
+
+  .btn {
+    padding: 11px 24px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn:hover {
+    background: #7c74ff;
+    transform: translateY(-2px);
+  }
+
+  .btn.secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  .btn.secondary:hover {
+    background: rgba(255,255,255,0.05);
+  }
+
+  .btn.success {
+    background: #1db954;
+  }
+
+  .btn.success:hover {
+    background: #22d45e;
+  }
+
+  .btn.danger {
+    background: rgba(255,107,107,0.2);
+    color: #ff6b6b;
+    border: 1px solid rgba(255,107,107,0.3);
+  }
+
+  .btn.danger:hover {
+    background: rgba(255,107,107,0.4);
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.3rem;
+    margin-bottom: 16px;
+  }
+
+  .favorites-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .fav-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .fav-item .fav-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .fav-item .fav-quote {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 4px;
+  }
+
+  .fav-item .fav-quote::before { content: "\201C"; }
+  .fav-item .fav-quote::after { content: "\201D"; }
+
+  .fav-item .fav-meta {
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+
+  .fav-item .fav-meta .fav-author {
+    color: var(--accent2);
+  }
+
+  .fav-item .fav-theme {
+    display: inline-block;
+    padding: 2px 10px;
+    background: rgba(108,99,255,0.12);
+    color: var(--accent);
+    border-radius: 10px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    margin-left: 8px;
+    text-transform: uppercase;
+  }
+
+  .empty-fav {
+    text-align: center;
+    color: var(--muted);
+    padding: 40px 0;
+    font-size: 0.9rem;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--surface2);
+    color: var(--text);
+    padding: 12px 24px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    font-size: 0.85rem;
+    opacity: 0;
+    transition: all 0.35s ease;
+    z-index: 9999;
+    pointer-events: none;
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .toast.success { border-color: #1db954; color: #1db954; }
+  .toast.error { border-color: #ff6b6b; color: #ff6b6b; }
+
+  @media (max-width: 768px) {
+    body { padding: 52px 12px 12px; }
+    .tool-topbar { padding: 10px 16px; font-size: 0.8rem; }
+    .tool-topbar a, .tool-topbar .current { font-size: 0.75rem; }
+    h1 { font-size: 1.4rem; }
+    .quote-card { padding: 28px 20px; min-height: 180px; }
+    .quote-text { font-size: 1.1rem; }
+  }
+
+  @media (max-width: 480px) {
+    body { padding: 48px 8px 8px; }
+    .tool-topbar { padding: 8px 12px; gap: 8px; }
+    .tool-topbar a, .tool-topbar .current { font-size: 0.7rem; }
+    h1 { font-size: 1.2rem; }
+    .quote-card { padding: 20px 14px; min-height: 150px; }
+    .quote-text { font-size: 1rem; }
+    .actions { gap: 8px; }
+    .btn { padding: 9px 16px; font-size: 0.78rem; }
+    .fav-item { padding: 12px 14px; flex-direction: column; }
+  }
+
+  .loading-overlay {
+    position: fixed; inset: 0;
+    background: var(--bg);
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.4s ease;
+  }
+  .loading-overlay.hidden { opacity: 0; pointer-events: none; }
+  .spinner {
+    width: 40px; height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-overlay p { color: var(--muted); font-size: 0.85rem; margin-top: 16px; }
+</style>
+</head>
+<body>
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <p>Chargement...</p>
+</div>
+
+<div class="tool-topbar">
+  <a href="../dashboard/Connected_internate.html">Internate</a>
+  <span class="sep">&gt;</span>
+  <a href="../courses/Ressources_ex.html">Cours</a>
+  <span class="sep">&gt;</span>
+  <span class="current">Générateur de Citations</span>
+</div>
+
+<div class="container">
+  <h1>Générateur de Citations</h1>
+
+  <div class="filters" id="filters">
+    <button class="filter-btn active" data-theme="all">Toutes</button>
+    <button class="filter-btn" data-theme="philosophie">Philosophie</button>
+    <button class="filter-btn" data-theme="litterature">Littérature</button>
+    <button class="filter-btn" data-theme="histoire">Histoire</button>
+    <button class="filter-btn" data-theme="sciences">Sciences</button>
+    <button class="filter-btn" data-theme="arts">Arts</button>
+    <button class="filter-btn" data-theme="politique">Politique</button>
+  </div>
+
+  <div class="quote-card" id="quoteCard">
+    <div class="quote-text" id="quoteText">Cliquez sur "Nouvelle citation" pour commencer</div>
+    <div class="quote-author" id="quoteAuthor"></div>
+    <div class="theme-badge" id="quoteTheme"></div>
+  </div>
+
+  <div class="actions">
+    <button class="btn" id="newQuoteBtn">Nouvelle citation</button>
+    <button class="btn secondary" id="copyBtn">Copier</button>
+    <button class="btn success" id="saveBtn">Sauvegarder</button>
+  </div>
+
+  <div class="section-title" id="favTitle">Vos citations favorites</div>
+  <div class="favorites-list" id="favoritesList">
+    <div class="empty-fav">Aucune citation favorite pour le moment.</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const quotes = [
+  { text: "Je pense, donc je suis.", author: "René Descartes", theme: "philosophie" },
+  { text: "Le coeur a ses raisons que la raison ne connait point.", author: "Blaise Pascal", theme: "philosophie" },
+  { text: "L'enfer, c'est les autres.", author: "Jean-Paul Sartre", theme: "philosophie" },
+  { text: "L'homme est condamné à être libre.", author: "Jean-Paul Sartre", theme: "philosophie" },
+  { text: "L'existence précède l'essence.", author: "Jean-Paul Sartre", theme: "philosophie" },
+  { text: "On ne nait pas femme, on le devient.", author: "Simone de Beauvoir", theme: "philosophie" },
+  { text: "Tout est bien, sortant des mains de l'auteur des choses, tout dégénère entre les mains de l'homme.", author: "Jean-Jacques Rousseau", theme: "philosophie" },
+  { text: "Le silence éternel de ces espaces infinis m'effraie.", author: "Blaise Pascal", theme: "philosophie" },
+  { text: "Ce n'est pas assez de faire le bien, il faut le faire avec grâce.", author: "Michel de Montaigne", theme: "philosophie" },
+  { text: "L'essentiel est invisible pour les yeux.", author: "Antoine de Saint-Exupéry", theme: "litterature" },
+  { text: "Aimer, ce n'est pas se regarder l'un l'autre, c'est regarder ensemble dans la même direction.", author: "Antoine de Saint-Exupéry", theme: "litterature" },
+  { text: "Toutes les grandes personnes ont d'abord été des enfants.", author: "Antoine de Saint-Exupéry", theme: "litterature" },
+  { text: "Un roman est un miroir que l'on promène le long d'un chemin.", author: "Stendhal", theme: "litterature" },
+  { text: "Le véritable voyage de découverte ne consiste pas à chercher de nouveaux paysages, mais à avoir de nouveaux yeux.", author: "Marcel Proust", theme: "litterature" },
+  { text: "La vie est une fleur dont l'amour est le miel.", author: "Victor Hugo", theme: "litterature" },
+  { text: "Les mots sont les passants mystérieux de l'âme.", author: "Victor Hugo", theme: "litterature" },
+  { text: "La musique, c'est du bruit qui pense.", author: "Victor Hugo", theme: "litterature" },
+  { text: "Le hasard ne favorise que les esprits préparés.", author: "Louis Pasteur", theme: "sciences" },
+  { text: "Rien ne se perd, rien ne se crée, tout se transforme.", author: "Antoine Lavoisier", theme: "sciences" },
+  { text: "Dans la science, le chemin est plus important que le but.", author: "Henri Poincaré", theme: "sciences" },
+  { text: "Il n'y a pas de sciences appliquées, mais seulement des applications de la science.", author: "Louis Pasteur", theme: "sciences" },
+  { text: "Un fait est un fait, une hypothèse est une hypothèse.", author: "Claude Bernard", theme: "sciences" },
+  { text: "La science est l'asymptote de la vérité. Elle approche sans cesse sans jamais l'atteindre.", author: "Henri Poincaré", theme: "sciences" },
+  { text: "Paris vaut bien une messe.", author: "Henri IV", theme: "histoire" },
+  { text: "L'État, c'est moi.", author: "Louis XIV", theme: "histoire" },
+  { text: "La France a perdu une bataille, mais la France n'a pas perdu la guerre.", author: "Charles de Gaulle", theme: "histoire" },
+  { text: "La liberté est le droit de faire tout ce que les lois permettent.", author: "Montesquieu", theme: "histoire" },
+  { text: "La guerre est une chose trop grave pour être confiée à des militaires.", author: "Georges Clemenceau", theme: "histoire" },
+  { text: "Je vous ai compris.", author: "Charles de Gaulle", theme: "histoire" },
+  { text: "Le dessin est la probité de l'art.", author: "Jean-Auguste-Dominique Ingres", theme: "arts" },
+  { text: "L'art, c'est le plus court chemin de l'homme à l'homme.", author: "André Malraux", theme: "arts" },
+  { text: "Le génie est une longue patience.", author: "Georges-Louis Leclerc de Buffon", theme: "arts" },
+  { text: "La beauté est dans l'oeil de celui qui regarde.", author: "Proverbe français", theme: "arts" },
+  { text: "L'architecture est le jeu savant, correct et magnifique des volumes assemblés sous la lumière.", author: "Le Corbusier", theme: "arts" },
+  { text: "La liberté des uns s'arrête là où commence celle des autres.", author: "Principe républicain", theme: "politique" },
+  { text: "Le peuple est le seul souverain légitime.", author: "Maximilien de Robespierre", theme: "politique" },
+  { text: "Tout homme a deux patries, la sienne et puis la France.", author: "Henri de Bornier", theme: "politique" },
+  { text: "Le plus grand dérèglement de l'esprit, c'est de croire les choses parce qu'on souhaite qu'elles soient ainsi.", author: "Louis Pasteur", theme: "politique" },
+  { text: "L'espoir est un risque à courir. C'est même le risque des risques.", author: "Georges Bernanos", theme: "politique" },
+  { text: "Gouverner, c'est prévoir.", author: "Émile de Girardin", theme: "politique" }
+];
+
+let currentQuote = null;
+let currentFilter = 'all';
+let favorites = JSON.parse(localStorage.getItem('internate_favorite_quotes') || '[]');
+
+const quoteText = document.getElementById('quoteText');
+const quoteAuthor = document.getElementById('quoteAuthor');
+const quoteTheme = document.getElementById('quoteTheme');
+const newQuoteBtn = document.getElementById('newQuoteBtn');
+const copyBtn = document.getElementById('copyBtn');
+const saveBtn = document.getElementById('saveBtn');
+const favoritesList = document.getElementById('favoritesList');
+const filterBtns = document.querySelectorAll('.filter-btn');
+const toast = document.getElementById('toast');
+
+let toastTimeout = null;
+
+function showToast(msg, type) {
+  if (toastTimeout) clearTimeout(toastTimeout);
+  toast.textContent = msg;
+  toast.className = 'toast ' + (type || '');
+  requestAnimationFrame(function () {
+    toast.classList.add('show');
+  });
+  toastTimeout = setTimeout(function () {
+    toast.classList.remove('show');
+  }, 2500);
+}
+
+function getFilteredQuotes() {
+  if (currentFilter === 'all') return quotes;
+  return quotes.filter(function (q) { return q.theme === currentFilter; });
+}
+
+function getRandomQuote() {
+  const pool = getFilteredQuotes();
+  if (pool.length === 0) return null;
+  const idx = Math.floor(Math.random() * pool.length);
+  return pool[idx];
+}
+
+function displayQuote(q) {
+  if (!q) {
+    quoteText.textContent = 'Aucune citation dans cette catégorie.';
+    quoteAuthor.textContent = '';
+    quoteTheme.textContent = '';
+    currentQuote = null;
+    return;
+  }
+  quoteText.textContent = q.text;
+  quoteAuthor.textContent = q.author;
+  quoteTheme.textContent = q.theme;
+  currentQuote = q;
+}
+
+function pickNew() {
+  const q = getRandomQuote();
+  displayQuote(q);
+}
+
+function copyQuote() {
+  if (!currentQuote) {
+    showToast('Aucune citation à copier.', 'error');
+    return;
+  }
+  const txt = '\u201C' + currentQuote.text + '\u201D \u2014 ' + currentQuote.author;
+  navigator.clipboard.writeText(txt).then(function () {
+    showToast('Citation copiée dans le presse-papiers !', 'success');
+  }).catch(function () {
+    showToast('Erreur lors de la copie.', 'error');
+  });
+}
+
+function saveFavorite() {
+  if (!currentQuote) {
+    showToast('Aucune citation à sauvegarder.', 'error');
+    return;
+  }
+  const exists = favorites.some(function (f) {
+    return f.text === currentQuote.text && f.author === currentQuote.author;
+  });
+  if (exists) {
+    showToast('Cette citation est déjà dans vos favoris.', 'error');
+    return;
+  }
+  favorites.push({
+    text: currentQuote.text,
+    author: currentQuote.author,
+    theme: currentQuote.theme
+  });
+  localStorage.setItem('internate_favorite_quotes', JSON.stringify(favorites));
+  renderFavorites();
+  showToast('Citation ajoutée aux favoris !', 'success');
+}
+
+function removeFavorite(idx) {
+  favorites.splice(idx, 1);
+  localStorage.setItem('internate_favorite_quotes', JSON.stringify(favorites));
+  renderFavorites();
+  showToast('Citation retirée des favoris.', 'success');
+}
+
+function renderFavorites() {
+  if (favorites.length === 0) {
+    favoritesList.innerHTML = '<div class="empty-fav">Aucune citation favorite pour le moment.</div>';
+    return;
+  }
+  let html = '';
+  favorites.forEach(function (fav, idx) {
+    html += '<div class="fav-item">';
+    html += '<div class="fav-content">';
+    html += '<div class="fav-quote">' + fav.text + '</div>';
+    html += '<div class="fav-meta"><span class="fav-author">' + fav.author + '</span><span class="fav-theme">' + fav.theme + '</span></div>';
+    html += '</div>';
+    html += '<button class="btn danger" onclick="removeFavorite(' + idx + ')">Retirer</button>';
+    html += '</div>';
+  });
+  favoritesList.innerHTML = html;
+}
+
+filterBtns.forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    filterBtns.forEach(function (b) { b.classList.remove('active'); });
+    this.classList.add('active');
+    currentFilter = this.dataset.theme;
+    pickNew();
+  });
+});
+
+newQuoteBtn.addEventListener('click', pickNew);
+copyBtn.addEventListener('click', copyQuote);
+saveBtn.addEventListener('click', saveFavorite);
+
+const loadingOverlay = document.getElementById('loadingOverlay');
+const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+if (user.email) {
+  loadingOverlay.classList.add('hidden');
+} else {
+  window.location.href = '../auth/Login_Internate.html';
+}
+
+renderFavorites();
+
+if (quotes.length > 0) {
+  displayQuote(quotes[Math.floor(Math.random() * quotes.length)]);
+}
+</script>
+<div style="text-align:center;padding:16px;font-size:0.75rem;color:var(--muted);margin-top:20px;">
+  Des retours ? <a href="mailto:gc05122008@gmail.com" style="color:var(--accent2);text-decoration:none;">gc05122008@gmail.com</a>
+</div>
+</body>
+</html>

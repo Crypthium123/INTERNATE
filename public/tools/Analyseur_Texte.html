@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analyseur de Texte - Internate</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #09090f;
+    --surface: #11111c;
+    --surface2: #1a1a2e;
+    --border: rgba(255,255,255,0.07);
+    --accent: #6c63ff;
+    --accent2: #00d4aa;
+    --text: #e8e8f0;
+    --muted: #6b6b8a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  .tool-topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 24px;
+    background: rgba(17,17,28,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    z-index: 100;
+  }
+  .tool-topbar a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.82rem;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  .tool-topbar a:hover { color: var(--text); }
+  .tool-topbar .sep { color: var(--border); font-size: 0.7rem; }
+  .tool-topbar .current { color: var(--accent); font-size: 0.82rem; font-weight: 600; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding: 52px 20px 20px;
+  }
+
+  .container {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 24px 0;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  textarea {
+    width: 100%;
+    height: 260px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  textarea:focus {
+    border-color: var(--accent);
+  }
+  textarea::placeholder {
+    color: var(--muted);
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+    margin: 20px 0;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    text-align: center;
+  }
+  .stat-card .label {
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+  .stat-card .value {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .extra-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 20px 0;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .card h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.95rem;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+
+  .word-list {
+    list-style: none;
+  }
+  .word-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.85rem;
+  }
+  .word-list li:last-child { border-bottom: none; }
+  .word-list .count {
+    color: var(--accent2);
+    font-weight: 600;
+  }
+
+  .longest-word {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--accent2);
+    word-break: break-all;
+  }
+
+  .actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin: 20px 0;
+  }
+
+  .actions button {
+    padding: 10px 24px;
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+    font-family: 'Syne', sans-serif;
+  }
+  .actions button:hover {
+    background: rgba(108,99,255,0.15);
+    border-color: var(--accent);
+  }
+  .actions button.primary {
+    background: rgba(108,99,255,0.2);
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  .actions button.primary:hover {
+    background: rgba(108,99,255,0.35);
+  }
+
+  .loading-overlay {
+    position: fixed; inset: 0;
+    background: var(--bg);
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.4s ease;
+  }
+  .loading-overlay.hidden { opacity: 0; pointer-events: none; }
+  .spinner {
+    width: 40px; height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-overlay p { color: var(--muted); font-size: 0.85rem; margin-top: 16px; }
+
+  footer {
+    text-align: center;
+    padding: 16px;
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 20px;
+  }
+  footer a {
+    color: var(--accent2);
+    text-decoration: none;
+  }
+  footer a:hover { text-decoration: underline; }
+
+  @media (max-width: 768px) {
+    body { padding: 52px 12px 12px; }
+    .tool-topbar { padding: 10px 16px; font-size: 0.8rem; }
+    .tool-topbar a, .tool-topbar .current { font-size: 0.75rem; }
+    .extra-section { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 480px) {
+    body { padding: 48px 8px 8px; }
+    .tool-topbar { padding: 8px 12px; gap: 8px; }
+    .tool-topbar a, .tool-topbar .current { font-size: 0.7rem; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .actions { flex-direction: column; align-items: center; }
+    .actions button { width: 100%; max-width: 280px; }
+  }
+</style>
+</head>
+<body>
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <p>Chargement...</p>
+</div>
+<div class="tool-topbar">
+  <a href="../dashboard/Connected_internate.html">Internate</a>
+  <span class="sep">›</span>
+  <a href="../courses/Ressources_ex.html">Cours</a>
+  <span class="sep">›</span>
+  <span class="current">Analyseur de Texte</span>
+</div>
+
+<div class="container">
+  <h1>Analyseur de Texte</h1>
+
+  <textarea id="textInput" placeholder="Collez ou tapez votre texte ici..."></textarea>
+
+  <div class="stats-grid" id="statsGrid">
+    <div class="stat-card"><div class="label">Caractères (avec espaces)</div><div class="value" id="charWithSpaces">0</div></div>
+    <div class="stat-card"><div class="label">Caractères (sans espaces)</div><div class="value" id="charWithoutSpaces">0</div></div>
+    <div class="stat-card"><div class="label">Mots</div><div class="value" id="wordCount">0</div></div>
+    <div class="stat-card"><div class="label">Phrases</div><div class="value" id="sentenceCount">0</div></div>
+    <div class="stat-card"><div class="label">Paragraphes</div><div class="value" id="paraCount">0</div></div>
+    <div class="stat-card"><div class="label">Temps de lecture</div><div class="value" id="readingTime">0 min</div></div>
+    <div class="stat-card"><div class="label">Lignes</div><div class="value" id="lineCount">0</div></div>
+  </div>
+
+  <div class="extra-section">
+    <div class="card">
+      <h2>Mots les plus fréquents</h2>
+      <ul class="word-list" id="freqList"><li style="color:var(--muted);font-size:0.8rem;">Écrivez du texte pour voir les mots fréquents...</li></ul>
+    </div>
+    <div class="card">
+      <h2>Mot le plus long</h2>
+      <div class="longest-word" id="longestWord">—</div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="primary" id="copyBtn">Copier les résultats</button>
+    <button id="clearBtn">Effacer</button>
+  </div>
+
+  <footer>
+    Des retours ? <a href="mailto:gc05122008@gmail.com">gc05122008@gmail.com</a>
+  </footer>
+</div>
+
+<script>
+const stopWords = new Set([
+  "le","la","les","de","du","des","un","une","et","est","sont","dans","pour","sur","avec",
+  "que","qui","pas","ne","ce","ces","ses","son","sa","se","si","mais","ou","où","donc",
+  "car","ni","par","au","aux","en","à","il","elle","ils","elles","nous","vous","on",
+  "je","tu","me","te","lui","leur","eux","cette","tout","tous","toute","toutes","plus",
+  "comme","très","être","avoir","faire","peut","peux","peu","mon","ton","mes","tes",
+  "nos","vos","leur","leurs","cet","celle","celui","ceux","celles","même","bien","donc",
+  "alors","aussi","autre","autres","fois","fait","faits","entre","vers","chez","sans",
+  "sous","derrière","devant","après","avant","pendant","depuis","jusque","selon","grâce",
+  "malgré","contre","sauf","hormis","voici","voilà","y","c","d","j","m","n","s","t",
+  "qu","l","étaient","était","suis","êtes","sommes","ont","a","ai","avait","avaient",
+  "auront","aura","sera","seront","soit","soient","étés","sois","fut","furent"
+]);
+
+const textarea = document.getElementById('textInput');
+const loadingOverlay = document.getElementById('loadingOverlay');
+
+const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+if (user.email) {
+  loadingOverlay.classList.add('hidden');
+} else {
+  window.location.href = '../auth/Login_Internate.html';
+}
+
+function analyze() {
+  const text = textarea.value;
+
+  document.getElementById('charWithSpaces').textContent = text.length;
+  document.getElementById('charWithoutSpaces').textContent = text.replace(/\s/g, '').length;
+
+  const words = text.trim() ? text.trim().split(/\s+/) : [];
+  document.getElementById('wordCount').textContent = words.length;
+
+  const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+  document.getElementById('sentenceCount').textContent = sentences.length;
+
+  const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 0);
+  document.getElementById('paraCount').textContent = paragraphs.length;
+
+  const wpm = 200;
+  const readingMinutes = words.length / wpm;
+  document.getElementById('readingTime').textContent = readingMinutes < 1 ? '< 1 min' : Math.ceil(readingMinutes) + ' min';
+
+  const lines = text.split('\n');
+  document.getElementById('lineCount').textContent = lines.length;
+
+  const freq = {};
+  let longest = '';
+  for (const w of words) {
+    const cleaned = w.replace(/[^a-zA-ZàâäéèêëîïôöùûüÿçÀÂÄÉÈÊËÎÏÔÖÙÛÜŸÇ'-]/g, '').toLowerCase();
+    if (cleaned && !stopWords.has(cleaned)) {
+      freq[cleaned] = (freq[cleaned] || 0) + 1;
+      if (cleaned.length > longest.length) longest = cleaned;
+    }
+  }
+
+  const sorted = Object.entries(freq).sort((a, b) => b[1] - a[1]).slice(0, 10);
+  const freqList = document.getElementById('freqList');
+  if (sorted.length === 0) {
+    freqList.innerHTML = '<li style="color:var(--muted);font-size:0.8rem;">Aucun mot fréquent trouvé.</li>';
+  } else {
+    freqList.innerHTML = sorted.map(([word, count]) =>
+      `<li><span>${word}</span><span class="count">${count}</span></li>`
+    ).join('');
+  }
+
+  document.getElementById('longestWord').textContent = longest || '—';
+}
+
+textarea.addEventListener('input', analyze);
+
+document.getElementById('clearBtn').addEventListener('click', () => {
+  textarea.value = '';
+  analyze();
+  textarea.focus();
+});
+
+document.getElementById('copyBtn').addEventListener('click', () => {
+  const text = textarea.value;
+  if (!text.trim()) return;
+
+  const words = text.trim() ? text.trim().split(/\s+/) : [];
+  const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+  const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 0);
+  const lines = text.split('\n');
+  const wpm = 200;
+  const readingMinutes = words.length / wpm;
+
+  const freq = {};
+  let longest = '';
+  for (const w of words) {
+    const cleaned = w.replace(/[^a-zA-ZàâäéèêëîïôöùûüÿçÀÂÄÉÈÊËÎÏÔÖÙÛÜŸÇ'-]/g, '').toLowerCase();
+    if (cleaned && !stopWords.has(cleaned)) {
+      freq[cleaned] = (freq[cleaned] || 0) + 1;
+      if (cleaned.length > longest.length) longest = cleaned;
+    }
+  }
+  const topWords = Object.entries(freq).sort((a, b) => b[1] - a[1]).slice(0, 10);
+
+  const result = `RÉSULTATS DE L'ANALYSE
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+Caractères (avec espaces) : ${text.length}
+Caractères (sans espaces) : ${text.replace(/\s/g, '').length}
+Mots : ${words.length}
+Phrases : ${sentences.length}
+Paragraphes : ${paragraphs.length}
+Temps de lecture : ${readingMinutes < 1 ? '< 1 min' : Math.ceil(readingMinutes) + ' min'}
+Lignes : ${lines.length}
+Mot le plus long : ${longest || '—'}
+Mots les plus fréquents :
+${topWords.map(([w, c]) => `  ${w} : ${c}`).join('\n')}`;
+
+  navigator.clipboard.writeText(result).then(() => {
+    const btn = document.getElementById('copyBtn');
+    const orig = btn.textContent;
+    btn.textContent = 'Copié !';
+    setTimeout(() => { btn.textContent = orig; }, 2000);
+  }).catch(() => {
+    const btn = document.getElementById('copyBtn');
+    const orig = btn.textContent;
+    btn.textContent = 'Erreur';
+    setTimeout(() => { btn.textContent = orig; }, 2000);
+  });
+});
+
+textarea.focus();
+</script>
+</body>
+</html>

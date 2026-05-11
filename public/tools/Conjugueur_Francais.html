@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conjugueur Français – Internate</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #09090f;
+    --surface: #11111c;
+    --surface2: #1a1a2e;
+    --border: rgba(255,255,255,0.07);
+    --accent: #6c63ff;
+    --accent2: #00d4aa;
+    --text: #e8e8f0;
+    --muted: #6b6b8a;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  .tool-topbar {
+    position:fixed; top:0; left:0; right:0;
+    display:flex; align-items:center; gap:16px;
+    padding:12px 24px;
+    background:rgba(17,17,28,0.85);
+    backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--border);
+    z-index:100;
+  }
+  .tool-topbar a {
+    color:var(--muted); text-decoration:none;
+    font-size:0.82rem; font-weight:500; transition:color 0.2s;
+  }
+  .tool-topbar a:hover { color:var(--text); }
+  .tool-topbar .sep { color:var(--border); font-size:0.7rem; }
+  .tool-topbar .current { color:var(--accent); font-size:0.82rem; font-weight:600; }
+  body {
+    background:var(--bg); color:var(--text);
+    font-family:'DM Sans',sans-serif; min-height:100vh;
+    padding:52px 20px 20px;
+  }
+  .app-layout {
+    display:grid; grid-template-columns:280px 1fr; gap:20px;
+    max-width:1200px; margin:0 auto;
+  }
+  .sidebar {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:12px; padding:20px;
+    height:fit-content; position:sticky; top:72px;
+  }
+  .sidebar h2 {
+    font-family:'Syne',sans-serif;
+    font-size:1.1rem; margin-bottom:16px; color:var(--accent);
+  }
+  #searchInput {
+    width:100%; padding:10px 14px;
+    background:var(--surface2); border:1px solid var(--border);
+    border-radius:8px; color:var(--text); font-size:0.85rem;
+    outline:none; transition:border 0.2s; margin-bottom:16px;
+  }
+  #searchInput:focus { border-color:var(--accent); }
+  #searchInput::placeholder { color:var(--muted); }
+  .verb-list {
+    display:flex; flex-direction:column; gap:4px;
+    max-height:60vh; overflow-y:auto;
+  }
+  .verb-list::-webkit-scrollbar { width:4px; }
+  .verb-list::-webkit-scrollbar-track { background:transparent; }
+  .verb-list::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
+  .verb-btn {
+    padding:8px 14px; background:transparent; border:none;
+    border-radius:6px; color:var(--text); cursor:pointer;
+    transition:all 0.2s; text-align:left; font-size:0.85rem;
+  }
+  .verb-btn:hover { background:rgba(108,99,255,0.12); color:white; }
+  .verb-btn.active { background:var(--accent); color:white; font-weight:600; }
+  .main-content {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:12px; padding:24px; min-height:400px;
+  }
+  .placeholder { text-align:center; color:var(--muted); padding:80px 20px; font-size:0.95rem; }
+  .conj-header {
+    display:flex; align-items:center; gap:12px;
+    margin-bottom:24px; flex-wrap:wrap;
+  }
+  .conj-header h1 { font-family:'Syne',sans-serif; font-size:1.6rem; color:var(--accent); }
+  .verb-type {
+    font-size:0.75rem; color:var(--muted); background:var(--surface2);
+    padding:4px 10px; border-radius:6px; border:1px solid var(--border);
+  }
+  .tense-section { margin-bottom:28px; }
+  .tense-section h3 {
+    font-family:'Syne',sans-serif; font-size:1rem;
+    color:var(--accent2); margin-bottom:12px;
+    padding-bottom:6px; border-bottom:1px solid var(--border);
+    text-transform:uppercase; letter-spacing:0.5px;
+  }
+  .tense-section h4 {
+    font-size:0.85rem; color:var(--muted);
+    margin-bottom:8px; font-weight:500;
+  }
+  .conj-table { width:100%; border-collapse:collapse; margin-bottom:8px; }
+  .conj-table td { padding:6px 12px; font-size:0.85rem; border:1px solid var(--border); }
+  .conj-table .person { color:var(--muted); width:100px; font-weight:500; }
+  .conj-table .conjugation { color:var(--text); font-weight:400; }
+  .conj-table tr:nth-child(even) { background:rgba(255,255,255,0.02); }
+  .conj-table tr:hover { background:rgba(108,99,255,0.06); }
+  .loading-overlay {
+    position:fixed; inset:0; background:var(--bg);
+    z-index:99999; display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    transition:opacity 0.4s ease;
+  }
+  .loading-overlay.hidden { opacity:0; pointer-events:none; }
+  .spinner {
+    width:40px; height:40px; border:3px solid var(--border);
+    border-top-color:var(--accent); border-radius:50%;
+    animation:spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .loading-overlay p { color:var(--muted); font-size:0.85rem; margin-top:16px; }
+  @media (max-width:768px) {
+    body { padding:52px 12px 12px; }
+    .tool-topbar { padding:10px 16px; font-size:0.8rem; }
+    .tool-topbar a, .tool-topbar .current { font-size:0.75rem; }
+    .app-layout { grid-template-columns:1fr; }
+    .sidebar { position:static; max-height:none; }
+    .verb-list { max-height:200px; }
+    .conj-header h1 { font-size:1.3rem; }
+    .conj-table td { font-size:0.8rem; padding:5px 8px; }
+    .conj-table .person { width:70px; }
+  }
+  @media (max-width:480px) {
+    body { padding:48px 8px 8px; }
+    .tool-topbar { padding:8px 12px; gap:8px; }
+    .tool-topbar a, .tool-topbar .current { font-size:0.7rem; }
+    .main-content { padding:16px; }
+    .conj-table td { font-size:0.75rem; padding:4px 6px; }
+    .conj-table .person { width:55px; }
+  }
+</style>
+</head>
+<body>
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <p>Chargement…</p>
+</div>
+<div class="tool-topbar">
+  <a href="../dashboard/Connected_internate.html">Internate</a>
+  <span class="sep">›</span>
+  <a href="../courses/Ressources_ex.html">Cours</a>
+  <span class="sep">›</span>
+  <span class="current">Conjugueur Français</span>
+</div>
+<div class="app-layout">
+  <aside class="sidebar">
+    <h2>Verbes</h2>
+    <input type="text" id="searchInput" placeholder="Rechercher un verbe…" oninput="filterVerbs()">
+    <div class="verb-list" id="verbList"></div>
+  </aside>
+  <main class="main-content" id="mainContent">
+    <div class="placeholder" id="placeholder">
+      Sélectionnez un verbe pour voir ses conjugaisons
+    </div>
+    <div id="conjugationView" style="display:none;"></div>
+  </main>
+</div>
+<script>
+const PERSONS = ['je','tu','il/elle/on','nous','vous','ils/elles'];
+
+const HARDCODED = {
+  être: {
+    type:'irrégulier',
+    'Indicatif':{
+      'Présent':['suis','es','est','sommes','êtes','sont'],
+      'Imparfait':['étais','étais','était','étions','étiez','étaient'],
+      'Futur simple':['serai','seras','sera','serons','serez','seront'],
+      'Passé simple':['fus','fus','fut','fûmes','fûtes','furent'],
+      'Passé composé':['ai été','as été','a été','avons été','avez été','ont été']
+    },
+    'Conditionnel':{'Présent':['serais','serais','serait','serions','seriez','seraient']},
+    'Subjonctif':{'Présent':['sois','sois','soit','soyons','soyez','soient']}
+  },
+  avoir: {
+    type:'irrégulier',
+    'Indicatif':{
+      'Présent':['ai','as','a','avons','avez','ont'],
+      'Imparfait':['avais','avais','avait','avions','aviez','avaient'],
+      'Futur simple':['aurai','auras','aura','aurons','aurez','auront'],
+      'Passé simple':['eus','eus','eut','eûmes','eûtes','eurent'],
+      'Passé composé':['ai eu','as eu','a eu','avons eu','avez eu','ont eu']
+    },
+    'Conditionnel':{'Présent':['aurais','aurais','aurait','aurions','auriez','auraient']},
+    'Subjonctif':{'Présent':['aie','aies','ait','ayons','ayez','aient']}
+  },
+  aller: {
+    type:'irrégulier',
+    'Indicatif':{
+      'Présent':['vais','vas','va','allons','allez','vont'],
+      'Imparfait':['allais','allais','allait','allions','alliez','allaient'],
+      'Futur simple':['irai','iras','ira','irons','irez','iront'],
+      'Passé simple':['allai','allas','alla','allâmes','allâtes','allèrent'],
+      'Passé composé':['suis allé(e)','es allé(e)','est allé(e)','sommes allés','êtes allés','sont allés']
+    },
+    'Conditionnel':{'Présent':['irais','irais','irait','irions','iriez','iraient']},
+    'Subjonctif':{'Présent':['aille','ailles','aille','allions','alliez','aillent']}
+  },
+  faire: {
+    type:'irrégulier',
+    'Indicatif':{
+      'Présent':['fais','fais','fait','faisons','faites','font'],
+      'Imparfait':['faisais','faisais','faisait','faisions','faisiez','faisaient'],
+      'Futur simple':['ferai','feras','fera','ferons','ferez','feront'],
+      'Passé simple':['fis','fis','fit','fîmes','fîtes','firent'],
+      'Passé composé':['ai fait','as fait','a fait','avons fait','avez fait','ont fait']
+    },
+    'Conditionnel':{'Présent':['ferais','ferais','ferait','ferions','feriez','feraient']},
+    'Subjonctif':{'Présent':['fasse','fasses','fasse','fassions','fassiez','fassent']}
+  },
+  pouvoir: {
+    type:'irrégulier',
+    'Indicatif':{
+      'Présent':['peux','peux','peut','pouvons','pouvez','peuvent'],
+      'Imparfait':['pouvais','pouvais','pouvait','pouvions','pouviez','pouvaient'],
+      'Futur simple':['pourrai','pourras','pourra','pourrons','pourrez','pourront'],
+      'Passé simple':['pus','pus','put','pûmes','pûtes','purent'],
+      'Passé composé':['ai pu','as pu','a pu','avons pu','avez pu','ont pu']
+    },
+    'Conditionnel':{'Présent':['pourrais','pourrais','pourrait','pourrions','pourriez','pourraient']},
+    'Subjonctif':{'Présent':['puisse','puisses','puisse','puissions','puissiez','puissent']}
+  },
+  vouloir: {
+    type:'irrégulier',
+    'Indicatif':{
+      'Présent':['veux','veux','veut','voulons','voulez','veulent'],
+      'Imparfait':['voulais','voulais','voulait','voulions','vouliez','voulaient'],
+      'Futur simple':['voudrai','voudras','voudra','voudrons','voudrez','voudront'],
+      'Passé simple':['voulus','voulus','voulut','voulûmes','voulûtes','voulurent'],
+      'Passé composé':['ai voulu','as voulu','a voulu','avons voulu','avez voulu','ont voulu']
+    },
+    'Conditionnel':{'Présent':['voudrais','voudrais','voudrait','voudrions','voudriez','voudraient']},
+    'Subjonctif':{'Présent':['veuille','veuilles','veuille','voulions','vouliez','veuillent']}
+  },
+  devoir: {
+    type:'irrégulier',
+    'Indicatif':{
+      'Présent':['dois','dois','doit','devons','devez','doivent'],
+      'Imparfait':['devais','devais','devait','devions','deviez','devaient'],
+      'Futur simple':['devrai','devras','devra','devrons','devrez','devront'],
+      'Passé simple':['dus','dus','dut','dûmes','dûtes','durent'],
+      'Passé composé':['ai dû','as dû','a dû','avons dû','avez dû','ont dû']
+    },
+    'Conditionnel':{'Présent':['devrais','devrais','devrait','devrions','devriez','devraient']},
+    'Subjonctif':{'Présent':['doive','doives','doive','devions','deviez','doivent']}
+  },
+  savoir: {
+    type:'irrégulier',
+    'Indicatif':{
+      'Présent':['sais','sais','sait','savons','savez','savent'],
+      'Imparfait':['savais','savais','savait','savions','saviez','savaient'],
+      'Futur simple':['saurai','sauras','saura','saurons','saurez','sauront'],
+      'Passé simple':['sus','sus','sut','sûmes','sûtes','surent'],
+      'Passé composé':['ai su','as su','a su','avons su','avez su','ont su']
+    },
+    'Conditionnel':{'Présent':['saurais','saurais','saurait','saurions','sauriez','sauraient']},
+    'Subjonctif':{'Présent':['sache','saches','sache','sachions','sachiez','sachent']}
+  },
+  venir: {
+    type:'irrégulier',
+    'Indicatif':{
+      'Présent':['viens','viens','vient','venons','venez','viennent'],
+      'Imparfait':['venais','venais','venait','venions','veniez','venaient'],
+      'Futur simple':['viendrai','viendras','viendra','viendrons','viendrez','viendront'],
+      'Passé simple':['vins','vins','vint','vînmes','vîntes','vinrent'],
+      'Passé composé':['suis venu(e)','es venu(e)','est venu(e)','sommes venus','êtes venus','sont venus']
+    },
+    'Conditionnel':{'Présent':['viendrais','viendrais','viendrait','viendrions','viendriez','viendraient']},
+    'Subjonctif':{'Présent':['vienne','viennes','vienne','venions','veniez','viennent']}
+  },
+  dire: {
+    type:'irrégulier',
+    'Indicatif':{
+      'Présent':['dis','dis','dit','disons','dites','disent'],
+      'Imparfait':['disais','disais','disait','disions','disiez','disaient'],
+      'Futur simple':['dirai','diras','dira','dirons','direz','diront'],
+      'Passé simple':['dis','dis','dit','dîmes','dîtes','dirent'],
+      'Passé composé':['ai dit','as dit','a dit','avons dit','avez dit','ont dit']
+    },
+    'Conditionnel':{'Présent':['dirais','dirais','dirait','dirions','diriez','diraient']},
+    'Subjonctif':{'Présent':['dise','dises','dise','disions','disiez','disent']}
+  },
+  voir: {
+    type:'irrégulier',
+    'Indicatif':{
+      'Présent':['vois','vois','voit','voyons','voyez','voient'],
+      'Imparfait':['voyais','voyais','voyait','voyions','voyiez','voyaient'],
+      'Futur simple':['verrai','verras','verra','verrons','verrez','verront'],
+      'Passé simple':['vis','vis','vit','vîmes','vîtes','virent'],
+      'Passé composé':['ai vu','as vu','a vu','avons vu','avez vu','ont vu']
+    },
+    'Conditionnel':{'Présent':['verrais','verrais','verrait','verrions','verriez','verraient']},
+    'Subjonctif':{'Présent':['voie','voies','voie','voyions','voyiez','voient']}
+  },
+  prendre: {
+    type:'irrégulier',
+    'Indicatif':{
+      'Présent':['prends','prends','prend','prenons','prenez','prennent'],
+      'Imparfait':['prenais','prenais','prenait','prenions','preniez','prenaient'],
+      'Futur simple':['prendrai','prendras','prendra','prendrons','prendrez','prendront'],
+      'Passé simple':['pris','pris','prit','prîmes','prîtes','prirent'],
+      'Passé composé':['ai pris','as pris','a pris','avons pris','avez pris','ont pris']
+    },
+    'Conditionnel':{'Présent':['prendrais','prendrais','prendrait','prendrions','prendriez','prendraient']},
+    'Subjonctif':{'Présent':['prenne','prennes','prenne','prenions','preniez','prennent']}
+  },
+  parler: {
+    type:'-er (régulier)',
+    'Indicatif':{
+      'Présent':['parle','parles','parle','parlons','parlez','parlent'],
+      'Imparfait':['parlais','parlais','parlait','parlions','parliez','parlaient'],
+      'Futur simple':['parlerai','parleras','parlera','parlerons','parlerez','parleront'],
+      'Passé simple':['parlai','parlas','parla','parlâmes','parlâtes','parlèrent'],
+      'Passé composé':['ai parlé','as parlé','a parlé','avons parlé','avez parlé','ont parlé']
+    },
+    'Conditionnel':{'Présent':['parlerais','parlerais','parlerait','parlerions','parleriez','parleraient']},
+    'Subjonctif':{'Présent':['parle','parles','parle','parlions','parliez','parlent']}
+  },
+  finir: {
+    type:'-ir (régulier)',
+    'Indicatif':{
+      'Présent':['finis','finis','finit','finissons','finissez','finissent'],
+      'Imparfait':['finissais','finissais','finissait','finissions','finissiez','finissaient'],
+      'Futur simple':['finirai','finiras','finira','finirons','finirez','finiront'],
+      'Passé simple':['finis','finis','finit','fînmes','fîntes','finirent'],
+      'Passé composé':['ai fini','as fini','a fini','avons fini','avez fini','ont fini']
+    },
+    'Conditionnel':{'Présent':['finirais','finirais','finirait','finirions','finiriez','finiraient']},
+    'Subjonctif':{'Présent':['finisse','finisses','finisse','finissions','finissiez','finissent']}
+  }
+};
+
+const ALL_VERBS = [
+  'être','avoir','aller','faire','pouvoir','vouloir','devoir','savoir',
+  'venir','dire','voir','prendre','parler','finir',
+  'aimer','arriver','chanter','chercher','danser','demander','donner',
+  'écouter','étudier','habiter','jouer','laisser','manger','penser',
+  'porter','regarder','rester','travailler','trouver',
+  'agir','choisir','grandir','réagir','réussir','vieillir',
+  'attendre','défendre','descendre','entendre','perdre','répondre',
+  'vendre','connaître','écrire','lire','mettre'
+];
+
+function erStem(v) { return v.slice(0,-2); }
+function irStem(v) { return v.slice(0,-2); }
+function reStem(v) { return v.slice(0,-2); }
+
+function conjER(verb){
+  const s=erStem(verb), pp=s+'é';
+  return {
+    'Indicatif':{
+      'Présent':[s+'e',s+'es',s+'e',s+'ons',s+'ez',s+'ent'],
+      'Imparfait':[s+'ais',s+'ais',s+'ait',s+'ions',s+'iez',s+'aient'],
+      'Futur simple':[verb+'ai',verb+'as',verb+'a',verb+'ons',verb+'ez',verb+'ont'],
+      'Passé simple':[s+'ai',s+'as',s+'a',s+'âmes',s+'âtes',s+'èrent'],
+      'Passé composé':['ai '+pp,'as '+pp,'a '+pp,'avons '+pp,'avez '+pp,'ont '+pp]
+    },
+    'Conditionnel':{'Présent':[verb+'ais',verb+'ais',verb+'ait',verb+'ions',verb+'iez',verb+'aient']},
+    'Subjonctif':{'Présent':[s+'e',s+'es',s+'e',s+'ions',s+'iez',s+'ent']}
+  };
+}
+
+function conjIR(verb){
+  const s=irStem(verb), pp=s+'i';
+  return {
+    'Indicatif':{
+      'Présent':[s+'is',s+'is',s+'it',s+'issons',s+'issez',s+'issent'],
+      'Imparfait':[s+'issais',s+'issais',s+'issait',s+'issions',s+'issiez',s+'issaient'],
+      'Futur simple':[verb+'ai',verb+'as',verb+'a',verb+'ons',verb+'ez',verb+'ont'],
+      'Passé simple':[s+'is',s+'is',s+'it',s+'îmes',s+'îtes',s+'irent'],
+      'Passé composé':['ai '+pp,'as '+pp,'a '+pp,'avons '+pp,'avez '+pp,'ont '+pp]
+    },
+    'Conditionnel':{'Présent':[verb+'ais',verb+'ais',verb+'ait',verb+'ions',verb+'iez',verb+'aient']},
+    'Subjonctif':{'Présent':[s+'isse',s+'isses',s+'isse',s+'issions',s+'issiez',s+'issent']}
+  };
+}
+
+function conjRE(verb){
+  const s=reStem(verb), fs=verb.slice(0,-1), pp=s+'u';
+  return {
+    'Indicatif':{
+      'Présent':[s+'s',s+'s',s,s+'ons',s+'ez',s+'ent'],
+      'Imparfait':[s+'ais',s+'ais',s+'ait',s+'ions',s+'iez',s+'aient'],
+      'Futur simple':[fs+'ai',fs+'as',fs+'a',fs+'ons',fs+'ez',fs+'ont'],
+      'Passé simple':[s+'is',s+'is',s+'it',s+'îmes',s+'îtes',s+'irent'],
+      'Passé composé':['ai '+pp,'as '+pp,'a '+pp,'avons '+pp,'avez '+pp,'ont '+pp]
+    },
+    'Conditionnel':{'Présent':[fs+'ais',fs+'ais',fs+'ait',fs+'ions',fs+'iez',fs+'aient']},
+    'Subjonctif':{'Présent':[s+'e',s+'es',s+'e',s+'ions',s+'iez',s+'ent']}
+  };
+}
+
+function getType(verb){
+  if(HARDCODED[verb]) return HARDCODED[verb].type;
+  if(verb.endsWith('er')) return '-er (régulier)';
+  if(verb.endsWith('ir')) return '-ir (régulier)';
+  if(verb.endsWith('re')) return '-re (régulier)';
+  return 'irrégulier';
+}
+
+function getConjugations(verb){
+  if(HARDCODED[verb]){ const {type,...c}=HARDCODED[verb]; return c; }
+  if(verb.endsWith('er')) return conjER(verb);
+  if(verb.endsWith('ir')) return conjIR(verb);
+  if(verb.endsWith('re')) return conjRE(verb);
+  return null;
+}
+
+let selectedVerb=null;
+const verbListEl=document.getElementById('verbList');
+const placeholderEl=document.getElementById('placeholder');
+const conjViewEl=document.getElementById('conjugationView');
+const searchInput=document.getElementById('searchInput');
+
+function renderVerbList(filter){
+  const f=(filter||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const filtered=ALL_VERBS.filter(v=>{
+    const vn=v.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    return vn.includes(f);
+  });
+  verbListEl.innerHTML=filtered.map(v=>
+    `<button class="verb-btn${v===selectedVerb?' active':''}" onclick="selectVerb('${v}')">${v}</button>`
+  ).join('');
+}
+
+function selectVerb(verb){
+  selectedVerb=verb;
+  renderVerbList(searchInput.value);
+  const conj=getConjugations(verb);
+  if(!conj){
+    conjViewEl.innerHTML='<p class="placeholder">Conjugaisons non disponibles.</p>';
+    conjViewEl.style.display='block'; placeholderEl.style.display='none';
+    return;
+  }
+  const type=getType(verb);
+  let html=`<div class="conj-header"><h1>${verb}</h1><span class="verb-type">${type}</span></div>`;
+  const groups=[
+    {label:'Indicatif',modes:['Présent','Imparfait','Futur simple','Passé simple','Passé composé']},
+    {label:'Conditionnel',modes:['Présent']},
+    {label:'Subjonctif',modes:['Présent']}
+  ];
+  for(const g of groups){
+    const md=conj[g.label];
+    if(!md) continue;
+    html+=`<div class="tense-section"><h3>${g.label}</h3>`;
+    for(const t of g.modes){
+      const forms=md[t];
+      if(!forms) continue;
+      html+=`<h4>${t}</h4><table class="conj-table">`;
+      for(let i=0;i<6;i++) html+=`<tr><td class="person">${PERSONS[i]}</td><td class="conjugation">${forms[i]||'—'}</td></tr>`;
+      html+='</table>';
+    }
+    html+='</div>';
+  }
+  conjViewEl.innerHTML=html;
+  conjViewEl.style.display='block';
+  placeholderEl.style.display='none';
+}
+
+function filterVerbs(){
+  if(selectedVerb){
+    const f=searchInput.value.toLowerCase();
+    if(!ALL_VERBS.some(v=>v===selectedVerb&&v.toLowerCase().includes(f)))
+      selectedVerb=null;
+  }
+  renderVerbList(searchInput.value);
+  if(!selectedVerb){ conjViewEl.style.display='none'; placeholderEl.style.display='block'; }
+}
+
+renderVerbList('');
+selectVerb('être');
+
+const loadingOverlay=document.getElementById('loadingOverlay');
+const user=JSON.parse(localStorage.getItem('currentUser')||'{}');
+if(user.email){
+  loadingOverlay.classList.add('hidden');
+}else{
+  window.location.href='../auth/Login_Internate.html';
+}
+</script>
+<div style="text-align:center;padding:16px;font-size:0.75rem;color:var(--muted);margin-top:20px;">
+  Des retours ? <a href="mailto:gc05122008@gmail.com" style="color:var(--accent2);text-decoration:none;">gc05122008@gmail.com</a>
+</div>
+</body>
+</html>
