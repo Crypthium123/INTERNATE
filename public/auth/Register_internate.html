@@ -35,7 +35,7 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    padding: 40px;
+    padding: 44px 48px;
     background: var(--surface);
     border-right: 1px solid var(--border);
     overflow: hidden;
@@ -69,7 +69,7 @@
   .panel-logo {
     font-family: 'Syne', sans-serif;
     font-weight: 800;
-    font-size: 1.6rem;
+    font-size: 1.4rem;
     letter-spacing: -0.03em;
     background: linear-gradient(135deg, #6c63ff, #00d4aa);
     -webkit-background-clip: text;
@@ -87,25 +87,24 @@
     justify-content: center;
     position: relative;
     z-index: 1;
-    padding: 60px 20px;
   }
 
   .steps-label {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 600;
-    letter-spacing: 0.15em;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--accent2);
-    margin-bottom: 20px;
+    margin-bottom: 16px;
   }
 
   .panel-content h2 {
     font-family: 'Syne', sans-serif;
     font-weight: 700;
-    font-size: 2.2rem;
+    font-size: 2rem;
     letter-spacing: -0.04em;
     line-height: 1.2;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
   }
 
   .panel-content h2 em {
@@ -116,23 +115,23 @@
     background-clip: text;
   }
 
-  .panel-content p {
+  .panel-content > p {
     color: var(--muted);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     line-height: 1.7;
-    margin-bottom: 48px;
+    margin-bottom: 36px;
   }
 
   .steps {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 16px;
   }
 
   .step {
     display: flex;
     align-items: flex-start;
-    gap: 16px;
+    gap: 14px;
     animation: slideRight 0.5s ease both;
   }
   .step:nth-child(1) { animation-delay: 0.1s; }
@@ -145,27 +144,27 @@
   }
 
   .step-num {
-    width: 32px; height: 32px;
-    border-radius: 8px;
+    width: 28px; height: 28px;
+    border-radius: 7px;
     background: linear-gradient(135deg, var(--accent), var(--accent2));
     display: flex; align-items: center; justify-content: center;
     font-family: 'Syne', sans-serif;
     font-weight: 700;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     flex-shrink: 0;
     color: white;
-    box-shadow: 0 0 15px rgba(108,99,255,0.3);
+    box-shadow: 0 0 12px rgba(108,99,255,0.25);
   }
 
   .step-info strong {
     display: block;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 600;
-    margin-bottom: 2px;
+    margin-bottom: 1px;
   }
 
   .step-info span {
-    font-size: 0.82rem;
+    font-size: 0.78rem;
     color: var(--muted);
   }
 
@@ -175,7 +174,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 60px 80px;
+    padding: 40px 60px;
     position: relative;
     overflow-y: auto;
     animation: fadeIn 0.6s ease both;
@@ -202,20 +201,20 @@
   }
 
   .form-header {
-    margin-bottom: 40px;
+    margin-bottom: 32px;
   }
 
   .form-header h1 {
     font-family: 'Syne', sans-serif;
     font-weight: 700;
-    font-size: 2rem;
+    font-size: 1.8rem;
     letter-spacing: -0.03em;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
   }
 
   .form-header p {
     color: var(--muted);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
   }
 
   .form-header p a {
@@ -227,36 +226,36 @@
   .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    margin-bottom: 18px;
+    gap: 12px;
+    margin-bottom: 14px;
   }
 
   .form-group {
-    margin-bottom: 18px;
+    margin-bottom: 14px;
   }
 
   label {
     display: block;
-    font-size: 0.78rem;
+    font-size: 0.72rem;
     font-weight: 600;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--muted);
-    margin-bottom: 7px;
+    margin-bottom: 6px;
   }
 
   input[type="email"],
   input[type="password"],
   input[type="text"] {
     width: 100%;
-    padding: 13px 16px;
-    background: var(--surface);
+    padding: 12px 14px;
+    background: var(--surface2);
     border: 1px solid var(--border);
-    border-radius: 10px;
+    border-radius: 8px;
     color: var(--text);
     font-family: 'DM Sans', sans-serif;
-    font-size: 0.92rem;
-    transition: all 0.25s;
+    font-size: 0.9rem;
+    transition: all 0.2s;
     outline: none;
   }
 
@@ -276,10 +275,10 @@
     box-shadow: 0 0 0 3px rgba(255,107,107,0.12);
   }
 
-  input::placeholder { color: var(--muted); opacity: 0.6; }
+  input::placeholder { color: var(--muted); opacity: 0.5; }
 
   .password-strength {
-    margin-top: 8px;
+    margin-top: 6px;
     display: flex;
     gap: 4px;
   }
@@ -287,7 +286,7 @@
   .strength-bar {
     flex: 1;
     height: 3px;
-    background: rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.06);
     border-radius: 100px;
     transition: background 0.3s;
   }
@@ -297,36 +296,36 @@
   .strength-bar.active-strong { background: var(--accent2); }
 
   .strength-label {
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     color: var(--muted);
-    margin-top: 6px;
+    margin-top: 4px;
   }
 
   .terms {
     display: flex;
     align-items: flex-start;
-    gap: 10px;
-    margin-top: 8px;
-    margin-bottom: 4px;
+    gap: 8px;
+    margin: 4px 0 2px;
   }
 
   .terms input[type="checkbox"] {
     width: 16px;
     height: 16px;
-    border-radius: 4px;
+    border-radius: 3px;
     accent-color: var(--accent);
-    margin-top: 2px;
+    margin-top: 3px;
     flex-shrink: 0;
     cursor: pointer;
   }
 
   .terms label {
-    font-size: 0.82rem;
+    font-size: 0.8rem;
     text-transform: none;
     letter-spacing: 0;
     color: var(--muted);
     cursor: pointer;
     font-weight: 400;
+    line-height: 1.5;
   }
 
   .terms label a {
@@ -336,23 +335,23 @@
 
   .btn-submit {
     width: 100%;
-    padding: 14px;
+    padding: 13px;
     background: linear-gradient(135deg, var(--accent), #5a52e0);
     color: white;
     border: none;
-    border-radius: 10px;
+    border-radius: 8px;
     font-family: 'DM Sans', sans-serif;
-    font-size: 0.95rem;
+    font-size: 0.92rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.25s;
-    margin-top: 24px;
-    box-shadow: 0 0 30px rgba(108,99,255,0.4);
+    margin-top: 20px;
+    box-shadow: 0 0 25px rgba(108,99,255,0.35);
   }
 
   .btn-submit:hover {
     transform: translateY(-1px);
-    box-shadow: 0 0 45px rgba(108,99,255,0.6);
+    box-shadow: 0 0 40px rgba(108,99,255,0.55);
   }
 
   .btn-submit:disabled {
@@ -364,11 +363,11 @@
   .message {
     display: none;
     align-items: center;
-    gap: 10px;
-    padding: 12px 16px;
+    gap: 8px;
+    padding: 10px 14px;
     border-radius: 8px;
-    font-size: 0.85rem;
-    margin-top: 16px;
+    font-size: 0.82rem;
+    margin-top: 12px;
   }
 
   .message.error {
@@ -387,8 +386,8 @@
   .login-link {
     display: block;
     text-align: center;
-    margin-top: 24px;
-    font-size: 0.85rem;
+    margin-top: 20px;
+    font-size: 0.82rem;
     color: var(--muted);
   }
 
@@ -401,10 +400,10 @@
   .divider {
     display: flex;
     align-items: center;
-    gap: 16px;
-    margin: 28px 0;
+    gap: 12px;
+    margin: 20px 0;
     color: var(--muted);
-    font-size: 0.8rem;
+    font-size: 0.78rem;
   }
   .divider::before, .divider::after {
     content: '';
@@ -417,45 +416,57 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
     width: 100%;
-    padding: 14px;
-    background: rgba(255,255,255,0.06);
+    padding: 12px;
+    background: rgba(255,255,255,0.05);
     border: 1px solid var(--border);
-    border-radius: 10px;
+    border-radius: 8px;
     color: var(--text);
     font-family: 'DM Sans', sans-serif;
-    font-size: 0.88rem;
+    font-size: 0.85rem;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
   }
   .btn-google:hover {
-    background: rgba(255,255,255,0.1);
-    border-color: rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.09);
+    border-color: rgba(255,255,255,0.18);
     transform: translateY(-1px);
   }
   .btn-google .g-icon {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     flex-shrink: 0;
+  }
+
+  .footer-email {
+    text-align: center;
+    padding: 12px 20px;
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: auto;
+  }
+  .footer-email a {
+    color: var(--accent2);
+    text-decoration: none;
   }
 
   @media (max-width: 900px) {
     body { grid-template-columns: 1fr; overflow-y: auto; }
     .left-panel { display: none; }
-    .right-panel { padding: 40px 24px; overflow-y: auto; }
+    .right-panel { padding: 32px 24px; }
     .right-panel::before { display: none; }
     .form-container { max-width: 100%; }
-    .form-header h1 { font-size: 1.6rem; }
+    .form-header h1 { font-size: 1.5rem; }
     .form-row { grid-template-columns: 1fr; }
   }
   @media (max-width: 400px) {
-    .right-panel { padding: 24px 16px; }
-    input[type="email"], input[type="password"], input[type="text"] { padding: 12px 14px; font-size: 0.88rem; }
-    .btn-submit { padding: 13px; }
-    .btn-google { padding: 12px; }
+    .right-panel { padding: 20px 16px; }
+    input[type="email"], input[type="password"], input[type="text"] { padding: 11px 12px; font-size: 0.85rem; }
+    .btn-submit { padding: 12px; }
+    .btn-google { padding: 11px; }
   }
 </style>
 </head>
@@ -488,9 +499,12 @@
         <div class="step-info">
           <strong>Apprends & partage</strong>
           <span>Cours, outils, ressources — tout est là</span>
-        </div>
-      </div>
-    </div>
+  </div>
+</div>
+
+<div class="footer-email">
+  Des retours ? <a href="mailto:gc05122008@gmail.com">gc05122008@gmail.com</a>
+</div>
   </div>
 </div>
 
