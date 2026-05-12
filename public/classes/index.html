@@ -801,9 +801,16 @@
 
     try {
       let code;
+      let found = false;
       for (let i = 0; i < 20; i++) {
         code = generateCode();
-        if (!(await codeExists(code))) break;
+        if (!(await codeExists(code))) { found = true; break; }
+      }
+      if (!found) {
+        showToast('Erreur : impossible de générer un code unique. Réessaie.', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Créer';
+        return;
       }
 
       const classRef = await db.collection('classes').add({
@@ -937,6 +944,11 @@
         }
       }
 
+      if (classes.length === 0) {
+        grid.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><p>Tes classes ont été supprimées ou sont introuvables.</p><p style="font-size:0.85rem;margin-top:8px;">Crée une nouvelle classe ou rejoins-en une.</p></div>';
+        return;
+      }
+
       classes.sort((a, b) => {
         const aCreated = a.createdAt ? a.createdAt.toMillis() : 0;
         const bCreated = b.createdAt ? b.createdAt.toMillis() : 0;
@@ -962,7 +974,7 @@
               : '<button class="btn btn-secondary btn-xs" disabled>Active</button>')
           + (isCreator
               ? '<button class="btn btn-danger btn-xs" onclick="deleteClass(\'' + c.id + '\', \'' + escapeHtml(c.name) + '\')">Supprimer</button>'
-              : '')
+              : '<button class="btn btn-secondary btn-xs" style="color:var(--accent3);border-color:rgba(255,107,107,0.2);" onclick="leaveClass(\'' + c.id + '\', \'' + escapeHtml(c.name) + '\')">Quitter</button>')
           + '</div>'
           + '</div>';
       }).join('');
@@ -986,7 +998,13 @@
 
   function deleteClass(classId, className) {
     showConfirm('Supprimer la classe "' + className + '" ? Les autres membres perdront l\'accès.', async () => {
+      if (!currentUser || !classId) return;
       try {
+        const classDoc = await db.collection('classes').doc(classId).get();
+        if (!classDoc.exists || classDoc.data().creatorId !== currentUser.uid) {
+          showToast('Tu ne peux pas supprimer cette classe.', 'error');
+          return;
+        }
         const memberSnap = await db.collection('classMembers')
           .where('classId', '==', classId)
           .get();
@@ -1006,6 +1024,40 @@
       } catch (e) {
         console.error('deleteClass error:', e);
         showToast('Erreur lors de la suppression : ' + e.message, 'error');
+      }
+    });
+  }
+
+  function leaveClass(classId, className) {
+    showConfirm('Quitter la classe "' + className + '" ?', async () => {
+      try {
+        const memberSnap = await db.collection('classMembers')
+          .where('classId', '==', classId)
+          .where('userId', '==', currentUser.uid)
+          .get();
+
+        if (memberSnap.empty) {
+          showToast('Tu n\'es pas membre de cette classe.', 'error');
+          return;
+        }
+
+        const batch = db.batch();
+        memberSnap.forEach(doc => batch.delete(doc.ref));
+        batch.update(db.collection('classes').doc(classId), {
+          memberCount: firebase.firestore.FieldValue.increment(-1)
+        });
+        await batch.commit();
+
+        const activeId = localStorage.getItem('activeClassId');
+        if (activeId === classId) {
+          localStorage.removeItem('activeClassId');
+        }
+
+        showToast('Tu as quitté "' + className + '".', 'success');
+        loadUserClasses();
+      } catch (e) {
+        console.error('leaveClass error:', e);
+        showToast('Erreur : ' + e.message, 'error');
       }
     });
   }
