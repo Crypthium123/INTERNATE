@@ -15,14 +15,14 @@
     color: var(--text);
     font-family: 'DM Sans', sans-serif;
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
     padding: 40px 20px;
-    text-align: center;
   }
-  .card {
+  .container {
+    max-width: 680px;
+    margin: 0 auto;
+    animation: fadeUp 0.4s ease both;
+  }
+  .hero-card {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 16px;
@@ -84,22 +84,155 @@
   .links { display: flex; flex-direction: column; gap: 10px; align-items: center; }
   .back { margin-top: 28px; display: block; color: var(--muted); font-size: 0.82rem; text-decoration: none; }
   .back:hover { color: var(--text); }
+
+  .faq-section { margin-bottom: 32px; }
+  .faq-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.3rem;
+    letter-spacing: -0.03em;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  details.faq-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  details.faq-item[open] { border-color: var(--accent); }
+  summary.faq-question {
+    padding: 16px 20px;
+    font-weight: 600;
+    font-size: 0.92rem;
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text);
+    user-select: none;
+  }
+  summary.faq-question::-webkit-details-marker { display: none; }
+  summary.faq-question::after {
+    content: '+';
+    font-size: 1.3rem;
+    color: var(--muted);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+    margin-left: 12px;
+  }
+  details[open] summary.faq-question::after {
+    content: '−';
+  }
+  .faq-answer {
+    padding: 0 20px 16px;
+    font-size: 0.88rem;
+    color: var(--text2);
+    line-height: 1.6;
+  }
+  .faq-answer a { color: var(--accent); text-decoration: none; }
+  .faq-answer a:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
-<div class="card">
-  <div class="icon">💬</div>
-  <h1>Centre d'aide</h1>
-  <p>Un bug, une suggestion ou juste une question ?<br>On est là pour ça.</p>
-  <div class="links">
-    <a href="https://forms.gle/KzNnZrZNkXEyJFV16" target="_blank" rel="noopener" class="btn btn-primary">
-      ✍️ Envoyer un retour
-    </a>
-    <a href="mailto:internatesupport@gmail.com?subject=Internate%20-%20Demande%20d'aide" class="btn btn-secondary">
-      📧 Nous écrire directement
-    </a>
+<div class="container">
+
+  <div class="hero-card">
+    <div class="icon">💬</div>
+    <h1>Centre d'aide</h1>
+    <p>Un bug, une suggestion ou juste une question ?<br>On est là pour ça.</p>
+    <div class="links">
+      <a href="https://forms.gle/KzNnZrZNkXEyJFV16" target="_blank" rel="noopener" class="btn btn-primary">
+        ✍️ Envoyer un retour
+      </a>
+      <a href="mailto:internatesupport@gmail.com?subject=Internate%20-%20Demande%20d'aide" class="btn btn-secondary">
+        📧 Nous écrire directement
+      </a>
+    </div>
   </div>
-  <a href="../index.html" class="back">← Retour à l'accueil</a>
+
+  <div class="faq-section">
+    <h2 class="faq-title">❓ Questions fréquentes</h2>
+
+    <details class="faq-item">
+      <summary class="faq-question">Comment créer un compte ?</summary>
+      <div class="faq-answer">
+        Rends-toi sur <a href="../auth/Register_internate.html">la page d'inscription</a>,
+        remplis les champs (email + mot de passe) et valide. Tu peux aussi utiliser
+        la connexion via Google. C'est gratuit et sans engagement.
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-question">J'ai oublié mon mot de passe, que faire ?</summary>
+      <div class="faq-answer">
+        Sur <a href="../auth/Login_Internate.html">la page de connexion</a>, clique sur
+        « Mot de passe oublié ? », entre ton adresse email et tu recevras un lien de
+        réinitialisation. Pense à vérifier tes spams.
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-question">Comment ajouter ou modifier un cours ?</summary>
+      <div class="faq-answer">
+        Connecte-toi et va sur <a href="../courses/Ressources_ex.html">la page Cours</a>.
+        Clique sur « Ajouter un cours » pour en créer un nouveau. Pour modifier ou
+        supprimer un cours existant, clique sur les trois points (⋯) en haut à droite
+        de sa carte.
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-question">Mes cours ne se synchronisent pas entre appareils</summary>
+      <div class="faq-answer">
+        Les cours sont sauvegardés sur Firestore et liés à ton compte. Assure-toi
+        d'être connecté avec le même email sur tous tes appareils. Si le problème
+        persiste, déconnecte-toi et reconnecte-toi, ou vide le cache du navigateur.
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-question">Comment modifier mon profil ?</summary>
+      <div class="faq-answer">
+        Va sur <a href="../profile/index.html">ta page profil</a> une fois connecté.
+        Tu peux y modifier ton prénom et ton nom. Les changements sont sauvegardés
+        automatiquement sur ton compte.
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-question">Un outil ne fonctionne pas correctement</summary>
+      <div class="faq-answer">
+        Essaye d'abord de rafraîchir la page (F5). Si ça ne résout rien,
+        <a href="https://forms.gle/KzNnZrZNkXEyJFV16" target="_blank">envoie-nous un retour</a>
+        en précisant l'outil concerné, ton navigateur et une description du problème.
+        Une capture d'écran nous aide énormément !
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-question">Internate est-il vraiment gratuit ?</summary>
+      <div class="faq-answer">
+        Oui, Internate est 100 % gratuit, sans publicité, sans abonnement et sans
+        tracking. Tous les outils et fonctionnalités sont accessibles sans limite.
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-question">Comment signaler un bug ou suggérer une amélioration ?</summary>
+      <div class="faq-answer">
+        Utilise <a href="https://forms.gle/KzNnZrZNkXEyJFV16" target="_blank">le formulaire de retour</a>
+        ou écris-nous directement à <a href="mailto:internatesupport@gmail.com">internatesupport@gmail.com</a>.
+        On lit tout et on répond sous 24 à 48h.
+      </div>
+    </details>
+
+  </div>
+
+  <a href="../index.html" class="back" style="display:block;text-align:center;margin-bottom:40px;">← Retour à l'accueil</a>
 </div>
 <script src="../js/theme.js"></script>
 <script>navigator.serviceWorker && navigator.serviceWorker.register('/sw.js');</script>
