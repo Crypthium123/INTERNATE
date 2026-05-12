@@ -1515,14 +1515,15 @@
     });
   }
 
-  // ---- CLASS CHAT ----
+  // ---- CLASS CHAT (REAL-TIME) ----
   let chatClassId = null;
   let chatListener = null;
+  let scrollShouldFollow = true;
 
   function openClassChat(classId) {
     chatClassId = classId;
     document.getElementById('classChatOverlay').classList.add('show');
-    loadClassMessages(classId);
+    subscribeClassMessages(classId);
   }
 
   function closeClassChat() {
@@ -1537,75 +1538,67 @@
     if (e.target === e.currentTarget) closeClassChat();
   });
 
-  async function loadClassMessages(classId) {
+  function renderChatMessages(msgs) {
     const area = document.getElementById('chatMessages');
-    area.innerHTML = '<div class="chat-empty"><div class="chat-empty-icon">💬</div><p>Chargement des messages…</p></div>';
-
-    try {
-      const snap = await db.collection('classMessages')
-        .where('classId', '==', classId)
-        .orderBy('timestamp', 'asc')
-        .get();
-
-      if (snap.empty) {
-        area.innerHTML = '<div class="chat-empty"><div class="chat-empty-icon">💬</div><p>Aucun message pour le moment. Sois le premier à écrire !</p></div>';
-        return;
-      }
-
-      let html = '';
-      snap.forEach(doc => {
-        const d = doc.data();
-        const isOwn = d.userId === currentUser?.uid;
-        const time = d.timestamp && d.timestamp.toDate ? d.timestamp.toDate().toLocaleString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '';
-        const initial = (d.userName?.[0] || d.userEmail?.[0] || '?').toUpperCase();
-        html += '<div class="chat-msg' + (isOwn ? ' own' : '') + '">'
-          + '<div class="chat-msg-avatar">' + initial + '</div>'
-          + '<div class="chat-msg-body">'
-          + '<div class="chat-msg-user">' + escapeHtml(d.userName || d.userEmail || 'Inconnu') + '</div>'
-          + '<div class="chat-msg-text">' + escapeHtml(d.text || '') + '</div>'
-          + (time ? '<div class="chat-msg-time">' + time + '</div>' : '')
-          + '</div>'
-          + '</div>';
-      });
-      area.innerHTML = html;
-      area.scrollTop = area.scrollHeight;
-    } catch (e) {
-      if (e.code === 'failed-precondition') {
-        area.innerHTML = '<div class="chat-empty"><div class="chat-empty-icon">⚠️</div><p>Index en cours de création. Rafraîchis dans quelques secondes.</p></div>';
-        console.warn('Chat index missing, retrying without orderBy');
-        try {
-          const snap = await db.collection('classMessages').where('classId', '==', classId).get();
-          if (!snap.empty) {
-            let msgs = [];
-            snap.forEach(doc => { const d = doc.data(); d.id = doc.id; msgs.push(d); });
-            msgs.sort((a, b) => (a.timestamp?.toMillis() || 0) - (b.timestamp?.toMillis() || 0));
-            let html = '';
-            msgs.forEach(d => {
-              const isOwn = d.userId === currentUser?.uid;
-              const time = d.timestamp && d.timestamp.toDate ? d.timestamp.toDate().toLocaleString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '';
-              const initial = (d.userName?.[0] || d.userEmail?.[0] || '?').toUpperCase();
-              html += '<div class="chat-msg' + (isOwn ? ' own' : '') + '">'
-                + '<div class="chat-msg-avatar">' + initial + '</div>'
-                + '<div class="chat-msg-body">'
-                + '<div class="chat-msg-user">' + escapeHtml(d.userName || d.userEmail || 'Inconnu') + '</div>'
-                + '<div class="chat-msg-text">' + escapeHtml(d.text || '') + '</div>'
-                + (time ? '<div class="chat-msg-time">' + time + '</div>' : '')
-                + '</div>'
-                + '</div>';
-            });
-            area.innerHTML = html;
-            area.scrollTop = area.scrollHeight;
-          } else {
-            area.innerHTML = '<div class="chat-empty"><div class="chat-empty-icon">💬</div><p>Aucun message pour le moment.</p></div>';
-          }
-        } catch (e2) {
-          area.innerHTML = '<div class="chat-empty"><div class="chat-empty-icon">⚠️</div><p>Erreur de chargement.</p></div>';
-        }
-      } else {
-        area.innerHTML = '<div class="chat-empty"><div class="chat-empty-icon">⚠️</div><p>Erreur de chargement des messages.</p></div>';
-        console.warn('Chat load error:', e.message);
-      }
+    if (!msgs || msgs.length === 0) {
+      area.innerHTML = '<div class="chat-empty"><div class="chat-empty-icon">💬</div><p>Aucun message pour le moment. Sois le premier à écrire !</p></div>';
+      return;
     }
+    const wasNearBottom = area.scrollTop >= area.scrollHeight - area.clientHeight - 80;
+    let html = '';
+    msgs.forEach(d => {
+      const isOwn = d.userId === currentUser?.uid;
+      const time = d.timestamp && d.timestamp.toDate ? d.timestamp.toDate().toLocaleString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '';
+      const initial = (d.userName?.[0] || d.userEmail?.[0] || '?').toUpperCase();
+      html += '<div class="chat-msg' + (isOwn ? ' own' : '') + '">'
+        + '<div class="chat-msg-avatar">' + initial + '</div>'
+        + '<div class="chat-msg-body">'
+        + '<div class="chat-msg-user">' + escapeHtml(d.userName || d.userEmail || 'Inconnu') + '</div>'
+        + '<div class="chat-msg-text">' + escapeHtml(d.text || '') + '</div>'
+        + (time ? '<div class="chat-msg-time">' + time + '</div>' : '')
+        + '</div>'
+        + '</div>';
+    });
+    area.innerHTML = html;
+    if (wasNearBottom || scrollShouldFollow) {
+      area.scrollTop = area.scrollHeight;
+      scrollShouldFollow = false;
+    }
+  }
+
+  function subscribeClassMessages(classId) {
+    const area = document.getElementById('chatMessages');
+    if (chatListener) { chatListener(); chatListener = null; }
+    area.innerHTML = '<div class="chat-empty"><div class="chat-empty-icon">💬</div><p>Chargement des messages…</p></div>';
+    scrollShouldFollow = true;
+
+    chatListener = db.collection('classMessages')
+      .where('classId', '==', classId)
+      .orderBy('timestamp', 'asc')
+      .onSnapshot(snap => {
+        const msgs = [];
+        snap.forEach(doc => msgs.push(doc.data()));
+        renderChatMessages(msgs);
+      }, err => {
+        if (err.code === 'failed-precondition') {
+          console.warn('Chat index missing, falling back to unordered query');
+          if (chatListener) { chatListener(); chatListener = null; }
+          chatListener = db.collection('classMessages')
+            .where('classId', '==', classId)
+            .onSnapshot(snap2 => {
+              const msgs = [];
+              snap2.forEach(doc => msgs.push(doc.data()));
+              msgs.sort((a, b) => (a.timestamp?.toMillis() || 0) - (b.timestamp?.toMillis() || 0));
+              renderChatMessages(msgs);
+            }, err2 => {
+              area.innerHTML = '<div class="chat-empty"><div class="chat-empty-icon">⚠️</div><p>Erreur de chargement des messages.</p></div>';
+              console.warn('Chat fallback error:', err2.message);
+            });
+        } else {
+          area.innerHTML = '<div class="chat-empty"><div class="chat-empty-icon">⚠️</div><p>Erreur de chargement des messages.</p></div>';
+          console.warn('Chat subscribe error:', err.message);
+        }
+      });
   }
 
   async function sendClassMessage() {
@@ -1638,7 +1631,6 @@
       });
 
       input.value = '';
-      loadClassMessages(chatClassId);
     } catch (e) {
       console.error('sendClassMessage error:', e);
       showToast('Erreur lors de l\'envoi : ' + e.message, 'error');

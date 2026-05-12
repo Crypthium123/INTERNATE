@@ -1226,6 +1226,12 @@
   }
 
   // ---- TOAST ----
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
   function showToast(msg, type) {
     const container = document.getElementById('toastContainer');
     const el = document.createElement('div');
@@ -1574,47 +1580,71 @@
     showToast('📥 Export CSV téléchargé !', 'success');
   }
 
-  // ---- DISCUSSION ----
+  // ---- DISCUSSION (REAL-TIME) ----
   let currentDiscussionCourseId = null;
+  let commentListener = null;
+
   function openDiscussion(courseId) {
     currentDiscussionCourseId = courseId;
     document.getElementById('discussionSection').style.display = 'block';
-    loadComments(courseId);
+    subscribeComments(courseId);
   }
   function closeDiscussion() {
     document.getElementById('discussionSection').style.display = 'none';
+    if (commentListener) { commentListener(); commentListener = null; }
     currentDiscussionCourseId = null;
   }
-  async function loadComments(courseId) {
+
+  function subscribeComments(courseId) {
     const area = document.getElementById('discussionArea');
-    try {
-      let snapshot;
-      try {
-        snapshot = await db.collection('comments').where('courseId', '==', courseId).orderBy('timestamp', 'asc').get();
-      } catch (indexErr) {
-        if (indexErr.code === 'failed-precondition') {
-          console.warn('Index manquant pour comments, fallback sans tri:', indexErr.message);
-          snapshot = await db.collection('comments').where('courseId', '==', courseId).get();
+    if (commentListener) { commentListener(); commentListener = null; }
+    area.innerHTML = '<div class="comment-input-area"><textarea id="commentText" placeholder="Écris un commentaire…"></textarea><button onclick="addComment()">Envoyer</button></div><div class="empty-state"><div class="empty-icon">💬</div><p>Chargement…</p></div>';
+
+    commentListener = db.collection('comments')
+      .where('courseId', '==', courseId)
+      .orderBy('timestamp', 'asc')
+      .onSnapshot(snap => {
+        let html = '<div class="comment-input-area"><textarea id="commentText" placeholder="Écris un commentaire…"></textarea><button onclick="addComment()">Envoyer</button></div>';
+        if (snap.empty) {
+          html += '<div class="empty-state"><div class="empty-icon">💬</div><p>Aucun commentaire pour ce cours. Sois le premier à commenter !</p></div>';
         } else {
-          throw indexErr;
+          snap.forEach(doc => {
+            const d = doc.data();
+            const time = d.timestamp && d.timestamp.toDate ? d.timestamp.toDate().toLocaleString('fr-FR') : '';
+            html += '<div class="comment"><div class="comment-user">' + escapeHtml(d.userId || 'Anonyme') + '</div><div class="comment-text">' + escapeHtml(d.text || '') + '</div>' + (time ? '<div class="comment-time">' + time + '</div>' : '') + '</div>';
+          });
         }
-      }
-      let html = '<div class="comment-input-area"><textarea id="commentText" placeholder="Écris un commentaire…"></textarea><button onclick="addComment()">Envoyer</button></div>';
-      if (snapshot.empty) {
-        html += '<div class="empty-state"><div class="empty-icon">💬</div><p>Aucun commentaire pour ce cours. Sois le premier à commenter !</p></div>';
-      } else {
-        snapshot.forEach(doc => {
-          const d = doc.data();
-          const time = d.timestamp && d.timestamp.toDate ? d.timestamp.toDate().toLocaleString('fr-FR') : '';
-          html += '<div class="comment"><div class="comment-user">' + (d.userId || 'Anonyme') + '</div><div class="comment-text">' + (d.text || '') + '</div>' + (time ? '<div class="comment-time">' + time + '</div>' : '') + '</div>';
-        });
-      }
-      area.innerHTML = html;
-    } catch (e) {
-      area.innerHTML = '<div class="comment-input-area"><textarea id="commentText" placeholder="Écris un commentaire…"></textarea><button onclick="addComment()">Envoyer</button></div><div class="empty-state"><div class="empty-icon">⚠️</div><p>Erreur lors du chargement des commentaires. Vérifie la console.</p></div>';
-      console.warn('Comments load error:', e.message);
-    }
+        area.innerHTML = html;
+      }, err => {
+        if (err.code === 'failed-precondition') {
+          console.warn('Comment index missing, fallback without orderBy');
+          if (commentListener) { commentListener(); commentListener = null; }
+          commentListener = db.collection('comments')
+            .where('courseId', '==', courseId)
+            .onSnapshot(snap2 => {
+              let html = '<div class="comment-input-area"><textarea id="commentText" placeholder="Écris un commentaire…"></textarea><button onclick="addComment()">Envoyer</button></div>';
+              if (snap2.empty) {
+                html += '<div class="empty-state"><div class="empty-icon">💬</div><p>Aucun commentaire pour ce cours.</p></div>';
+              } else {
+                const comments = [];
+                snap2.forEach(doc => comments.push(doc.data()));
+                comments.sort((a, b) => (a.timestamp?.toMillis() || 0) - (b.timestamp?.toMillis() || 0));
+                comments.forEach(d => {
+                  const time = d.timestamp && d.timestamp.toDate ? d.timestamp.toDate().toLocaleString('fr-FR') : '';
+                  html += '<div class="comment"><div class="comment-user">' + escapeHtml(d.userId || 'Anonyme') + '</div><div class="comment-text">' + escapeHtml(d.text || '') + '</div>' + (time ? '<div class="comment-time">' + time + '</div>' : '') + '</div>';
+                });
+              }
+              area.innerHTML = html;
+            }, err2 => {
+              area.innerHTML = '<div class="comment-input-area"><textarea id="commentText" placeholder="Écris un commentaire…"></textarea><button onclick="addComment()">Envoyer</button></div><div class="empty-state"><div class="empty-icon">⚠️</div><p>Erreur de chargement.</p></div>';
+            });
+        } else {
+          area.innerHTML = '<div class="comment-input-area"><textarea id="commentText" placeholder="Écris un commentaire…"></textarea><button onclick="addComment()">Envoyer</button></div><div class="empty-state"><div class="empty-icon">⚠️</div><p>Erreur de chargement.</p></div>';
+          console.warn('Comments subscribe error:', err.message);
+        }
+      });
   }
+
   async function addComment() {
     const text = document.getElementById('commentText').value.trim();
     if (!text) { showToast('Veuillez écrire un commentaire.', 'error'); return; }
@@ -1629,8 +1659,6 @@
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       });
       document.getElementById('commentText').value = '';
-      showToast('Commentaire ajouté !', 'success');
-      loadComments(currentDiscussionCourseId);
     } catch (e) {
       showToast('Erreur lors de l\'envoi du commentaire.', 'error');
       console.warn('Comment add error:', e.message);
