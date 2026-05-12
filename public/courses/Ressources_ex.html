@@ -1108,8 +1108,10 @@
 
 <script>
   let currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+  let authEmail = currentUser.email || '';
 
   function getUserEmail() {
+    if (authEmail) return authEmail;
     if (firebase.auth().currentUser) return firebase.auth().currentUser.email;
     return currentUser.email || '';
   }
@@ -1126,6 +1128,7 @@
 
   auth.onAuthStateChanged(function(user) {
     if (user) {
+      authEmail = user.email;
       let userData = { uid: user.uid, email: user.email };
       localStorage.setItem('currentUser', JSON.stringify(userData));
       updateUserUI(userData);
@@ -1139,6 +1142,7 @@
       document.getElementById('loadingOverlay').classList.add('hidden');
       syncCoursesFromFirestore().then(() => renderCourses());
     } else if (currentUser.email) {
+      authEmail = currentUser.email;
       document.getElementById('loadingOverlay').classList.add('hidden');
       updateUserUI(currentUser);
       syncCoursesFromFirestore().then(() => renderCourses());
@@ -1313,7 +1317,7 @@
   let editId = null;
 
   function openModal(course) {
-    if (course && course.userId !== getUserEmail()) {
+    if (course && course.userId.toLowerCase() !== getUserEmail().toLowerCase()) {
       showToast("Tu ne peux pas modifier ce cours.", "error");
       return;
     }
@@ -1449,7 +1453,7 @@
   function deleteCourse(id) {
     const target = getCourses().find(c => c.id === id);
     if (!target) return;
-    if (target.userId !== getUserEmail()) {
+    if (target.userId.toLowerCase() !== getUserEmail().toLowerCase()) {
       showToast("Tu ne peux pas supprimer ce cours.", "error");
       return;
     }
@@ -1685,8 +1689,8 @@
 
       const dateStr = c.dateAdded ? new Date(c.dateAdded).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) : '';
       const creator = c.userId ? c.userId.replace(/@.*/, '') : '';
-      const userEmail = getUserEmail();
-      const isOwner = creator && userEmail && c.userId === userEmail;
+      const userEmail = getUserEmail().toLowerCase();
+      const isOwner = creator && userEmail && c.userId.toLowerCase() === userEmail;
 
       return `
         <div class="cours-card" id="cours-${c.id}" style="cursor:default;">
