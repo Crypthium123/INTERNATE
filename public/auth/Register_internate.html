@@ -557,7 +557,7 @@
       <span>⚠️</span><span id="errorText">Erreur lors de l'inscription.</span>
     </div>
     <div class="message success" id="successMsg">
-      <span>✅</span><span>Compte créé ! Redirection vers la connexion…</span>
+      <span>✅</span><span>Compte créé ! Vérifie tes emails (pense aux spams) puis connecte-toi.</span>
     </div>
 
     <div class="login-link">
@@ -648,6 +648,12 @@
     try {
       const userCredential = await auth.createUserWithEmailAndPassword(email, password);
 
+      try {
+        await userCredential.user.sendEmailVerification();
+      } catch (e) {
+        console.warn("Email verification send failed:", e.message);
+      }
+
       localStorage.setItem("currentUser", JSON.stringify({
         uid: userCredential.user.uid,
         prenom: prenom,
@@ -668,7 +674,7 @@
       }
 
       document.getElementById("successMsg").style.display = "flex";
-      setTimeout(() => window.location.href = "../dashboard/Connected_internate.html", 2000);
+      setTimeout(() => window.location.href = "Login_Internate.html?registered=true", 2000);
     } catch (error) {
       if (error.code === "auth/email-already-in-use") {
         showError("Un compte existe déjà avec cet email.");

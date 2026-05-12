@@ -22,18 +22,17 @@
     margin: 0 auto;
     animation: fadeUp 0.4s ease both;
   }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
   .hero-card {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 16px;
     padding: 48px 40px;
-    max-width: 520px;
-    width: 100%;
-    animation: fadeUp 0.4s ease both;
-  }
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    text-align: center;
+    margin-bottom: 32px;
   }
   .icon { font-size: 3rem; margin-bottom: 16px; }
   h1 {
@@ -180,8 +179,8 @@
       <div class="faq-answer">
         Connecte-toi et va sur <a href="../courses/Ressources_ex.html">la page Cours</a>.
         Clique sur « Ajouter un cours » pour en créer un nouveau. Pour modifier ou
-        supprimer un cours existant, clique sur les trois points (⋯) en haut à droite
-        de sa carte.
+        supprimer un cours existant, passe la souris sur la carte : les icônes d'action
+        apparaissent en haut à droite (✎ modifier, ✕ supprimer, ↗ partager, 💬 commentaires).
       </div>
     </details>
 
@@ -232,7 +231,7 @@
 
   </div>
 
-  <a href="../index.html" class="back" style="display:block;text-align:center;margin-bottom:40px;">← Retour à l'accueil</a>
+  <a href="../index.html" class="back" style="display:block;text-align:center;color:var(--muted);font-size:0.82rem;text-decoration:none;margin-bottom:40px;">← Retour à l'accueil</a>
 </div>
 <script src="../js/theme.js"></script>
 <script>navigator.serviceWorker && navigator.serviceWorker.register('/sw.js');</script>

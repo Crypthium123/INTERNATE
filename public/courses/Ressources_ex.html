@@ -771,7 +771,6 @@
   .comment-input-area textarea { flex:1; padding:10px 14px; border-radius:8px; background:var(--surface2); border:1px solid var(--border); color:var(--text); font-family:'DM Sans',sans-serif; font-size:0.85rem; resize:vertical; min-height:44px; }
   .comment-input-area button { padding:10px 20px; border-radius:8px; background:var(--accent); color:white; border:none; cursor:pointer; font-weight:600; }
 
-  .file-upload-wrapper { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
 
   @media (max-width: 900px) {
     .menu-toggle { display: flex; position: fixed; top: 12px; left: 12px; z-index: 60; }
@@ -855,6 +854,9 @@
   <a class="nav-item" href="../classes/">
     <span class="nav-icon">👥</span> Classes
   </a>
+  <a class="nav-item" href="../profile/index.html">
+    <span class="nav-icon">👤</span> Mon profil
+  </a>
 
   <div class="nav-section-label">Outils</div>
   <a class="nav-item" href="../tools/Calculatrice_Scientifique.html">
@@ -919,7 +921,7 @@
     </div>
     <button class="btn-upload" onclick="exportJSON()" style="background:var(--surface2);font-size:0.8rem;padding:10px 16px;">📥 JSON</button>
     <button class="btn-upload" onclick="exportCSV()" style="background:var(--surface2);font-size:0.8rem;padding:10px 16px;">📥 CSV</button>
-    <button class="btn-upload"><span>＋</span> Ajouter un cours</button>
+    <button class="btn-upload" id="addCourseBtn"><span>＋</span> Ajouter un cours</button>
   </div>
 <!-- FILTRES -->
   <div class="filter-bar">
@@ -1062,15 +1064,6 @@
       <div class="form-group">
         <label>Description (optionnelle)</label>
         <textarea id="formDescription" placeholder="Description du cours…"></textarea>
-      </div>
-      <div class="form-group">
-        <label>Fichier (upload)</label>
-        <div class="file-upload-wrapper">
-          <input type="file" id="formFileUpload" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.gif,.zip" style="display:none;">
-          <label for="formFileUpload" class="btn btn-secondary" style="display:inline-flex;cursor:pointer;padding:9px 16px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:0.82rem;transition:all 0.2s;">📤 Choisir un fichier</label>
-          <span id="uploadFileName" style="font-size:0.78rem;color:var(--muted);"></span>
-        </div>
-        <div id="uploadStatus" style="font-size:0.78rem;color:var(--muted);margin-top:6px;"></div>
       </div>
       <div class="form-group">
         <label>URL du fichier (optionnelle)</label>
@@ -1329,11 +1322,6 @@
     document.getElementById('formDescription').value = '';
     document.getElementById('formFileUrl').value = '';
     document.getElementById('formFileName').value = '';
-    document.getElementById('uploadStatus').textContent = '';
-    const fu = document.getElementById('formFileUpload');
-    if (fu) fu.value = '';
-    const ufn = document.getElementById('uploadFileName');
-    if (ufn) ufn.textContent = '';
   }
 
   document.getElementById('modalOverlay').addEventListener('click', (e) => {
@@ -1369,16 +1357,15 @@
   }
 
   // ---- CRUD ----
-  async function addCourse() {
+  function addCourse() {
     const title = document.getElementById('formTitle').value.trim();
     const filiere = document.getElementById('formFiliere').value;
     const annee = document.getElementById('formAnnee').value;
     const specialite = document.getElementById('formSpecialite').value;
     const matiere = document.getElementById('formMatiere').value;
     const description = document.getElementById('formDescription').value.trim();
-    const fileUrlInput = document.getElementById('formFileUrl').value.trim();
+    const fileUrl = document.getElementById('formFileUrl').value.trim();
     const fileName = document.getElementById('formFileName').value.trim();
-    const fileInput = document.getElementById('formFileUpload');
 
     if (!title) { showToast('Veuillez saisir un titre.', 'error'); return; }
     if (!filiere) { showToast('Veuillez sélectionner une filière.', 'error'); return; }
@@ -1390,36 +1377,6 @@
       const label = document.getElementById('formSpecialiteLabel').textContent;
       showToast(`Veuillez sélectionner une ${label.toLowerCase()}.`, 'error');
       return;
-    }
-
-    let fileUrl = fileUrlInput;
-    if (fileInput && fileInput.files && fileInput.files[0]) {
-      const authUser = firebase.auth().currentUser;
-      if (!authUser) { showToast('Tu dois être connecté pour uploader un fichier.', 'error'); return; }
-      const statusEl = document.getElementById('uploadStatus');
-      statusEl.textContent = 'Upload en cours... 0%';
-      try {
-        const file = fileInput.files[0];
-        const storageRef = firebase.storage().ref();
-        const fileRef = storageRef.child(`uploads/${authUser.email}/${file.name}`);
-        const task = fileRef.put(file);
-        await new Promise((resolve, reject) => {
-          task.on('state_changed',
-            snapshot => {
-              const pct = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-              statusEl.textContent = `Upload en cours... ${pct}%`;
-            },
-            reject,
-            resolve
-          );
-        });
-        fileUrl = await fileRef.getDownloadURL();
-        statusEl.textContent = 'Upload terminé ✓';
-      } catch (e) {
-        showToast('Erreur lors de l\'upload du fichier.', 'error');
-        console.warn('Upload error:', e.message);
-        return;
-      }
     }
 
     let courses = getCourses();
@@ -1721,8 +1678,8 @@
   }
 
   // ---- INIT ----
-  const uploadBtn = document.querySelector('.btn-upload');
-  if (uploadBtn) uploadBtn.addEventListener('click', openModal);
+  const addCourseBtn = document.getElementById('addCourseBtn');
+  if (addCourseBtn) addCourseBtn.addEventListener('click', function() { openModal(); });
 
   // Populate matière filter
   const matiereFilter = document.getElementById('filterMatiere');
@@ -1732,14 +1689,6 @@
     opt.textContent = m.label;
     matiereFilter.appendChild(opt);
   });
-
-  // File input - show filename
-  const fileUploadEl = document.getElementById('formFileUpload');
-  if (fileUploadEl) {
-    fileUploadEl.addEventListener('change', function() {
-      document.getElementById('uploadFileName').textContent = this.files[0] ? this.files[0].name : '';
-    });
-  }
 
   // Load classes
   loadClasses();
@@ -1762,7 +1711,6 @@ document.addEventListener('click', function(e) {
   Des retours ? <a href="../help/" style="color:var(--accent2);text-decoration:none;font-weight:500;">💬 Aide &amp; retours</a>
 </div>
 <script src="../js/theme.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-storage-compat.js"></script>
 <script>navigator.serviceWorker && navigator.serviceWorker.register('/sw.js');</script>
 </body>
 </html>

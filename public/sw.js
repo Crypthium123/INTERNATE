@@ -7,7 +7,6 @@ const PRECACHE_URLS = [
   '/css/theme.css',
   '/js/firebase-config.js',
   '/js/theme.js',
-  '/js/analytics.js',
   '/js/pdf-export.js',
   '/auth/Login_Internate.html',
   '/auth/Register_internate.html',

@@ -535,10 +535,14 @@
 
       window.location.href = "../dashboard/Connected_internate.html";
     } catch (error) {
-      if (error.code === "auth/user-not-found" || error.code === "auth/wrong-password" || error.code === "auth/invalid-credential") {
+      if (error.code === "auth/invalid-credential") {
+        errorDiv.style.display = "flex";
+      } else if (error.code === "auth/too-many-requests") {
+        errorDiv.querySelector('span:last-child').textContent = "Trop de tentatives. Réessaie plus tard.";
         errorDiv.style.display = "flex";
       } else {
-        alert("Erreur de connexion: " + error.message);
+        errorDiv.querySelector('span:last-child').textContent = "Erreur : " + error.message;
+        errorDiv.style.display = "flex";
       }
       console.error("Erreur de connexion:", error.message);
     }
@@ -581,7 +585,13 @@
       window.location.href = "../dashboard/Connected_internate.html";
     } catch (error) {
       console.error("Erreur Google:", error.message);
-      alert("Erreur lors de la connexion avec Google: " + error.message);
+      if (error.code === 'auth/popup-blocked') {
+        document.getElementById("errorMessage").querySelector('span:last-child').textContent = "Pop-up bloqué par le navigateur. Autorise les pop-ups ou réessaie.";
+        document.getElementById("errorMessage").style.display = "flex";
+      } else {
+        document.getElementById("errorMessage").querySelector('span:last-child').textContent = "Erreur : " + error.message;
+        document.getElementById("errorMessage").style.display = "flex";
+      }
     }
   }
 
