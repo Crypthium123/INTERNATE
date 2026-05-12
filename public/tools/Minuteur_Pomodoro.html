@@ -7,17 +7,10 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
 <style>
   :root {
-    --bg: #09090f;
-    --surface: #11111c;
-    --surface2: #1a1a2e;
-    --border: rgba(255,255,255,0.07);
-    --accent: #6c63ff;
-    --accent2: #00d4aa;
-    --accent3: #ff6b6b;
-    --text: #e8e8f0;
-    --muted: #6b6b8a;
+    --accent3: var(--red);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -29,7 +22,7 @@
     align-items: center;
     gap: 16px;
     padding: 12px 24px;
-    background: rgba(17,17,28,0.85);
+    background: var(--surface-glass);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
     z-index: 100;
@@ -116,7 +109,7 @@
   }
 
   button:hover {
-    background: #7c74ff;
+    background: var(--accent);
     transform: translateY(-2px);
   }
 
@@ -125,7 +118,7 @@
   }
 
   button.stop:hover {
-    background: #ff7c7c;
+    background: var(--red);
   }
 
   button.secondary {
@@ -136,7 +129,7 @@
   }
 
   button.secondary:hover {
-    background: rgba(255,255,255,0.05);
+    background: var(--hover-overlay);
   }
 
   .settings {
@@ -173,7 +166,7 @@
 
   input {
     padding: 10px 12px;
-    background: rgba(255,255,255,0.05);
+    background: var(--hover-overlay);
     border: 1px solid var(--border);
     border-radius: 6px;
     color: var(--text);
@@ -186,8 +179,8 @@
   }
 
   .stats {
-    background: rgba(108,99,255,0.08);
-    border: 1px solid rgba(108,99,255,0.15);
+    background: var(--overlay-accent);
+    border: 1px solid var(--overlay-accent);
     border-radius: 8px;
     padding: 16px;
     margin-bottom: 16px;
@@ -256,10 +249,11 @@
   <a href="../courses/Ressources_ex.html">Cours</a>
   <span class="sep">›</span>
   <span class="current">Pomodoro</span>
-</div>
+  </div>
 
-<div class="container">
+<div class="container" id="mainContent">
   <h1>⏱️ Minuteur Pomodoro</h1>
+  <button onclick="exportPDF('mainContent', 'Minuteur_Pomodoro.pdf')" class="btn btn-secondary" style="padding:6px 14px;font-size:0.8rem;margin-bottom:12px;">📄 Exporter en PDF</button>
   <p class="subtitle">Optimise ton temps d'étude</p>
   
   <div class="settings">
@@ -443,7 +437,11 @@ document.querySelectorAll('input').forEach(inp => {
 updateDisplay();
 </script>
 <div style="text-align:center;padding:16px;font-size:0.75rem;color:var(--muted);margin-top:20px;">
-  Des retours ? <a href="mailto:gc05122008@gmail.com" style="color:var(--accent2);text-decoration:none;">gc05122008@gmail.com</a>
+  <a href="../help/" style="color:var(--accent2);text-decoration:none;">💬 Aide & retours</a>
 </div>
+<script src="../js/theme.js"></script>
+<script src="../js/analytics.js"></script>
+<script src="../js/pdf-export.js"></script>
+<script>navigator.serviceWorker && navigator.serviceWorker.register('/sw.js');</script>
 </body>
 </html>

@@ -7,6 +7,7 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
 <style>
   :root {
     --bg: #09090f;
@@ -86,8 +87,8 @@
     transition: all 0.2s;
   }
 
-  .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.05); }
-  .nav-item.active { color: var(--accent); background: rgba(108,99,255,0.1); }
+  .nav-item:hover { color: var(--text); background: var(--hover-overlay); }
+  .nav-item.active { color: var(--accent);     background: var(--overlay-accent); }
   .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
 
   .sidebar-footer {
@@ -134,7 +135,7 @@
     background: none;
     width: 100%;
   }
-  .logout-btn:hover { color: var(--accent3); background: rgba(255,107,107,0.08); }
+  .logout-btn:hover { color: var(--accent3);     background: var(--btn-danger-bg); }
 
   /* MAIN */
   .main {
@@ -184,7 +185,7 @@
     box-shadow: 0 0 20px rgba(108,99,255,0.3);
   }
   .btn-upload:hover {
-    background: #7c74ff;
+    background: var(--accent);
     box-shadow: 0 0 30px rgba(108,99,255,0.5);
     transform: translateY(-1px);
   }
@@ -267,7 +268,7 @@
     top: 12px; right: 12px;
     padding: 4px 10px;
     background: rgba(0,0,0,0.6);
-    border: 1px solid rgba(255,255,255,0.1);
+    border: 1px solid var(--hover-overlay-strong);
     border-radius: 100px;
     font-size: 0.7rem;
     color: rgba(255,255,255,0.8);
@@ -301,7 +302,7 @@
 
   .meta-tag {
     padding: 3px 9px;
-    background: rgba(255,255,255,0.05);
+    background: var(--hover-overlay);
     border-radius: 100px;
     font-size: 0.7rem;
     color: var(--muted);
@@ -476,7 +477,7 @@
     border-radius: 6px;
     transition: all 0.2s;
   }
-  .modal-close:hover { color: var(--text); background: rgba(255,255,255,0.06); }
+  .modal-close:hover { color: var(--text);     background: var(--hover-overlay); }
 
   .form-group {
     margin-bottom: 16px;
@@ -543,7 +544,7 @@
     cursor: pointer;
     transition: all 0.2s;
   }
-  .btn-primary:hover { background: #7c74ff; transform: translateY(-1px); }
+  .btn-primary:hover { background: var(--accent); transform: translateY(-1px); }
 
   .btn-secondary {
     padding: 10px 22px;
@@ -566,7 +567,7 @@
     width: 30px; height: 30px;
     border-radius: 8px;
     background: rgba(0,0,0,0.5);
-    border: 1px solid rgba(255,255,255,0.08);
+    border: 1px solid var(--hover-overlay-strong);
     color: var(--accent3);
     font-size: 0.9rem;
     cursor: pointer;
@@ -588,7 +589,7 @@
     width: 30px; height: 30px;
     border-radius: 8px;
     background: rgba(0,0,0,0.5);
-    border: 1px solid rgba(255,255,255,0.08);
+    border: 1px solid var(--hover-overlay-strong);
     color: var(--accent2);
     font-size: 0.85rem;
     cursor: pointer;
@@ -814,7 +815,10 @@
     <span class="nav-icon">&#x1F4AC;</span> Générateur de Citations
   </a>
 
-  <div class="sidebar-footer">
+  <a href="../admin/index.html" class="nav-item" id="adminNavLink">
+  <span class="ni">⚙️</span> Administration
+</a>
+<div class="sidebar-footer">
     <div class="user-card">
       <div class="avatar" id="avatarEl">?</div>
       <div class="user-info">
@@ -825,9 +829,6 @@
     <button class="logout-btn" onclick="logout()">
       <span>🚪</span> Se déconnecter
     </button>
-    <button class="logout-btn" onclick="logout()">
-      <span>🚪</span> Se déconnecter
-    </button>
     <a href="../contact.html" class="logout-btn" style="text-decoration:none;margin-top:2px;">
       <span>💬</span> Contact & retours
     </a>
@@ -835,9 +836,16 @@
 
   </aside>
 
-<button class="menu-toggle" onclick="toggleSidebar()" aria-label="Menu">?</button>
+<button class="menu-toggle" onclick="toggleSidebar()" aria-label="Menu">&#9776;</button>
 
 <main class="main">
+  <div class="page-header">
+    <div>
+      <h1>📚 Mes cours</h1>
+      <p>Ressources et supports pédagogiques</p>
+    </div>
+    <button class="btn-upload"><span>＋</span> Ajouter un cours</button>
+  </div>
 <!-- FILTRES -->
   <div class="filter-bar">
     <select class="filter-select" id="filterFiliere" onchange="applyFilters()">
@@ -1009,9 +1017,18 @@
 
 <script>
   // Auth check
-  document.getElementById('loadingOverlay').classList.add('hidden');
   const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
-  if (!user.email) window.location.href = '../auth/Login_Internate.html';
+  if (user.email) {
+    document.getElementById('loadingOverlay').classList.add('hidden');
+    syncCoursesFromFirestore().then(() => renderCourses());
+  } else {
+    window.location.href = '../auth/Login_Internate.html';
+  }
+
+  if (user.email !== 'gc05122008@gmail.com') {
+    const el = document.getElementById('adminNavLink');
+    if (el) el.style.display = 'none';
+  }
 
   const initials = (user.prenom?.[0] || '?') + (user.nom?.[0] || '');
   document.getElementById('avatarEl').textContent = initials.toUpperCase();
@@ -1059,6 +1076,63 @@
 
   // ---- DATA ----
   const STORAGE_KEY = 'internate_courses';
+  let firestoreReady = false;
+
+  function getLocalCourses() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch { return []; }
+  }
+
+  function saveLocalCourses(courses) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(courses));
+  }
+
+  async function syncCoursesFromFirestore() {
+    if (typeof db === 'undefined') return;
+    try {
+      const snapshot = await db.collection('cours').orderBy('dateAdded', 'desc').get();
+      const courses = [];
+      snapshot.forEach(doc => {
+        const d = doc.data();
+        courses.push({ id: doc.id, firestoreId: doc.id, ...d });
+      });
+      saveLocalCourses(courses);
+      firestoreReady = true;
+      return courses;
+    } catch (e) {
+      if (e.code !== 'failed-precondition' && e.code !== 'unavailable') {
+        console.warn('Firestore sync error:', e.message);
+      }
+      return null;
+    }
+  }
+
+  async function saveToFirestore(course) {
+    if (typeof db === 'undefined') return false;
+    try {
+      if (course.firestoreId) {
+        const { firestoreId, id, ...data } = course;
+        await db.collection('cours').doc(firestoreId).set(data, { merge: true });
+      } else {
+        const { firestoreId, id, ...data } = course;
+        const ref = await db.collection('cours').add(data);
+        course.firestoreId = ref.id;
+        course.id = ref.id;
+      }
+      return true;
+    } catch (e) {
+      console.warn('Firestore save error:', e.message);
+      return false;
+    }
+  }
+
+  async function deleteFromFirestore(firestoreId) {
+    if (typeof db === 'undefined' || !firestoreId) return;
+    try {
+      await db.collection('cours').doc(firestoreId).delete();
+    } catch (e) {
+      console.warn('Firestore delete error:', e.message);
+    }
+  }
 
   const SPECIALITES_GENERALE = {
     '1ere': [
@@ -1116,11 +1190,11 @@
   ];
 
   function getCourses() {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch { return []; }
+    return getLocalCourses();
   }
 
   function saveCourses(courses) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(courses));
+    saveLocalCourses(courses);
   }
 
   // ---- MODAL ----
@@ -1145,7 +1219,6 @@
     } else {
       editId = null;
       document.getElementById('modalTitle').textContent = 'Ajouter un cours';
-      closeModal();
       document.getElementById('modalOverlay').classList.add('show');
     }
     document.getElementById('formTitle').focus();
@@ -1226,13 +1299,18 @@
     const now = new Date().toISOString();
 
     if (editId) {
-      courses = courses.map(c => c.id === editId ? { ...c, title, filiere, annee, specialite, matiere, matiereLabel: matiereObj.label, matiereIcon: matiereObj.icon, matiereColor: matiereObj.color, description, fileUrl, fileName: fileName || (fileUrl ? fileUrl.split('/').pop() : '') } : c);
-      saveCourses(courses);
+      const idx = courses.findIndex(c => c.id === editId);
+      if (idx !== -1) {
+        const updated = { ...courses[idx], title, filiere, annee, specialite, matiere, matiereLabel: matiereObj.label, matiereIcon: matiereObj.icon, matiereColor: matiereObj.color, description, fileUrl, fileName: fileName || (fileUrl ? fileUrl.split('/').pop() : '') };
+        courses[idx] = updated;
+        saveCourses(courses);
+        saveToFirestore(updated);
+      }
       closeModal();
       renderCourses();
       showToast('Cours modifié !', 'success');
     } else {
-      courses.push({
+      const newCourse = {
         id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
         title, filiere, annee, specialite, matiere,
         matiereLabel: matiereObj.label,
@@ -1240,9 +1318,12 @@
         matiereColor: matiereObj.color,
         description, fileUrl,
         fileName: fileName || (fileUrl ? fileUrl.split('/').pop() : ''),
-        dateAdded: now
-      });
+        dateAdded: now,
+        userId: user.email || 'unknown'
+      };
+      courses.push(newCourse);
       saveCourses(courses);
+      saveToFirestore(newCourse);
       closeModal();
       renderCourses();
       showToast('Cours ajouté !', 'success');
@@ -1251,8 +1332,11 @@
 
   function deleteCourse(id) {
     showConfirm('Supprimer ce cours ?', () => {
-      const courses = getCourses().filter(c => c.id !== id);
+      const all = getCourses();
+      const target = all.find(c => c.id === id);
+      const courses = all.filter(c => c.id !== id);
       saveCourses(courses);
+      if (target) deleteFromFirestore(target.firestoreId || target.id);
       renderCourses();
       showToast('Cours supprimé.', 'success');
     });
@@ -1369,7 +1453,8 @@
   }
 
   // ---- INIT ----
-  document.querySelector('.btn-upload').addEventListener('click', openModal);
+  const uploadBtn = document.querySelector('.btn-upload');
+  if (uploadBtn) uploadBtn.addEventListener('click', openModal);
 
   // Populate matière filter
   const matiereFilter = document.getElementById('filterMatiere');
@@ -1396,7 +1481,10 @@ document.addEventListener('click', function(e) {
 });
 </script>
 <div style="text-align:center;padding:20px;font-size:0.78rem;color:var(--muted);border-top:1px solid var(--border);margin-top:40px;">
-  Des retours ? <a href="mailto:gc05122008@gmail.com" style="color:var(--accent2);text-decoration:none;font-weight:500;">gc05122008@gmail.com</a>
+  Des retours ? <a href="../help/" style="color:var(--accent2);text-decoration:none;font-weight:500;">💬 Aide &amp; retours</a>
 </div>
+<script src="../js/theme.js"></script>
+<script src="../js/analytics.js"></script>
+<script>navigator.serviceWorker && navigator.serviceWorker.register('/sw.js');</script>
 </body>
 </html>

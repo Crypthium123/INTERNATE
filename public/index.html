@@ -7,17 +7,10 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
 <style>
   :root {
-    --bg: #09090f;
-    --surface: #11111c;
-    --surface2: #1a1a2e;
-    --border: rgba(255,255,255,0.07);
-    --accent: #6c63ff;
-    --accent2: #00d4aa;
     --accent3: #ff6b6b;
-    --text: #e8e8f0;
-    --muted: #6b6b8a;
     --glow: rgba(108, 99, 255, 0.3);
   }
 
@@ -58,8 +51,8 @@
     filter: blur(80px);
     animation: float 20s ease-in-out infinite;
   }
-  .orb-1 { width: 500px; height: 500px; background: rgba(108,99,255,0.12); top: -100px; left: -100px; animation-delay: 0s; }
-  .orb-2 { width: 400px; height: 400px; background: rgba(0,212,170,0.08); top: 50%; right: -100px; animation-delay: -7s; }
+  .orb-1 { width: 500px; height: 500px; background: var(--overlay-accent); top: -100px; left: -100px; animation-delay: 0s; }
+  .orb-2 { width: 400px; height: 400px; background: var(--overlay-green); top: 50%; right: -100px; animation-delay: -7s; }
   .orb-3 { width: 350px; height: 350px; background: rgba(255,107,107,0.06); bottom: -80px; left: 30%; animation-delay: -14s; }
 
   @keyframes float {
@@ -79,7 +72,7 @@
     justify-content: space-between;
     backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--border);
-    background: rgba(9,9,15,0.7);
+    background: var(--surface-glass-light);
     animation: slideDown 0.6s ease both;
   }
 
@@ -93,7 +86,7 @@
     font-weight: 800;
     font-size: 1.6rem;
     letter-spacing: -0.03em;
-    background: linear-gradient(135deg, #6c63ff, #00d4aa);
+    background: var(--gen-gradient);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -128,7 +121,7 @@
 
   .btn-outline {
     padding: 9px 22px;
-    border: 1px solid rgba(255,255,255,0.15);
+    border: 1px solid var(--border2);
     border-radius: 8px;
     color: var(--text);
     text-decoration: none;
@@ -154,11 +147,11 @@
     transition: all 0.2s;
     border: none;
     cursor: pointer;
-    box-shadow: 0 0 20px rgba(108,99,255,0.4);
+    box-shadow: var(--shadow-btn);
   }
   .btn-primary:hover {
-    background: #7c74ff;
-    box-shadow: 0 0 30px rgba(108,99,255,0.6);
+    background: var(--accent);
+    box-shadow: var(--shadow-btn-hover);
     transform: translateY(-1px);
   }
 
@@ -180,12 +173,12 @@
     align-items: center;
     gap: 8px;
     padding: 6px 16px;
-    border: 1px solid rgba(108,99,255,0.3);
+    border: 1px solid var(--overlay-accent-strong);
     border-radius: 100px;
     font-size: 0.78rem;
     font-weight: 500;
     color: #a8a3ff;
-    background: rgba(108,99,255,0.08);
+    background: var(--overlay-accent);
     margin-bottom: 36px;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -218,7 +211,7 @@
   .hero h1 .line1 { display: block; color: var(--text); }
   .hero h1 .line2 {
     display: block;
-    background: linear-gradient(135deg, #6c63ff 0%, #00d4aa 60%, #ff6b6b 100%);
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 60%, var(--accent3) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -263,14 +256,14 @@
   }
 
   .btn-hero-secondary {
-    background: rgba(255,255,255,0.05);
+    background: var(--hover-overlay);
     color: var(--text);
     border: 1px solid var(--border);
     backdrop-filter: blur(10px);
   }
   .btn-hero-secondary:hover {
-    background: rgba(255,255,255,0.1);
-    border-color: rgba(255,255,255,0.15);
+    background: var(--hover-overlay-strong);
+    border-color: var(--border2);
     transform: translateY(-2px);
   }
 
@@ -314,7 +307,7 @@
     gap: 0;
     border-top: 1px solid var(--border);
     border-bottom: 1px solid var(--border);
-    background: rgba(255,255,255,0.02);
+    background: var(--hover-overlay);
     padding: 30px 0;
     animation: fadeIn 0.8s ease 1s both;
   }
@@ -416,7 +409,7 @@
     justify-content: center;
     font-size: 1.5rem;
     margin-bottom: 24px;
-    background: var(--icon-bg, rgba(108,99,255,0.15));
+    background: var(--icon-bg, var(--overlay-accent));
   }
 
   .feature-title {
@@ -471,7 +464,7 @@
     cursor: pointer;
   }
   .tool-item:hover {
-    background: rgba(255,255,255,0.04);
+    background: var(--hover-overlay);
     border-color: var(--border);
     transform: translateX(4px);
   }
@@ -480,7 +473,7 @@
     font-size: 1.4rem;
     width: 44px; height: 44px;
     display: flex; align-items: center; justify-content: center;
-    background: rgba(255,255,255,0.05);
+    background: var(--hover-overlay);
     border-radius: 10px;
     flex-shrink: 0;
   }
@@ -608,6 +601,7 @@
     .hero h1 { font-size: clamp(1.8rem, 10vw, 2.5rem); }
     .feature-card { padding: 20px 16px; }
   }
+
 </style>
 </head>
 <body>
@@ -630,7 +624,7 @@
     <a href="auth/Login_Internate.html" class="btn-outline">Se connecter</a>
     <a href="auth/Register_internate.html" class="btn-primary">Créer un compte</a>
   </div>
-</nav>
+  </nav>
 
 <!-- HERO -->
 <section class="hero">
@@ -660,7 +654,7 @@
     <div class="stat-label">Gratuit & accessible</div>
   </div>
   <div class="stat-item">
-    <div class="stat-number">7+</div>
+    <div class="stat-number">11</div>
     <div class="stat-label">Outils intégrés</div>
   </div>
   <div class="stat-item">
@@ -680,32 +674,32 @@
     <div class="section-title">Tout ce qu'il te faut pour<br><em>réussir</em>, au même endroit.</div>
   </div>
   <div class="features-grid">
-    <div class="feature-card reveal reveal-delay-1" style="--accent-color: #6c63ff; --icon-bg: rgba(108,99,255,0.15);">
+    <div class="feature-card reveal reveal-delay-1" style="--accent-color: var(--accent); --icon-bg: var(--overlay-accent);">
       <div class="feature-icon">📚</div>
       <div class="feature-title">Cours organisés</div>
       <div class="feature-desc">Retrouve tous tes cours classés par matière et par thème. Télécharge les PDFs, consulte les fiches, garde tout sous la main.</div>
     </div>
-    <div class="feature-card reveal reveal-delay-2" style="--accent-color: #00d4aa; --icon-bg: rgba(0,212,170,0.15);">
+    <div class="feature-card reveal reveal-delay-2" style="--accent-color: var(--accent2); --icon-bg: var(--overlay-green);">
       <div class="feature-icon">🔧</div>
       <div class="feature-title">Outils de révision</div>
-      <div class="feature-desc">Générateur de fréquences, QR codes, traducteur Morse, chiffrements… Des outils concrets pour apprendre autrement.</div>
+      <div class="feature-desc">Calculatrice, fiches de révision, QCM, Pomodoro, conjugueur… Des outils concrets pour apprendre autrement.</div>
     </div>
-    <div class="feature-card reveal reveal-delay-3" style="--accent-color: #ff6b6b; --icon-bg: rgba(255,107,107,0.15);">
+    <div class="feature-card reveal reveal-delay-3" style="--accent-color: var(--accent3); --icon-bg: rgba(255,107,107,0.15);">
       <div class="feature-icon">🤝</div>
       <div class="feature-title">Entraide de classe</div>
       <div class="feature-desc">Partage tes propres ressources, aide tes camarades et construis une base de connaissances commune.</div>
     </div>
-    <div class="feature-card reveal reveal-delay-1" style="--accent-color: #ffa94d; --icon-bg: rgba(255,169,77,0.15);">
+    <div class="feature-card reveal reveal-delay-1" style="--accent-color: var(--orange); --icon-bg: rgba(255,169,77,0.15);">
       <div class="feature-icon">🔐</div>
       <div class="feature-title">Espace personnel</div>
       <div class="feature-desc">Crée ton compte, accède à tes cours à tout moment depuis n'importe quel appareil. Ton espace, ta progression.</div>
     </div>
-    <div class="feature-card reveal reveal-delay-2" style="--accent-color: #a78bfa; --icon-bg: rgba(167,139,250,0.15);">
+    <div class="feature-card reveal reveal-delay-2" style="--accent-color: var(--purple); --icon-bg: rgba(167,139,250,0.15);">
       <div class="feature-icon">⚡</div>
       <div class="feature-title">Rapide & léger</div>
       <div class="feature-desc">Interface ultra-rapide, sans pub, sans tracking. Juste ce dont tu as besoin pour apprendre efficacement.</div>
     </div>
-    <div class="feature-card reveal reveal-delay-3" style="--accent-color: #34d399; --icon-bg: rgba(52,211,153,0.15);">
+    <div class="feature-card reveal reveal-delay-3" style="--accent-color: var(--accent2); --icon-bg: rgba(52,211,153,0.15);">
       <div class="feature-icon">🌐</div>
       <div class="feature-title">Toujours disponible</div>
       <div class="feature-desc">Plateforme hébergée en ligne — consulte tes cours chez toi, en transport, ou n'importe où avec du réseau.</div>
@@ -735,7 +729,7 @@
         <div class="tool-emoji">📊</div>
         <div class="tool-info">
           <strong>Convertisseur d'Unités</strong>
-          <span>Convertit longueur, masse, température, vitesse et volume</span>
+          <span>Convertit longueur, masse, température, vitesse, volume et énergie</span>
         </div>
         <span class="tool-arrow">→</span>
       </div>
@@ -775,7 +769,7 @@
         <div class="tool-emoji">🎨</div>
         <div class="tool-info">
           <strong>Tableau Blanc</strong>
-          <span>Dessine, annoté et exporte tes schémas et croquis</span>
+          <span>Dessine, annote et exporte tes schémas et croquis</span>
         </div>
         <span class="tool-arrow">→</span>
       </div>
@@ -783,7 +777,7 @@
         <div class="tool-emoji">&#x1F50D;</div>
         <div class="tool-info">
           <strong>Analyseur de Texte</strong>
-          <span>Analyse la fréquence des mots, la lisibilité et le ton d'un texte</span>
+          <span>Analyse la fréquence des mots, le nombre de caractères, la vitesse de lecture et plus</span>
         </div>
         <span class="tool-arrow">→</span>
       </div>
@@ -799,7 +793,7 @@
         <div class="tool-emoji">&#x1F4D6;</div>
         <div class="tool-info">
           <strong>Conjugueur Français</strong>
-          <span>Conjugue tous les verbes français à tous les temps</span>
+          <span>Conjugue les verbes français aux principaux temps de l'indicatif</span>
         </div>
         <span class="tool-arrow">→</span>
       </div>
@@ -830,7 +824,7 @@
 <footer>
   <div class="logo" style="font-size:1.1rem;">Inter<span style="-webkit-text-fill-color:rgba(255,255,255,0.4)">nate</span></div>
   <span>Plateforme éducative collaborative — Fait avec ❤️</span>
-  <span>© 2025 Internate</span>
+  <span>© 2026 Internate</span>
 </footer>
 
 <script>
@@ -853,8 +847,11 @@
   });
 </script>
 <div style="text-align:center;padding:20px 20px 30px;font-size:0.8rem;color:var(--muted);border-top:1px solid var(--border);margin-top:60px;">
-  Des retours ? <a href="mailto:gc05122008@gmail.com" style="color:var(--accent2);text-decoration:none;font-weight:500;">gc05122008@gmail.com</a>
+  Des retours ? <a href="help/" style="color:var(--accent2);text-decoration:none;font-weight:500;">💬 Aide &amp; retours</a>
   · <a href="contact.html" style="color:var(--muted);text-decoration:none;">Page contact</a>
 </div>
+<script src="js/theme.js"></script>
+<script src="js/analytics.js"></script>
+<script>navigator.serviceWorker && navigator.serviceWorker.register('/sw.js');</script>
 </body>
 </html>

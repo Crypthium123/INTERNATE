@@ -7,6 +7,7 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
 <style>
   :root {
     --bg: #09090f; --surface: #11111c; --surface2: #1a1a2e; --surface3: rgba(255,255,255,0.03);
@@ -59,11 +60,11 @@
     font-family: 'DM Sans', sans-serif;
   }
   .nav-item .ni { font-size: 1rem; width: 22px; text-align: center; flex-shrink: 0; }
-  .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.05); }
-  .nav-item.active { color: var(--accent); background: rgba(108,99,255,0.1); font-weight: 600; }
+  .nav-item:hover { color: var(--text); background: var(--hover-overlay); }
+  .nav-item.active { color: var(--accent); background: var(--overlay-accent); font-weight: 600; }
   .sidebar-footer { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 4px; }
   .user-tile { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 10px; cursor: pointer; transition: background 0.2s; }
-  .user-tile:hover { background: rgba(255,255,255,0.04); }
+  .user-tile:hover { background: var(--hover-overlay); }
   .avatar {
     width: 36px; height: 36px; border-radius: 9px;
     background: linear-gradient(135deg, var(--accent), var(--accent2));
@@ -74,7 +75,7 @@
   .user-name { font-size: 0.85rem; font-weight: 600; }
   .user-role { font-size: 0.7rem; color: var(--muted); }
   .btn-logout { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; color: var(--muted); font-size: 0.82rem; cursor: pointer; border: none; background: none; width: 100%; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
-  .btn-logout:hover { color: var(--red); background: rgba(255,71,87,0.08); }
+  .btn-logout:hover { color: var(--red); background: var(--btn-danger-bg); }
   .main-content { margin-left: var(--sidebar-w); flex: 1; padding: 36px 44px; min-height: 100vh; animation: fadeUp 0.4s ease both; }
   @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
   .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 40px; }
@@ -86,18 +87,18 @@
   .form-group { margin-bottom: 20px; }
   .form-group label { display: block; font-size: 0.76rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-bottom: 7px; }
   .form-group input { width: 100%; padding: 13px 16px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.92rem; outline: none; transition: all 0.22s; }
-  .form-group input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(108,99,255,0.13); background: rgba(255,255,255,0.05); }
+  .form-group input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--overlay-accent); background: var(--hover-overlay); }
   .form-group input:disabled { opacity: 0.5; cursor: not-allowed; }
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: 9px; font-family: 'DM Sans', sans-serif; font-size: 0.87rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; text-decoration: none; }
   .btn-primary { background: var(--accent); color: white; box-shadow: 0 0 20px rgba(108,99,255,0.35); }
   .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 0 35px rgba(108,99,255,0.55); }
-  .btn-secondary { background: rgba(255,255,255,0.06); color: var(--text); border: 1px solid var(--border); }
-  .btn-secondary:hover { background: rgba(255,255,255,0.1); }
+  .btn-secondary { background: var(--hover-overlay); color: var(--text); border: 1px solid var(--border); }
+  .btn-secondary:hover { background: var(--hover-overlay-strong); }
   .form-actions { display: flex; gap: 12px; margin-top: 32px; justify-content: flex-end; }
   .alert { display: none; align-items: center; gap: 10px; padding: 12px 16px; border-radius: 9px; font-size: 0.85rem; margin-bottom: 20px; }
-  .alert-success { display: flex; background: rgba(0,212,170,0.1); border: 1px solid rgba(0,212,170,0.2); color: var(--accent2); }
-  .alert-error { display: flex; background: rgba(255,71,87,0.1); border: 1px solid rgba(255,71,87,0.2); color: var(--red); }
+  .alert-success { display: flex; background: var(--overlay-green); border: 1px solid rgba(0,212,170,0.2); color: var(--accent2); }
+  .alert-error { display: flex; background: var(--overlay-red); border: 1px solid rgba(255,71,87,0.2); color: var(--red); }
   .menu-toggle { display: none; position: fixed; top: 12px; left: 12px; z-index: 60; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; width: 40px; height: 40px; cursor: pointer; align-items: center; justify-content: center; font-size: 1.3rem; color: var(--text); transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
   .menu-toggle:hover { background: var(--surface2); }
   .loading-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.4s ease; }
@@ -151,7 +152,10 @@
   <a class="nav-item" href="../tools/Calculateur_Moyenne.html"><span class="ni">&#x1F4C8;</span> Calculateur de Moyenne</a>
   <a class="nav-item" href="../tools/Conjugueur_Francais.html"><span class="ni">&#x1F4D6;</span> Conjugueur Français</a>
   <a class="nav-item" href="../tools/Generateur_Citations.html"><span class="ni">&#x1F4AC;</span> Générateur de Citations</a>
-  <div class="sidebar-footer">
+  <a href="../admin/index.html" class="nav-item" id="adminNavLink">
+  <span class="ni">⚙️</span> Administration
+</a>
+<div class="sidebar-footer">
     <div class="user-tile" id="userTile" onclick="window.location.href='index.html'">
       <div class="avatar" id="avatarEl">?</div>
       <div>
@@ -196,11 +200,14 @@ function showToast(msg,type){var c=document.getElementById('toastContainer'),e=d
 function toggleSidebar(){document.querySelector('.sidebar').classList.toggle('open')}
 document.addEventListener('click',function(e){var s=document.querySelector('.sidebar'),t=document.querySelector('.menu-toggle');if(window.innerWidth<=900&&!s.contains(e.target)&&!t.contains(e.target)){s.classList.remove('open')}})
 function logout(){auth.signOut().then(function(){localStorage.removeItem('currentUser');window.location.href='../auth/Login_Internate.html'})}
-auth.onAuthStateChanged(async function(user){document.getElementById('loadingOverlay').classList.add('hidden');if(user){var userData={};try{var userDoc=await db.collection('users').doc(user.uid).get();if(userDoc.exists)userData=userDoc.data()}catch(e){console.warn('Firestore indisponible:',e.message);userData=JSON.parse(localStorage.getItem('currentUser')||'{}')}var fullData={uid:user.uid,email:user.email};Object.assign(fullData,userData);localStorage.setItem('currentUser',JSON.stringify(fullData));var prenom=userData.prenom||(user.displayName?user.displayName.split(' ')[0]:'')||'Utilisateur';var nom=userData.nom||(user.displayName?user.displayName.split(' ').slice(1).join(' '):'')||'';var initial=(prenom[0]||'?').toUpperCase();document.getElementById('profileAvatar').textContent=initial;document.getElementById('profileName').textContent=(prenom+' '+nom).trim();document.getElementById('profileEmail').textContent=user.email;document.getElementById('avatarEl').textContent=initial;document.getElementById('userNameEl').textContent=(prenom+' '+nom).trim();document.getElementById('inputPrenom').value=prenom==='Utilisateur'?'':prenom;document.getElementById('inputNom').value=nom;document.getElementById('inputEmail').value=user.email}else{window.location.href='../auth/Login_Internate.html'}})
+auth.onAuthStateChanged(async function(user){document.getElementById('loadingOverlay').classList.add('hidden');if(user){var userData={};try{var userDoc=await db.collection('users').doc(user.uid).get();if(userDoc.exists)userData=userDoc.data()}catch(e){console.warn('Firestore indisponible:',e.message);userData=JSON.parse(localStorage.getItem('currentUser')||'{}')}var fullData={uid:user.uid,email:user.email};Object.assign(fullData,userData);localStorage.setItem('currentUser',JSON.stringify(fullData));var prenom=userData.prenom||(user.displayName?user.displayName.split(' ')[0]:'')||'Utilisateur';var nom=userData.nom||(user.displayName?user.displayName.split(' ').slice(1).join(' '):'')||'';var initial=(prenom[0]||'?').toUpperCase();document.getElementById('profileAvatar').textContent=initial;document.getElementById('profileName').textContent=(prenom+' '+nom).trim();document.getElementById('profileEmail').textContent=user.email;document.getElementById('avatarEl').textContent=initial;document.getElementById('userNameEl').textContent=(prenom+' '+nom).trim();document.getElementById('inputPrenom').value=prenom==='Utilisateur'?'':prenom;document.getElementById('inputNom').value=nom;document.getElementById('inputEmail').value=user.email;if(user.email!=='gc05122008@gmail.com'){var el=document.getElementById('adminNavLink');if(el)el.style.display='none'}}else{window.location.href='../auth/Login_Internate.html'}})
 async function saveProfile(e){e.preventDefault();var prenom=document.getElementById('inputPrenom').value.trim();var nom=document.getElementById('inputNom').value.trim();if(!prenom||!nom){showToast('Veuillez remplir tous les champs.','error');return}var btn=document.getElementById('saveBtn');btn.disabled=true;btn.textContent='Enregistrement...';try{var user=auth.currentUser;if(!user)throw new Error('Non connecte');await db.collection('users').doc(user.uid).update({prenom:prenom,nom:nom});var cur=JSON.parse(localStorage.getItem('currentUser')||'{}');cur.prenom=prenom;cur.nom=nom;localStorage.setItem('currentUser',JSON.stringify(cur));document.getElementById('profileName').textContent=prenom+' '+nom;document.getElementById('profileAvatar').textContent=prenom[0].toUpperCase();document.getElementById('avatarEl').textContent=prenom[0].toUpperCase();document.getElementById('userNameEl').textContent=prenom+' '+nom;document.getElementById('successAlert').style.display='flex';document.getElementById('errorAlert').style.display='none';showToast('Profil mis a jour !','success');setTimeout(function(){document.getElementById('successAlert').style.display='none'},3000)}catch(err){console.error('Erreur sauvegarde profil:',err);document.getElementById('errorAlert').style.display='flex';document.getElementById('successAlert').style.display='none';showToast('Erreur: '+err.message,'error')}finally{btn.disabled=false;btn.textContent='Enregistrer'}}
 </script>
 <div style="text-align:center;padding:20px;font-size:0.78rem;color:var(--muted);border-top:1px solid var(--border);margin-top:40px;">
-  Des retours ? <a href="mailto:gc05122008@gmail.com" style="color:var(--accent2);text-decoration:none;font-weight:500;">gc05122008@gmail.com</a>
+  Des retours ? <a href="../help/" style="color:var(--accent2);text-decoration:none;font-weight:500;">💬 Aide &amp; retours</a>
 </div>
+<script src="../js/theme.js"></script>
+<script src="../js/analytics.js"></script>
+<script>navigator.serviceWorker && navigator.serviceWorker.register('/sw.js');</script>
 </body>
 </html>

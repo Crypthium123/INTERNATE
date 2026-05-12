@@ -1,0 +1,59 @@
+/* ============================================================
+   INTERNATE V3 — Theme (Dark only)
+   ============================================================ */
+
+:root {
+  --bg: #07070e;
+  --surface: #0f0f1a;
+  --surface2: #161625;
+  --surface3: #1d1d30;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+
+  --gen-primary: #6c63ff;
+  --gen-secondary: #00d4aa;
+  --gen-gradient: linear-gradient(135deg, #6c63ff, #00d4aa);
+
+  --tech-primary: #ff6b35;
+  --tech-secondary: #ffd166;
+  --tech-gradient: linear-gradient(135deg, #ff6b35, #ffd166);
+
+  --accent: var(--gen-primary);
+  --accent2: var(--gen-secondary);
+  --red: #ff4757;
+  --orange: #ffa94d;
+  --green: #00d4aa;
+  --blue: #54a0ff;
+  --purple: #a78bfa;
+  --pink: #f472b6;
+
+  --text: #eeeef5;
+  --text2: #b0b0cc;
+  --muted: #5a5a7a;
+
+  --sidebar-w: 260px;
+  --topbar-h: 64px;
+
+  --shadow-card: 0 12px 40px rgba(0,0,0,0.4);
+  --shadow-btn: 0 0 20px rgba(108,99,255,0.35);
+  --shadow-btn-hover: 0 0 35px rgba(108,99,255,0.55);
+  --scrollbar-thumb: rgba(255,255,255,0.1);
+  --scrollbar-thumb-hover: rgba(255,255,255,0.18);
+
+  --hover-overlay: rgba(255,255,255,0.05);
+  --hover-overlay-strong: rgba(255,255,255,0.10);
+  --surface-glass: rgba(15,15,26,0.85);
+  --surface-glass-light: rgba(15,15,26,0.7);
+  --overlay-accent: rgba(108,99,255,0.15);
+  --overlay-accent-strong: rgba(108,99,255,0.25);
+  --overlay-red: rgba(255,71,87,0.1);
+  --overlay-green: rgba(0,212,170,0.1);
+  --overlay-blue: rgba(84,160,255,0.1);
+  --overlay-accent-hover: rgba(108,99,255,0.2);
+  --btn-danger-bg: rgba(255,71,87,0.08);
+}
+
+body.filiere-techno {
+  --accent: var(--tech-primary);
+  --accent2: var(--tech-secondary);
+}

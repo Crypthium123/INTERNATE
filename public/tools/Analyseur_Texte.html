@@ -7,17 +7,8 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
 <style>
-  :root {
-    --bg: #09090f;
-    --surface: #11111c;
-    --surface2: #1a1a2e;
-    --border: rgba(255,255,255,0.07);
-    --accent: #6c63ff;
-    --accent2: #00d4aa;
-    --text: #e8e8f0;
-    --muted: #6b6b8a;
-  }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -28,7 +19,7 @@
     align-items: center;
     gap: 16px;
     padding: 12px 24px;
-    background: rgba(17,17,28,0.85);
+    background: var(--surface-glass);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
     z-index: 100;
@@ -179,16 +170,16 @@
     font-family: 'Syne', sans-serif;
   }
   .actions button:hover {
-    background: rgba(108,99,255,0.15);
+    background: var(--overlay-accent);
     border-color: var(--accent);
   }
   .actions button.primary {
-    background: rgba(108,99,255,0.2);
+    background: var(--overlay-accent-hover);
     color: var(--accent);
     border-color: var(--accent);
   }
   .actions button.primary:hover {
-    background: rgba(108,99,255,0.35);
+    background: var(--overlay-accent-strong);
   }
 
   .loading-overlay {
@@ -252,10 +243,11 @@
   <a href="../courses/Ressources_ex.html">Cours</a>
   <span class="sep">›</span>
   <span class="current">Analyseur de Texte</span>
-</div>
+  </div>
 
-<div class="container">
+<div class="container" id="mainContent">
   <h1>Analyseur de Texte</h1>
+  <button onclick="exportPDF('mainContent', 'Analyseur_Texte.pdf')" class="btn btn-secondary" style="padding:6px 14px;font-size:0.8rem;margin-bottom:12px;">📄 Exporter en PDF</button>
 
   <textarea id="textInput" placeholder="Collez ou tapez votre texte ici..."></textarea>
 
@@ -286,7 +278,7 @@
   </div>
 
   <footer>
-    Des retours ? <a href="mailto:gc05122008@gmail.com">gc05122008@gmail.com</a>
+    <a href="../help/" style="color:var(--accent2);text-decoration:none;">💬 Aide & retours</a>
   </footer>
 </div>
 
@@ -418,5 +410,9 @@ ${topWords.map(([w, c]) => `  ${w} : ${c}`).join('\n')}`;
 
 textarea.focus();
 </script>
+<script src="../js/theme.js"></script>
+<script src="../js/analytics.js"></script>
+<script src="../js/pdf-export.js"></script>
+<script>navigator.serviceWorker && navigator.serviceWorker.register('/sw.js');</script>
 </body>
 </html>

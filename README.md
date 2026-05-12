@@ -1,38 +1,41 @@
 # Internate
 
-**Plateforme éducative collaborative** — Accède à tous tes cours, utilise des outils de révision intelligents et apprends avec ta classe, tout au même endroit.
+**Plateforme éducative collaborative** — centralise les cours, outils de révision et ressources pédagogiques dans un espace sécurisé, sans publicité et sans tracking.
 
-![Internate](https://img.shields.io/badge/version-2.0.0-6c63ff) ![Firebase](https://img.shields.io/badge/Firebase-✓-00d4aa) ![License](https://img.shields.io/badge/license-MIT-6c63ff)
+![Version](https://img.shields.io/badge/version-3.0-6c63ff) ![Firebase](https://img.shields.io/badge/Firebase-Auth%20|%20Firestore%20|%20Hosting-00d4aa) ![License](https://img.shields.io/badge/license-MIT-6c63ff) ![Status](https://img.shields.io/badge/status-production-00d4aa)
+
+🔗 **Site en ligne :** [https://internate.web.app](https://internate.web.app)
 
 ---
 
-## But du projet
+## À propos
 
-Internate est une plateforme web éducative conçue pour centraliser les ressources pédagogiques d'une classe. Elle permet aux élèves de :
+Internate est une plateforme web éducative pensée pour les lycéens et leurs enseignants. Le projet est né d'un constat simple : les outils éducatifs existants sont soit payants, soit truffés de publicités, soit dispersés sur plusieurs plateformes. L'objectif est de tout réunir au même endroit, gratuitement.
 
-- **Accéder** à leurs cours classés par matière, filière et niveau
-- **Réviser** avec 11 outils interactifs intégrés (calculatrice, fiches, QCM…)
-- **Partager** des ressources avec leurs camarades
-- **Suivre** leur progression dans un espace personnel sécurisé
+**Ce qui a été fait depuis le début :**
 
-Le projet est né du besoin d'avoir une alternative gratuite, sans publicité et sans tracking, aux plateformes éducatives existantes.
+- **V1** — Prototype fonctionnel avec un système de cours en localStorage et quelques outils de révision basiques.
+- **V2** — Refonte complète de l'interface (design sombre, animations, responsive), ajout du dashboard, de l'authentification Firebase, et extension à 11 outils de révision interactifs.
+- **V3** — Migration multi-utilisateur : passage de localStorage à Firestore pour le stockage des cours, synchronisation en temps réel entre les comptes, page d'administration avec analytics, page d'aide avec formulaire de retour, règles de sécurité Firestore, mode sombre permanent, et corrections générales.
 
 ---
 
 ## Fonctionnalités
 
-### 🔐 Authentification
+### 🔐 Authentification & Comptes
 - Inscription et connexion par email/mot de passe
 - Connexion via Google
-- Espace personnel avec profil modifiable
-- Base de données Firestore pour les utilisateurs
+- Profil modifiable (prénom, nom)
+- Réinitialisation du mot de passe
+- Espace personnel sécurisé par Firebase Auth
 
-### 📚 Gestion de cours
+### 📚 Gestion de cours collaborative
 - Ajout, modification et suppression de cours
 - Filtres par filière (générale, technologique), année (2nde, 1ère, terminale), spécialité et matière
 - Tri par date, titre ou matière
+- Stockage Firestore synchronisé entre tous les utilisateurs connectés
+- Fallback localStorage en cas d'indisponibilité Firestore
 - Pièces jointes (URLs de fichiers)
-- Stockage local (localStorage) persistant
 
 ### 🛠️ 11 outils de révision
 
@@ -50,48 +53,54 @@ Le projet est né du besoin d'avoir une alternative gratuite, sans publicité et
 | 📖 Conjugueur Français | Conjugue tous les verbes français |
 | 💬 Générateur de Citations | Découvre des citations inspirantes |
 
+### 📊 Analytics & Administration
+- Collecte anonyme des pages visitées (Firestore + localStorage)
+- Page admin réservée au créateur du projet avec statistiques globales
+- Suivi des utilisateurs actifs et des pages populaires
+
 ### 🎨 Interface
-- Design sombre moderne (dark mode)
+- Design sombre permanent
 - Animations fluides et orbes dynamiques
 - Interface responsive (mobile + desktop)
-- Navigation par sidebar ou topbar selon les pages
+- Navigation par sidebar hamburger
 
 ---
 
 ## Architecture du projet
 
 ```
-├── server.js                 ← Serveur HTTP local (Node.js)
-├── package.json              ← Métadonnées du projet
-├── demarrer.bat              ← Lanceur Windows
-├── stop.bat                  ← Arrêt du serveur
-├── .gitignore                ← Fichiers ignorés par Git
-├── firebase.json             ← Configuration Firebase Hosting
-├── .firebaserc               ← Projet Firebase
+├── firebase.json                ← Configuration Firebase Hosting
+├── firestore.rules              ← Règles de sécurité Firestore
+├── .firebaserc                  ← Projet Firebase
 │
 └── public/
-    ├── index.html            ← Landing page
-    ├── 404.html              ← Page d'erreur personnalisée
-    ├── contact.html          ← Page de contact
-    ├── favicon.svg           ← Icône du site
+    ├── index.html               ← Landing page
+    ├── 404.html                 ← Page d'erreur personnalisée
+    ├── sw.js                    ← Service Worker
     │
     ├── auth/
-    │   ├── Login_Internate.html      ← Connexion
-    │   └── Register_internate.html   ← Inscription
+    │   ├── Login_Internate.html       ← Connexion
+    │   └── Register_internate.html    ← Inscription
     │
     ├── dashboard/
-    │   └── Connected_internate.html  ← Tableau de bord (connecté)
+    │   └── Connected_internate.html   ← Tableau de bord
     │
     ├── courses/
-    │   └── Ressources_ex.html        ← Gestion des cours (CRUD)
+    │   └── Ressources_ex.html         ← Gestion des cours (CRUD)
     │
     ├── profile/
-    │   └── index.html                ← Profil utilisateur
+    │   └── index.html                 ← Profil utilisateur
+    │
+    ├── admin/
+    │   └── index.html                 ← Administration & analytics
+    │
+    ├── help/
+    │   └── index.html                 ← Aide & formulaire de retour
     │
     ├── legal/
-    │   └── Legal.html                ← Conditions d'utilisation & confidentialité
+    │   └── Legal.html                 ← Conditions d'utilisation
     │
-    ├── tools/                        ← 11 outils de révision
+    ├── tools/                         ← 11 outils de révision
     │   ├── Calculatrice_Scientifique.html
     │   ├── Convertisseur_Unites.html
     │   ├── Fabricateur_Fiches.html
@@ -105,91 +114,57 @@ Le projet est né du besoin d'avoir une alternative gratuite, sans publicité et
     │   └── Generateur_Citations.html
     │
     ├── css/
-    │   └── style.css                 ← Styles globaux
+    │   ├── style.css                  ← Styles globaux
+    │   └── theme.css                  ← Variables et thème sombre
     │
     └── js/
-        ├── firebase-config.js        ← 🔑 Clés Firebase (IGNORÉ par git)
-        └── firebase-config.example.js ← Modèle à remplir
+        ├── firebase-config.js         ← 🔑 Clés Firebase (ignoré par git)
+        ├── firebase-config.example.js ← Modèle à remplir
+        ├── analytics.js               ← Collecte de données
+        ├── pdf-export.js              ← Export PDF
+        └── theme.js                   ← Gestion du thème
 ```
 
 ---
 
-## Technologies utilisées
+## Technologies
 
 | Technologie | Rôle |
 |-------------|------|
 | **Firebase Auth** | Authentification (email + Google) |
-| **Firebase Firestore** | Base de données utilisateurs |
+| **Firebase Firestore** | Base de données cours & analytics |
 | **Firebase Hosting** | Hébergement et déploiement |
-| **Vanilla JS** | Aucun framework前端 — JavaScript pur |
-| **CSS3** | Styles inline + feuille globale |
-| **Node.js** | Serveur HTTP local (développement) |
+| **Vanilla JS** | Aucun framework — JavaScript pur |
+| **CSS3** | Styles globaux + variables CSS |
 
 ---
 
-## Démarrage rapide (développement local)
+## Futur
 
-```bash
-# 1. Cloner le projet
-git clone https://github.com/Crypthium123/INTERNATE.git
-cd INTERNATE
-
-# 2. Copier et configurer Firebase
-cp public/js/firebase-config.example.js public/js/firebase-config.js
-# Modifier public/js/firebase-config.js avec vos clés Firebase
-
-# 3. Lancer le serveur local
-node server.js
-# → http://localhost:3000
-
-# Ou双击 demarrer.bat (Windows)
-```
-
-### Configuration Firebase
-
-1. Aller sur [console.firebase.google.com](https://console.firebase.google.com)
-2. Créer un projet (ou utiliser "internate")
-3. Activer **Authentication** → Email/Password + Google
-4. Activer **Firestore Database** → Démarrer en mode test
-5. Copier les clés dans `public/js/firebase-config.js`
-6. Ajouter les domaines d'hébergement dans Authentication → Authorized domains
+- 📱 Application mobile (PWA ou native)
+- 🔔 Notifications push (nouveaux cours, rappels)
+- 📤 Upload de fichiers (PDF, images) via Firebase Storage
+- 👥 Espaces de classe avec invitations
+- 📊 Statistiques de progression individuelles
+- 🤖 Suggestions intelligentes de révision
 
 ---
 
-## Déploiement
+## Retours et suggestions
 
-Le site est déployé sur **Firebase Hosting** :
+Tu as une idée, un bug à signaler ou une suggestion ?
 
-```bash
-npm install -g firebase-tools
-firebase login
-firebase init hosting     # public/ → public, configurer comme SPA
-firebase deploy
-```
-
-🔗 **Site en ligne :** [https://internate.web.app](https://internate.web.app)
-
----
-
-## Captures d'écran
-
-| Page | Aperçu |
-|------|--------|
-| Landing | Hero avec gradient + sections features et outils |
-| Connexion | Split-screen avec formulaire et panneau informatif |
-| Dashboard | Sidebar + grille d'outils + statistiques |
-| Cours | CRUD complet avec filtres et tris |
+➡️ **Formulaire de retour :** [forms.gle/KzNnZrZNkXEyJFV16](https://forms.gle/KzNnZrZNkXEyJFV16)
 
 ---
 
 ## Licence
 
-MIT © 2025 Internate
+MIT © 2026 Internate
 
 ---
 
 ## Contact
 
-Des retours, suggestions ou problèmes ?
-- Email : [gc05122008@gmail.com](mailto:gc05122008@gmail.com)
-- Site : [https://internate.web.app/contact.html](https://internate.web.app/contact.html)
+- Site : [https://internate.web.app](https://internate.web.app)
+- Aide : [https://internate.web.app/help/](https://internate.web.app/help/)

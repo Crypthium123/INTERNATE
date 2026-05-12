@@ -7,17 +7,8 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
 <style>
-  :root {
-    --bg: #09090f;
-    --surface: #11111c;
-    --surface2: #1a1a2e;
-    --border: rgba(255,255,255,0.07);
-    --accent: #6c63ff;
-    --text: #e8e8f0;
-    --muted: #6b6b8a;
-  }
-
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   .tool-topbar {
@@ -27,7 +18,7 @@
     align-items: center;
     gap: 16px;
     padding: 12px 24px;
-    background: rgba(17,17,28,0.85);
+    background: var(--surface-glass);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
     z-index: 100;
@@ -83,7 +74,7 @@
   }
 
   .tool:hover {
-    background: rgba(108,99,255,0.15);
+    background: var(--overlay-accent);
     border-color: var(--accent);
   }
 
@@ -131,16 +122,16 @@
   }
 
   button:hover {
-    background: rgba(255,255,255,0.05);
+    background: var(--hover-overlay);
   }
 
   button.danger {
-    color: #ff6b6b;
-    border-color: #ff6b6b;
+    color: var(--red);
+    border-color: var(--red);
   }
 
   button.danger:hover {
-    background: rgba(255,107,107,0.1);
+    background: var(--overlay-red);
   }
 
   #canvas {
@@ -191,7 +182,7 @@
   .loading-overlay p { color: var(--muted); font-size: 0.85rem; margin-top: 16px; }
 </style>
 </head>
-<body>
+<body id="tool-content">
 <div class="loading-overlay" id="loadingOverlay">
   <div class="spinner"></div>
   <p>Chargement...</p>
@@ -202,10 +193,11 @@
   <a href="../courses/Ressources_ex.html">Cours</a>
   <span class="sep">›</span>
   <span class="current">Tableau Blanc</span>
-</div>
+  </div>
 
 <div class="toolbar">
   <h1>🎨 Tableau Blanc</h1>
+  <button onclick="exportPDF('tool-content', 'Tableau_Blanc.pdf')" class="btn btn-secondary" style="padding:6px 14px;font-size:0.8rem;">📄 Exporter en PDF</button>
   
   <div class="tool" onclick="selectTool('pen')" id="penTool">✏️ Crayon</div>
   <div class="tool" onclick="selectTool('line')">📐 Ligne</div>
@@ -252,10 +244,11 @@ function saveState() {
   states.push(canvas.toDataURL());
 }
 
-function selectTool(tool) {
+function selectTool(tool, e) {
+  e = e || window.event;
   currentTool = tool;
   document.querySelectorAll('.tool').forEach(t => t.classList.remove('active'));
-  event.target.classList.add('active');
+  e.target.classList.add('active');
   canvas.style.cursor = tool === 'eraser' ? 'grab' : 'crosshair';
 }
 
@@ -356,7 +349,11 @@ window.addEventListener('resize', () => {
 selectTool('pen');
 </script>
 <div style="text-align:center;padding:16px;font-size:0.75rem;color:var(--muted);margin-top:20px;">
-  Des retours ? <a href="mailto:gc05122008@gmail.com" style="color:var(--accent2);text-decoration:none;">gc05122008@gmail.com</a>
+  <a href="../help/" style="color:var(--accent2);text-decoration:none;">💬 Aide & retours</a>
 </div>
+<script src="../js/theme.js"></script>
+<script src="../js/analytics.js"></script>
+<script src="../js/pdf-export.js"></script>
+<script>navigator.serviceWorker && navigator.serviceWorker.register('/sw.js');</script>
 </body>
 </html>

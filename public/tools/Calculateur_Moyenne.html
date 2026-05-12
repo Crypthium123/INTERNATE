@@ -7,20 +7,12 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
 <style>
   :root {
-    --bg: #09090f;
-    --surface: #11111c;
-    --surface2: #1a1a2e;
-    --border: rgba(255,255,255,0.07);
-    --accent: #6c63ff;
-    --accent2: #00d4aa;
-    --text: #e8e8f0;
-    --muted: #6b6b8a;
-    --green: #00d4aa;
     --orange: #ffa726;
-    --red: #ff6b6b;
   }
+
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -31,7 +23,7 @@
     align-items: center;
     gap: 16px;
     padding: 12px 24px;
-    background: rgba(17,17,28,0.85);
+    background: var(--surface-glass);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
     z-index: 100;
@@ -112,7 +104,7 @@
   .row input::placeholder { color: var(--muted); }
 
   .row .remove-btn {
-    background: rgba(255,107,107,0.15);
+    background: var(--overlay-red);
     border: 1px solid var(--red);
     color: var(--red);
     border-radius: 6px;
@@ -147,7 +139,7 @@
   }
 
   button:hover {
-    background: rgba(108,99,255,0.15);
+    background: var(--overlay-accent);
     border-color: var(--accent);
   }
 
@@ -156,10 +148,10 @@
     color: white;
     border-color: var(--accent);
   }
-  button.primary:hover { background: #7c74ff; }
+  button.primary:hover { background: var(--accent); }
 
   button.danger {
-    background: rgba(255,107,107,0.15);
+    background: var(--overlay-red);
     border-color: var(--red);
     color: var(--red);
   }
@@ -307,10 +299,11 @@
   <a href="../courses/Ressources_ex.html">Cours</a>
   <span class="sep">›</span>
   <span class="current">Calculateur de Moyenne</span>
-</div>
+  </div>
 
-<div class="container">
+<div class="container" id="mainContent">
   <h1>📊 Calculateur de Moyenne</h1>
+  <button onclick="exportPDF('mainContent', 'Calculateur_Moyenne.pdf')" class="btn btn-secondary" style="padding:6px 14px;font-size:0.8rem;margin-bottom:12px;">📄 Exporter en PDF</button>
   <p class="subtitle">Calcule ta moyenne pondérée sur 20</p>
 
   <div class="header-row">
@@ -347,7 +340,7 @@
 </div>
 
 <div style="text-align:center;padding:16px;font-size:0.75rem;color:var(--muted);margin-top:12px;">
-  Des retours ? <a href="mailto:gc05122008@gmail.com" style="color:var(--accent2);text-decoration:none;">gc05122008@gmail.com</a>
+  <a href="../help/" style="color:var(--accent2);text-decoration:none;">💬 Aide & retours</a>
 </div>
 
 <script>
@@ -536,5 +529,9 @@ if (user.email) {
 loadGrades();
 if (rowsContainer.children.length === 0) addRow({});
 </script>
+<script src="../js/theme.js"></script>
+<script src="../js/analytics.js"></script>
+<script src="../js/pdf-export.js"></script>
+<script>navigator.serviceWorker && navigator.serviceWorker.register('/sw.js');</script>
 </body>
 </html>

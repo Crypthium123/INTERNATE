@@ -7,23 +7,15 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
 <style>
-  :root {
-    --bg: #09090f;
-    --surface: #11111c;
-    --surface2: #1a1a2e;
-    --border: rgba(255,255,255,0.07);
-    --accent: #6c63ff;
-    --accent2: #00d4aa;
-    --text: #e8e8f0;
-    --muted: #6b6b8a;
-  }
+
   * { margin:0; padding:0; box-sizing:border-box; }
   .tool-topbar {
     position:fixed; top:0; left:0; right:0;
     display:flex; align-items:center; gap:16px;
     padding:12px 24px;
-    background:rgba(17,17,28,0.85);
+    background:var(--surface-glass);
     backdrop-filter:blur(12px);
     border-bottom:1px solid var(--border);
     z-index:100;
@@ -72,7 +64,7 @@
     border-radius:6px; color:var(--text); cursor:pointer;
     transition:all 0.2s; text-align:left; font-size:0.85rem;
   }
-  .verb-btn:hover { background:rgba(108,99,255,0.12); color:white; }
+  .verb-btn:hover { background:var(--overlay-accent); color:white; }
   .verb-btn.active { background:var(--accent); color:white; font-weight:600; }
   .main-content {
     background:var(--surface); border:1px solid var(--border);
@@ -104,7 +96,7 @@
   .conj-table .person { color:var(--muted); width:100px; font-weight:500; }
   .conj-table .conjugation { color:var(--text); font-weight:400; }
   .conj-table tr:nth-child(even) { background:rgba(255,255,255,0.02); }
-  .conj-table tr:hover { background:rgba(108,99,255,0.06); }
+  .conj-table tr:hover { background:var(--overlay-accent); }
   .loading-overlay {
     position:fixed; inset:0; background:var(--bg);
     z-index:99999; display:flex; flex-direction:column;
@@ -151,8 +143,9 @@
   <a href="../courses/Ressources_ex.html">Cours</a>
   <span class="sep">›</span>
   <span class="current">Conjugueur Français</span>
-</div>
-<div class="app-layout">
+  </div>
+<button onclick="exportPDF('tool-content', 'Conjugueur_Francais.pdf')" class="btn btn-secondary" style="padding:6px 14px;font-size:0.8rem;margin:8px 20px 0;">📄 Exporter en PDF</button>
+<div class="app-layout" id="tool-content">
   <aside class="sidebar">
     <h2>Verbes</h2>
     <input type="text" id="searchInput" placeholder="Rechercher un verbe…" oninput="filterVerbs()">
@@ -336,6 +329,66 @@ const HARDCODED = {
     },
     'Conditionnel':{'Présent':['finirais','finirais','finirait','finirions','finiriez','finiraient']},
     'Subjonctif':{'Présent':['finisse','finisses','finisse','finissions','finissiez','finissent']}
+  },
+  'connaître': {
+    type:'irrégulier',
+    'Indicatif':{
+      'Présent':['je connais','tu connais','il connaît','nous connaissons','vous connaissez','ils connaissent'],
+      'Imparfait':['je connaissais','tu connaissais','il connaissait','nous connaissions','vous connaissiez','ils connaissaient'],
+      'Futur simple':['je connaîtrai','tu connaîtras','il connaîtra','nous connaîtrons','vous connaîtrez','ils connaîtront'],
+      'Passé simple':['je connus','tu connus','il connut','nous connûmes','vous connûtes','ils connurent'],
+      'Passé composé':['j\'ai connu','tu as connu','il a connu','nous avons connu','vous avez connu','ils ont connu']
+    },
+    'Conditionnel':{'Présent':['je connaîtrais','tu connaîtrais','il connaîtrait','nous connaîtrions','vous connaîtrez','ils connaîtraient']},
+    'Subjonctif':{'Présent':['que je connaisse','que tu connaisses','qu\'il connaisse','que nous connaissions','que vous connaissiez','qu\'ils connaissent']}
+  },
+  'écrire': {
+    type:'irrégulier',
+    'Indicatif':{
+      'Présent':['j\'écris','tu écris','il écrit','nous écrivons','vous écrivez','ils écrivent'],
+      'Imparfait':['j\'écrivais','tu écrivais','il écrivait','nous écrivions','vous écriviez','ils écrivaient'],
+      'Futur simple':['j\'écrirai','tu écriras','il écrira','nous écrirons','vous écrirez','ils écriront'],
+      'Passé simple':['j\'écrivis','tu écrivis','il écrivit','nous écrivîmes','vous écrivîtes','ils écrivirent'],
+      'Passé composé':['j\'ai écrit','tu as écrit','il a écrit','nous avons écrit','vous avez écrit','ils ont écrit']
+    },
+    'Conditionnel':{'Présent':['j\'écrirais','tu écrirais','il écrirait','nous écririons','vous écririez','ils écriraient']},
+    'Subjonctif':{'Présent':['que j\'écrive','que tu écrives','qu\'il écrive','que nous écrivions','que vous écriviez','qu\'ils écrivent']}
+  },
+  'lire': {
+    type:'irrégulier',
+    'Indicatif':{
+      'Présent':['je lis','tu lis','il lit','nous lisons','vous lisez','ils lisent'],
+      'Imparfait':['je lisais','tu lisais','il lisait','nous lisions','vous lisiez','ils lisaient'],
+      'Futur simple':['je lirai','tu liras','il lira','nous lirons','vous lirez','ils liront'],
+      'Passé simple':['je lus','tu lus','il lut','nous lûmes','vous lûtes','ils lurent'],
+      'Passé composé':['j\'ai lu','tu as lu','il a lu','nous avons lu','vous avez lu','ils ont lu']
+    },
+    'Conditionnel':{'Présent':['je lirais','tu lirais','il lirait','nous lirions','vous liriez','ils liraient']},
+    'Subjonctif':{'Présent':['que je lise','que tu lises','qu\'il lise','que nous lisions','que vous lisiez','qu\'ils lisent']}
+  },
+  'mettre': {
+    type:'irrégulier',
+    'Indicatif':{
+      'Présent':['je mets','tu mets','il met','nous mettons','vous mettez','ils mettent'],
+      'Imparfait':['je mettais','tu mettais','il mettait','nous mettions','vous mettiez','ils mettaient'],
+      'Futur simple':['je mettrai','tu mettras','il mettra','nous mettrons','vous mettrez','ils mettront'],
+      'Passé simple':['je mis','tu mis','il mit','nous mîmes','vous mîtes','ils mirent'],
+      'Passé composé':['j\'ai mis','tu as mis','il a mis','nous avons mis','vous avez mis','ils ont mis']
+    },
+    'Conditionnel':{'Présent':['je mettrais','tu mettrais','il mettrait','nous mettrions','vous mettriez','ils mettraient']},
+    'Subjonctif':{'Présent':['que je mette','que tu mettes','qu\'il mette','que nous mettions','que vous mettiez','qu\'ils mettent']}
+  },
+  'manger': {
+    type:'-er (régulier)',
+    'Indicatif':{
+      'Présent':['mange','manges','mange','mangeons','mangez','mangent'],
+      'Imparfait':['mangeais','mangeais','mangeait','mangions','mangiez','mangeaient'],
+      'Futur simple':['mangerai','mangeras','mangera','mangerons','mangerez','mangeront'],
+      'Passé simple':['mangeai','mangeas','mangea','mangeâmes','mangeâtes','mangèrent'],
+      'Passé composé':['ai mangé','as mangé','a mangé','avons mangé','avez mangé','ont mangé']
+    },
+    'Conditionnel':{'Présent':['mangerais','mangerais','mangerait','mangerions','mangeriez','mangeraient']},
+    'Subjonctif':{'Présent':['mange','manges','mange','mangions','mangiez','mangent']}
   }
 };
 
@@ -488,7 +541,11 @@ if(user.email){
 }
 </script>
 <div style="text-align:center;padding:16px;font-size:0.75rem;color:var(--muted);margin-top:20px;">
-  Des retours ? <a href="mailto:gc05122008@gmail.com" style="color:var(--accent2);text-decoration:none;">gc05122008@gmail.com</a>
+  <a href="../help/" style="color:var(--accent2);text-decoration:none;">💬 Aide & retours</a>
 </div>
+<script src="../js/theme.js"></script>
+<script src="../js/analytics.js"></script>
+<script src="../js/pdf-export.js"></script>
+<script>navigator.serviceWorker && navigator.serviceWorker.register('/sw.js');</script>
 </body>
 </html>

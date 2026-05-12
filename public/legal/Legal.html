@@ -7,18 +7,8 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
 <style>
-  :root {
-    --bg: #09090f;
-    --surface: #11111c;
-    --surface2: #1a1a2e;
-    --border: rgba(255,255,255,0.07);
-    --accent: #6c63ff;
-    --accent2: #00d4aa;
-    --text: #e8e8f0;
-    --muted: #6b6b8a;
-  }
-
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
@@ -40,7 +30,7 @@
   h1 {
     font-family: 'Syne', sans-serif;
     font-size: 2rem;
-    background: linear-gradient(135deg, #6c63ff, #00d4aa);
+    background: var(--gen-gradient);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -102,7 +92,7 @@
   }
 
   .back-btn:hover {
-    background: #7c74ff;
+    background: var(--accent);
     transform: translateY(-2px);
   }
 
@@ -118,13 +108,13 @@
   @media (max-width: 400px) {
     .legal-container { padding: 16px; }
   }
+
 </style>
 </head>
 <body>
-
 <div class="container">
   <h1>Conditions d'utilisation</h1>
-  <p class="last-update">Dernière mise à jour : Mai 2025</p>
+  <p class="last-update">Dernière mise à jour : Mai 2026</p>
 
   <p>Bienvenue sur Internate. En accédant à cette plateforme, vous acceptez les présentes conditions d'utilisation. Si vous n'acceptez pas ces conditions, veuillez ne pas utiliser le service.</p>
 
@@ -162,7 +152,7 @@
   <p>Nous nous réservons le droit de modifier ces conditions à tout moment. Les utilisateurs seront informés des modifications importantes par email ou via la plateforme.</p>
 
   <h1 style="margin-top: 60px;">Politique de confidentialité</h1>
-  <p class="last-update">Dernière mise à jour : Mai 2025</p>
+  <p class="last-update">Dernière mise à jour : Mai 2026</p>
 
   <p>Internate accorde une grande importance à la protection de vos données personnelles. Cette politique explique comment nous collectons, utilisons et protégeons vos informations.</p>
 
@@ -207,11 +197,14 @@
 
   <h2>8. Retours & Suggestions</h2>
   <p>Si tu as des retours, des suggestions ou des problèmes avec la plateforme, n'hésite pas à nous contacter :</p>
-  <p style="margin-top:12px;"><a href="mailto:gc05122008@gmail.com" style="color:var(--accent2);font-weight:600;text-decoration:none;">✉ gc05122008@gmail.com</a></p>
+  <p style="margin-top:12px;"><a href="../help/" style="color:var(--accent2);font-weight:600;text-decoration:none;">💬 Aide &amp; retours</a></p>
 
   <a href="javascript:window.close()" class="back-btn">← Fermer cette page</a>
 </div>
 
+<script src="../js/theme.js"></script>
+<script src="../js/analytics.js"></script>
+<script>navigator.serviceWorker && navigator.serviceWorker.register('/sw.js');</script>
 </body>
 </html>
 

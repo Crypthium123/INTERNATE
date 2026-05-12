@@ -7,15 +7,8 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
 <style>
-  :root {
-    --bg: #09090f;
-    --surface: #11111c;
-    --accent: #6c63ff;
-    --accent2: #00d4aa;
-    --text: #e8e8f0;
-    --muted: #5a5a7a;
-  }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     background: var(--bg);
@@ -66,7 +59,7 @@
     transition: all 0.25s;
   }
   .btn:hover {
-    background: #7c74ff;
+    background: var(--accent);
     transform: translateY(-2px);
     box-shadow: 0 0 30px rgba(108,99,255,0.4);
   }
@@ -78,14 +71,14 @@
     background: transparent;
     color: var(--text);
     text-decoration: none;
-    border: 1px solid rgba(255,255,255,0.12);
+    border: 1px solid var(--border2);
     border-radius: 10px;
     font-weight: 500;
     transition: all 0.25s;
   }
   .btn-outline:hover {
-    border-color: rgba(255,255,255,0.25);
-    background: rgba(255,255,255,0.04);
+    border-color: var(--border2);
+    background: var(--hover-overlay);
   }
   .orb {
     position: fixed;
@@ -97,17 +90,18 @@
   }
   .orb-1 {
     top: -200px; left: -200px;
-    background: radial-gradient(circle, rgba(108,99,255,0.10), transparent 70%);
+    background: radial-gradient(circle, var(--overlay-accent), transparent 70%);
   }
   .orb-2 {
     bottom: -200px; right: -200px;
-    background: radial-gradient(circle, rgba(0,212,170,0.08), transparent 70%);
+    background: radial-gradient(circle, var(--overlay-green), transparent 70%);
   }
   @media (max-width: 480px) {
     .code { font-size: 5rem; }
     h1 { font-size: 1.3rem; }
     .btn, .btn-outline { display: block; margin: 12px auto; width: 100%; }
   }
+
 </style>
 </head>
 <body>
@@ -120,5 +114,8 @@
     <a href="/" class="btn">Accueil</a>
     <a href="/auth/Login_Internate.html" class="btn-outline">Connexion</a>
   </div>
+<script src="js/theme.js"></script>
+<script src="js/analytics.js"></script>
+<script>navigator.serviceWorker && navigator.serviceWorker.register('/sw.js');</script>
 </body>
 </html>

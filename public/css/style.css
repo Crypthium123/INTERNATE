@@ -1,50 +1,9 @@
 /* ============================================================
-   INTERNATE — Global Stylesheet
+   INTERNATE V3 — Global Stylesheet
    ============================================================ */
 
+@import url('theme.css');
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap');
-
-:root {
-  --bg: #07070e;
-  --surface: #0f0f1a;
-  --surface2: #161625;
-  --surface3: #1d1d30;
-  --border: rgba(255,255,255,0.07);
-  --border2: rgba(255,255,255,0.12);
-
-  /* Couleurs filière Générale */
-  --gen-primary: #6c63ff;
-  --gen-secondary: #00d4aa;
-  --gen-gradient: linear-gradient(135deg, #6c63ff, #00d4aa);
-
-  /* Couleurs filière Techno */
-  --tech-primary: #ff6b35;
-  --tech-secondary: #ffd166;
-  --tech-gradient: linear-gradient(135deg, #ff6b35, #ffd166);
-
-  /* Accents universels */
-  --accent: var(--gen-primary);
-  --accent2: var(--gen-secondary);
-  --red: #ff4757;
-  --orange: #ffa94d;
-  --green: #00d4aa;
-  --blue: #54a0ff;
-  --purple: #a78bfa;
-  --pink: #f472b6;
-
-  --text: #eeeef5;
-  --text2: #b0b0cc;
-  --muted: #5a5a7a;
-
-  /* Sidebar */
-  --sidebar-w: 260px;
-}
-
-/* Filière Techno override */
-body.filiere-techno {
-  --accent: var(--tech-primary);
-  --accent2: var(--tech-secondary);
-}
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html { scroll-behavior: smooth; }
@@ -311,11 +270,11 @@ body.filiere-techno .avatar { background: var(--tech-gradient); }
 .btn-primary {
   background: var(--accent);
   color: white;
-  box-shadow: 0 0 20px rgba(108,99,255,0.35);
+  box-shadow: var(--shadow-btn);
 }
 .btn-primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 0 35px rgba(108,99,255,0.55);
+  box-shadow: var(--shadow-btn-hover);
 }
 
 .btn-secondary {
@@ -327,9 +286,9 @@ body.filiere-techno .avatar { background: var(--tech-gradient); }
 
 body.filiere-techno .btn-primary {
   background: var(--tech-primary);
-  box-shadow: 0 0 20px rgba(255,107,53,0.35);
+  box-shadow: var(--shadow-btn);
 }
-body.filiere-techno .btn-primary:hover { box-shadow: 0 0 35px rgba(255,107,53,0.55); }
+body.filiere-techno .btn-primary:hover { box-shadow: var(--shadow-btn-hover); }
 
 /* ---- CARDS ---- */
 .card {
@@ -341,7 +300,7 @@ body.filiere-techno .btn-primary:hover { box-shadow: 0 0 35px rgba(255,107,53,0.
 .card:hover {
   border-color: var(--border2);
   transform: translateY(-2px);
-  box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+  box-shadow: var(--shadow-card);
 }
 
 /* ---- GRID LAYOUTS ---- */
@@ -448,8 +407,8 @@ body.filiere-techno .btn-primary:hover { box-shadow: 0 0 35px rgba(255,107,53,0.
 /* ---- SCROLLBAR ---- */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 100px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.18); }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 100px; }
+::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }
 
 /* ---- ANIMATIONS ---- */
 @keyframes slideRight { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
