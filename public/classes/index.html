@@ -741,6 +741,132 @@
     color: var(--accent2);
     margin-left: 6px;
   }
+
+  /* ---- CHAT ---- */
+  .chat-area {
+    display: flex;
+    flex-direction: column;
+    height: 360px;
+    max-height: 60vh;
+  }
+
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 4px 0;
+    margin-bottom: 12px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  .chat-messages::-webkit-scrollbar { width: 4px; }
+  .chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  .chat-msg {
+    display: flex;
+    gap: 10px;
+    padding: 8px 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    max-width: 85%;
+  }
+
+  .chat-msg.own {
+    align-self: flex-end;
+    background: rgba(108,99,255,0.08);
+    border-color: rgba(108,99,255,0.2);
+  }
+
+  .chat-msg-avatar {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.7rem;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .chat-msg-body { flex: 1; min-width: 0; }
+  .chat-msg-user { font-size: 0.72rem; font-weight: 600; color: var(--accent); margin-bottom: 2px; }
+  .chat-msg-text { font-size: 0.83rem; color: var(--text); line-height: 1.4; word-wrap: break-word; }
+  .chat-msg-time { font-size: 0.6rem; color: var(--muted); margin-top: 3px; }
+
+  .chat-input-area {
+    display: flex;
+    gap: 8px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  .chat-input-area textarea {
+    flex: 1;
+    padding: 10px 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    outline: none;
+    resize: none;
+    min-height: 44px;
+    max-height: 80px;
+  }
+
+  .chat-input-area textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(108,99,255,0.13);
+  }
+
+  .chat-input-area button {
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: none;
+    background: var(--accent);
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .chat-input-area button:hover { transform: translateY(-1px); box-shadow: 0 0 20px rgba(108,99,255,0.3); }
+  .chat-input-area button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  .chat-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--muted);
+    font-size: 0.88rem;
+  }
+  .chat-empty .chat-empty-icon { font-size: 2.5rem; margin-bottom: 12px; }
+
+  .active-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: rgba(0,212,170,0.12);
+    border: 1px solid rgba(0,212,170,0.25);
+    border-radius: 100px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--accent2);
+    animation: pulseGlow 2s ease-in-out infinite;
+  }
+
+  @keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(0,212,170,0.2); }
+    50% { box-shadow: 0 0 12px 2px rgba(0,212,170,0.15); }
+  }
 </style>
 </head>
 <body>
@@ -854,6 +980,25 @@
     <h2>Mes classes</h2>
   </div>
   <div class="classes-grid" id="classesGrid"></div>
+
+  <!-- CLASS CHAT MODAL -->
+  <div class="modal-overlay" id="classChatOverlay">
+    <div class="modal" style="width:520px;">
+      <div class="modal-header">
+        <h2 id="classChatTitle">💬 Classe</h2>
+        <button class="modal-close" onclick="closeClassChat()">✕</button>
+      </div>
+      <div class="chat-area">
+        <div class="chat-messages" id="chatMessages">
+          <div class="chat-empty"><div class="chat-empty-icon">💬</div><p>Chargement des messages…</p></div>
+        </div>
+        <div class="chat-input-area">
+          <textarea id="chatInput" placeholder="Écris un message…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendClassMessage()}"></textarea>
+          <button id="chatSendBtn" onclick="sendClassMessage()">Envoyer</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- CLASS DETAIL MODAL -->
   <div class="modal-overlay" id="classDetailOverlay">
@@ -1133,9 +1278,10 @@
           + '<span class="code-tag" onclick="event.stopPropagation();copyCode(\'' + c.code + '\')" title="Copier le code">#' + c.code + ' 📋</span>'
           + '</div>'
           + '<div class="class-actions">'
+          + '<button class="btn btn-secondary btn-xs" onclick="event.stopPropagation();openClassChat(\'' + c.id + '\')">💬</button>'
           + (!isActive
-              ? '<button class="btn btn-primary btn-xs" onclick="event.stopPropagation();switchActiveClass(\'' + c.id + '\')">Utiliser</button>'
-              : '<button class="btn btn-secondary btn-xs" disabled>Active</button>')
+              ? '<button class="btn btn-primary btn-xs" onclick="event.stopPropagation();activateClass(\'' + c.id + '\')">Activer</button>'
+              : '<button class="btn btn-secondary btn-xs" style="color:var(--accent2);border-color:rgba(0,212,170,0.3);" onclick="event.stopPropagation();deactivateClass()">Désactiver</button>')
           + (isCreator
               ? '<button class="btn btn-danger btn-xs" onclick="event.stopPropagation();deleteClass(\'' + c.id + '\', \'' + escapeHtml(c.name) + '\')">Supprimer</button>'
               : '<button class="btn btn-secondary btn-xs" style="color:var(--accent3);border-color:rgba(255,107,107,0.2);" onclick="event.stopPropagation();leaveClass(\'' + c.id + '\', \'' + escapeHtml(c.name) + '\')">Quitter</button>')
@@ -1154,9 +1300,15 @@
     return div.innerHTML;
   }
 
-  function switchActiveClass(classId) {
+  function activateClass(classId) {
     localStorage.setItem('activeClassId', classId);
-    showToast('Classe active changée !', 'success');
+    showToast('Classe activée — seuls les cours de cette classe seront visibles.', 'success');
+    loadUserClasses();
+  }
+
+  function deactivateClass() {
+    localStorage.removeItem('activeClassId');
+    showToast('Classe désactivée — tous les cours sont visibles.', 'info');
     loadUserClasses();
   }
 
@@ -1351,6 +1503,138 @@
         showToast('Erreur : ' + e.message, 'error');
       }
     });
+  }
+
+  // ---- CLASS CHAT ----
+  let chatClassId = null;
+  let chatListener = null;
+
+  function openClassChat(classId) {
+    chatClassId = classId;
+    document.getElementById('classChatOverlay').classList.add('show');
+    loadClassMessages(classId);
+  }
+
+  function closeClassChat() {
+    document.getElementById('classChatOverlay').classList.remove('show');
+    if (chatListener) {
+      chatListener();
+      chatListener = null;
+    }
+    chatClassId = null;
+  }
+  document.getElementById('classChatOverlay').addEventListener('click', function (e) {
+    if (e.target === e.currentTarget) closeClassChat();
+  });
+
+  async function loadClassMessages(classId) {
+    const area = document.getElementById('chatMessages');
+    area.innerHTML = '<div class="chat-empty"><div class="chat-empty-icon">💬</div><p>Chargement des messages…</p></div>';
+
+    try {
+      const snap = await db.collection('classMessages')
+        .where('classId', '==', classId)
+        .orderBy('timestamp', 'asc')
+        .get();
+
+      if (snap.empty) {
+        area.innerHTML = '<div class="chat-empty"><div class="chat-empty-icon">💬</div><p>Aucun message pour le moment. Sois le premier à écrire !</p></div>';
+        return;
+      }
+
+      let html = '';
+      snap.forEach(doc => {
+        const d = doc.data();
+        const isOwn = d.userId === currentUser?.uid;
+        const time = d.timestamp && d.timestamp.toDate ? d.timestamp.toDate().toLocaleString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '';
+        const initial = (d.userName?.[0] || d.userEmail?.[0] || '?').toUpperCase();
+        html += '<div class="chat-msg' + (isOwn ? ' own' : '') + '">'
+          + '<div class="chat-msg-avatar">' + initial + '</div>'
+          + '<div class="chat-msg-body">'
+          + '<div class="chat-msg-user">' + escapeHtml(d.userName || d.userEmail || 'Inconnu') + '</div>'
+          + '<div class="chat-msg-text">' + escapeHtml(d.text || '') + '</div>'
+          + (time ? '<div class="chat-msg-time">' + time + '</div>' : '')
+          + '</div>'
+          + '</div>';
+      });
+      area.innerHTML = html;
+      area.scrollTop = area.scrollHeight;
+    } catch (e) {
+      if (e.code === 'failed-precondition') {
+        area.innerHTML = '<div class="chat-empty"><div class="chat-empty-icon">⚠️</div><p>Index en cours de création. Rafraîchis dans quelques secondes.</p></div>';
+        console.warn('Chat index missing, retrying without orderBy');
+        try {
+          const snap = await db.collection('classMessages').where('classId', '==', classId).get();
+          if (!snap.empty) {
+            let msgs = [];
+            snap.forEach(doc => { const d = doc.data(); d.id = doc.id; msgs.push(d); });
+            msgs.sort((a, b) => (a.timestamp?.toMillis() || 0) - (b.timestamp?.toMillis() || 0));
+            let html = '';
+            msgs.forEach(d => {
+              const isOwn = d.userId === currentUser?.uid;
+              const time = d.timestamp && d.timestamp.toDate ? d.timestamp.toDate().toLocaleString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '';
+              const initial = (d.userName?.[0] || d.userEmail?.[0] || '?').toUpperCase();
+              html += '<div class="chat-msg' + (isOwn ? ' own' : '') + '">'
+                + '<div class="chat-msg-avatar">' + initial + '</div>'
+                + '<div class="chat-msg-body">'
+                + '<div class="chat-msg-user">' + escapeHtml(d.userName || d.userEmail || 'Inconnu') + '</div>'
+                + '<div class="chat-msg-text">' + escapeHtml(d.text || '') + '</div>'
+                + (time ? '<div class="chat-msg-time">' + time + '</div>' : '')
+                + '</div>'
+                + '</div>';
+            });
+            area.innerHTML = html;
+            area.scrollTop = area.scrollHeight;
+          } else {
+            area.innerHTML = '<div class="chat-empty"><div class="chat-empty-icon">💬</div><p>Aucun message pour le moment.</p></div>';
+          }
+        } catch (e2) {
+          area.innerHTML = '<div class="chat-empty"><div class="chat-empty-icon">⚠️</div><p>Erreur de chargement.</p></div>';
+        }
+      } else {
+        area.innerHTML = '<div class="chat-empty"><div class="chat-empty-icon">⚠️</div><p>Erreur de chargement des messages.</p></div>';
+        console.warn('Chat load error:', e.message);
+      }
+    }
+  }
+
+  async function sendClassMessage() {
+    const input = document.getElementById('chatInput');
+    const text = input.value.trim();
+    if (!text) return;
+    if (!currentUser) { showToast('Tu dois être connecté.', 'error'); return; }
+    if (!chatClassId) return;
+
+    const btn = document.getElementById('chatSendBtn');
+    btn.disabled = true;
+
+    try {
+      let displayName = currentUser.email || 'Inconnu';
+      try {
+        const userDoc = await db.collection('users').doc(currentUser.uid).get();
+        if (userDoc.exists) {
+          const u = userDoc.data();
+          displayName = ((u.prenom || '') + ' ' + (u.nom || '')).trim() || u.email || currentUser.email || 'Inconnu';
+        }
+      } catch (e) { /* use default */ }
+
+      await db.collection('classMessages').add({
+        classId: chatClassId,
+        userId: currentUser.uid,
+        userEmail: currentUser.email || '',
+        userName: displayName,
+        text: text,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      input.value = '';
+      loadClassMessages(chatClassId);
+    } catch (e) {
+      console.error('sendClassMessage error:', e);
+      showToast('Erreur lors de l\'envoi : ' + e.message, 'error');
+    } finally {
+      btn.disabled = false;
+    }
   }
 
   auth.onAuthStateChanged(async (user) => {

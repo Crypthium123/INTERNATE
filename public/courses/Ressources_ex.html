@@ -421,6 +421,56 @@
     margin-left: auto;
   }
 
+  /* ---- ACTIVE CLASS BANNER ---- */
+  .active-class-banner {
+    display: none;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, rgba(0,212,170,0.08), rgba(108,99,255,0.08));
+    border: 1px solid rgba(0,212,170,0.2);
+    border-radius: 12px;
+    margin-bottom: 16px;
+    animation: fadeIn 0.3s ease both;
+  }
+  .active-class-banner.show { display: flex; }
+
+  .active-class-banner .banner-icon {
+    font-size: 1.3rem;
+    flex-shrink: 0;
+  }
+
+  .active-class-banner .banner-text {
+    flex: 1;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .active-class-banner .banner-text strong {
+    color: var(--accent2);
+  }
+
+  .active-class-banner .banner-btn {
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.04);
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .active-class-banner .banner-btn:hover {
+    background: rgba(255,107,107,0.1);
+    border-color: rgba(255,107,107,0.2);
+    color: var(--accent3);
+  }
+
   /* ---- MODAL ---- */
   .modal-overlay {
     display: none;
@@ -955,6 +1005,13 @@
     </select>
   </div>
 
+  <!-- ACTIVE CLASS BANNER -->
+  <div class="active-class-banner" id="activeClassBanner">
+    <span class="banner-icon">📚</span>
+    <span class="banner-text">Classe active : <strong id="activeBannerName">—</strong> — seuls les cours de cette classe sont affichés</span>
+    <button class="banner-btn" onclick="deactivateActiveClass()">✕ Désactiver</button>
+  </div>
+
   <!-- COURS -->
   <div class="cours-grid" id="coursGrid"></div>
 
@@ -1149,13 +1206,13 @@
         }
       }).catch(() => {});
       document.getElementById('loadingOverlay').classList.add('hidden');
-      syncCoursesFromFirestore().then(() => renderCourses());
+      syncCoursesFromFirestore().then(() => { renderCourses(); renderActiveBanner(); });
     } else if (currentUser.email) {
       authEmail = currentUser.email;
       document.getElementById('loadingOverlay').classList.add('hidden');
       updateUserUI(currentUser);
       loadFormClasses();
-      syncCoursesFromFirestore().then(() => renderCourses());
+      syncCoursesFromFirestore().then(() => { renderCourses(); renderActiveBanner(); });
     } else {
       window.location.href = '../auth/Login_Internate.html';
     }
@@ -1585,13 +1642,17 @@
     try {
       const snapshot = await db.collection('classes').get();
       const select = document.getElementById('filterClasse');
+      const activeId = localStorage.getItem('activeClassId');
       snapshot.forEach(doc => {
         const d = doc.data();
         const opt = document.createElement('option');
         opt.value = doc.id;
         opt.textContent = d.name || d.nom || doc.id;
         select.appendChild(opt);
+        if (doc.id === activeId) _activeClassName = d.name || d.nom || doc.id;
       });
+      renderActiveBanner();
+      if (activeId) select.value = activeId;
     } catch (e) {
       console.warn('Classes load error:', e.message);
     }
@@ -1622,6 +1683,39 @@
     } catch (e) {
       console.warn('Form classes load error:', e.message);
     }
+  }
+
+  // ---- ACTIVE CLASS BANNER ----
+  let _activeClassName = '';
+
+  function renderActiveBanner() {
+    const banner = document.getElementById('activeClassBanner');
+    const nameEl = document.getElementById('activeBannerName');
+    const activeId = localStorage.getItem('activeClassId');
+    if (activeId) {
+      if (_activeClassName) {
+        nameEl.textContent = _activeClassName;
+        banner.classList.add('show');
+      } else {
+        db.collection('classes').doc(activeId).get().then(doc => {
+          if (doc.exists) {
+            _activeClassName = doc.data().name || doc.data().nom || 'Classe';
+            nameEl.textContent = _activeClassName;
+            banner.classList.add('show');
+          }
+        }).catch(() => {});
+      }
+    } else {
+      banner.classList.remove('show');
+    }
+  }
+
+  function deactivateActiveClass() {
+    localStorage.removeItem('activeClassId');
+    _activeClassName = '';
+    renderActiveBanner();
+    renderCourses();
+    showToast('Classe désactivée — tous les cours sont visibles.', 'info');
   }
 
   // ---- URL HASH ----
@@ -1665,10 +1759,11 @@
 
   function resetFilters() {
     document.getElementById('filterFiliere').value = '';
-    document.getElementById('filterClasse').value = '';
-    document.getElementById('filterAnnee').value = '';
     document.getElementById('filterSpecialite').innerHTML = '<option value="">Toutes spécialités/séries</option>';
+    document.getElementById('filterAnnee').value = '';
     document.getElementById('filterMatiere').value = '';
+    const activeId = localStorage.getItem('activeClassId');
+    if (!activeId) document.getElementById('filterClasse').value = '';
     renderCourses();
   }
 
@@ -1688,8 +1783,13 @@
     if (filiere) filtered = filtered.filter(c => c.filiere === filiere);
     if (annee) filtered = filtered.filter(c => c.annee === annee);
     if (specialite) filtered = filtered.filter(c => c.specialite === specialite);
-    const classe = document.getElementById('filterClasse').value;
-    if (classe) filtered = filtered.filter(c => c.classId === classe);
+    const activeId = localStorage.getItem('activeClassId');
+    if (activeId) {
+      filtered = filtered.filter(c => c.classId === activeId);
+    } else {
+      const classe = document.getElementById('filterClasse').value;
+      if (classe) filtered = filtered.filter(c => c.classId === classe);
+    }
     if (matiere) filtered = filtered.filter(c => c.matiere === matiere);
 
     if (sortBy === 'date-desc') filtered.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
@@ -1779,6 +1879,7 @@
   loadClasses();
 
   renderCourses();
+  renderActiveBanner();
   checkUrlHash();
 
 function toggleSidebar() {

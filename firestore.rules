@@ -30,5 +30,10 @@ service cloud.firestore {
       allow create: if request.auth != null;
       allow read: if request.auth != null && (resource.data.userId == request.auth.uid || get(/databases/$(database)/documents/classes/$(resource.data.classId)).data.creatorId == request.auth.uid);
     }
+    match /classMessages/{document} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
   }
 }
