@@ -16,7 +16,7 @@ Internate est une plateforme web éducative pensée pour les lycéens et leurs e
 
 - **V1** — Prototype fonctionnel avec un système de cours en localStorage et quelques outils de révision basiques.
 - **V2** — Refonte complète de l'interface (design sombre, animations, responsive), ajout du dashboard, de l'authentification Firebase, et extension à 11 outils de révision interactifs.
-- **V3** — Migration multi-utilisateur : passage de localStorage à Firestore pour le stockage des cours, synchronisation en temps réel entre les comptes, page d'administration avec analytics, page d'aide avec formulaire de retour, règles de sécurité Firestore, mode sombre permanent, et corrections générales.
+- **V3** — Migration multi-utilisateur : passage de localStorage à Firestore pour le stockage des cours, synchronisation en temps réel entre les comptes, page d'aide avec formulaire de retour, règles de sécurité Firestore, mode sombre permanent, et corrections générales.
 
 ---
 
@@ -53,11 +53,6 @@ Internate est une plateforme web éducative pensée pour les lycéens et leurs e
 | 📖 Conjugueur Français | Conjugue tous les verbes français |
 | 💬 Générateur de Citations | Découvre des citations inspirantes |
 
-### 📊 Analytics & Administration
-- Collecte anonyme des pages visitées (Firestore + localStorage)
-- Page admin réservée au créateur du projet avec statistiques globales
-- Suivi des utilisateurs actifs et des pages populaires
-
 ### 🎨 Interface
 - Design sombre permanent
 - Animations fluides et orbes dynamiques
@@ -91,9 +86,6 @@ Internate est une plateforme web éducative pensée pour les lycéens et leurs e
     ├── profile/
     │   └── index.html                 ← Profil utilisateur
     │
-    ├── admin/
-    │   └── index.html                 ← Administration & analytics
-    │
     ├── help/
     │   └── index.html                 ← Aide & formulaire de retour
     │
@@ -120,7 +112,6 @@ Internate est une plateforme web éducative pensée pour les lycéens et leurs e
     └── js/
         ├── firebase-config.js         ← 🔑 Clés Firebase (ignoré par git)
         ├── firebase-config.example.js ← Modèle à remplir
-        ├── analytics.js               ← Collecte de données
         ├── pdf-export.js              ← Export PDF
         └── theme.js                   ← Gestion du thème
 ```

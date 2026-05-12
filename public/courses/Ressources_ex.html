@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -815,9 +815,6 @@
     <span class="nav-icon">&#x1F4AC;</span> Générateur de Citations
   </a>
 
-  <a href="../admin/index.html" class="nav-item" id="adminNavLink">
-  <span class="ni">⚙️</span> Administration
-</a>
 <div class="sidebar-footer">
     <div class="user-card">
       <div class="avatar" id="avatarEl">?</div>
@@ -1023,11 +1020,6 @@
     syncCoursesFromFirestore().then(() => renderCourses());
   } else {
     window.location.href = '../auth/Login_Internate.html';
-  }
-
-  if (user.email !== 'gc05122008@gmail.com') {
-    const el = document.getElementById('adminNavLink');
-    if (el) el.style.display = 'none';
   }
 
   const initials = (user.prenom?.[0] || '?') + (user.nom?.[0] || '');
@@ -1484,7 +1476,6 @@ document.addEventListener('click', function(e) {
   Des retours ? <a href="../help/" style="color:var(--accent2);text-decoration:none;font-weight:500;">💬 Aide &amp; retours</a>
 </div>
 <script src="../js/theme.js"></script>
-<script src="../js/analytics.js"></script>
 <script>navigator.serviceWorker && navigator.serviceWorker.register('/sw.js');</script>
 </body>
 </html>
