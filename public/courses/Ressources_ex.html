@@ -1109,6 +1109,11 @@
 <script>
   let currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
 
+  function getUserEmail() {
+    if (firebase.auth().currentUser) return firebase.auth().currentUser.email;
+    return currentUser.email || '';
+  }
+
   function updateUserUI(userData) {
     currentUser = userData;
     const prenom = userData.prenom || '';
@@ -1308,7 +1313,7 @@
   let editId = null;
 
   function openModal(course) {
-    if (course && course.userId !== currentUser.email) {
+    if (course && course.userId !== getUserEmail()) {
       showToast("Tu ne peux pas modifier ce cours.", "error");
       return;
     }
@@ -1430,7 +1435,7 @@
         description, fileUrl,
         fileName: fileName || (fileUrl ? fileUrl.split('/').pop() : ''),
         dateAdded: now,
-        userId: currentUser.email || 'unknown'
+        userId: getUserEmail() || 'unknown'
       };
       courses.push(newCourse);
       saveCourses(courses);
@@ -1444,7 +1449,7 @@
   function deleteCourse(id) {
     const target = getCourses().find(c => c.id === id);
     if (!target) return;
-    if (target.userId !== currentUser.email) {
+    if (target.userId !== getUserEmail()) {
       showToast("Tu ne peux pas supprimer ce cours.", "error");
       return;
     }
@@ -1680,7 +1685,8 @@
 
       const dateStr = c.dateAdded ? new Date(c.dateAdded).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) : '';
       const creator = c.userId ? c.userId.replace(/@.*/, '') : '';
-      const isOwner = creator && currentUser.email && c.userId === currentUser.email;
+      const userEmail = getUserEmail();
+      const isOwner = creator && userEmail && c.userId === userEmail;
 
       return `
         <div class="cours-card" id="cours-${c.id}" style="cursor:default;">
