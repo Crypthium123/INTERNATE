@@ -595,6 +595,152 @@
     font-size: 0.85rem;
     margin-top: 16px;
   }
+
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    z-index: 9998;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.show { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px 32px;
+    width: 480px;
+    max-width: 92vw;
+    max-height: 80vh;
+    overflow-y: auto;
+    animation: modalIn 0.2s ease both;
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .modal-header h2 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.2rem;
+  }
+
+  .modal-close {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    border: none;
+    background: var(--surface3);
+    color: var(--muted);
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .modal-close:hover { background: var(--surface2); color: var(--text); }
+
+  .member-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .member-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    transition: border-color 0.2s;
+  }
+
+  .member-item:hover { border-color: rgba(255,255,255,0.1); }
+
+  .member-avatar {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .member-info { flex: 1; min-width: 0; }
+  .member-info strong { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text); }
+  .member-info span { font-size: 0.75rem; color: var(--muted); }
+
+  .member-actions { flex-shrink: 0; }
+
+  .detail-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding: 12px 16px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+
+  .detail-code {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--accent2);
+  }
+
+  .detail-count {
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  .empty-members {
+    text-align: center;
+    padding: 32px;
+    color: var(--muted);
+    font-size: 0.88rem;
+  }
+
+  .badge-creator {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    background: rgba(108,99,255,0.15);
+    color: var(--accent);
+    margin-left: 6px;
+  }
+
+  .badge-you {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    background: rgba(0,212,170,0.15);
+    color: var(--accent2);
+    margin-left: 6px;
+  }
 </style>
 </head>
 <body>
@@ -708,6 +854,24 @@
     <h2>Mes classes</h2>
   </div>
   <div class="classes-grid" id="classesGrid"></div>
+
+  <!-- CLASS DETAIL MODAL -->
+  <div class="modal-overlay" id="classDetailOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="classDetailName">Classe</h2>
+        <button class="modal-close" onclick="closeClassDetail()">✕</button>
+      </div>
+      <div class="detail-row">
+        <span class="detail-code" id="classDetailCode">——</span>
+        <span class="detail-count" id="classDetailCount">👥 0 membres</span>
+      </div>
+      <div style="font-size:0.78rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:12px;">Membres</div>
+      <div class="member-list" id="memberList">
+        <div class="empty-members">Chargement…</div>
+      </div>
+    </div>
+  </div>
 
   <div class="toast-container" id="toastContainer"></div>
 
@@ -961,20 +1125,20 @@
         const members = memberData[c.id] || [];
         const memberCount = c.memberCount || members.length;
 
-        return '<div class="class-card' + (isActive ? ' active' : '') + '">'
+        return '<div class="class-card' + (isActive ? ' active' : '') + '" onclick="openClassDetail(\'' + c.id + '\')" style="cursor:pointer;">'
           + (isActive ? '<div class="active-badge">● Active</div>' : '')
           + '<div class="class-name">' + escapeHtml(c.name || 'Sans nom') + '</div>'
           + '<div class="class-meta">'
           + '<span>👥 ' + memberCount + ' membre' + (memberCount > 1 ? 's' : '') + '</span>'
-          + '<span class="code-tag" onclick="copyCode(\'' + c.code + '\')" title="Copier le code">#' + c.code + ' 📋</span>'
+          + '<span class="code-tag" onclick="event.stopPropagation();copyCode(\'' + c.code + '\')" title="Copier le code">#' + c.code + ' 📋</span>'
           + '</div>'
           + '<div class="class-actions">'
           + (!isActive
-              ? '<button class="btn btn-primary btn-xs" onclick="switchActiveClass(\'' + c.id + '\')">Utiliser</button>'
+              ? '<button class="btn btn-primary btn-xs" onclick="event.stopPropagation();switchActiveClass(\'' + c.id + '\')">Utiliser</button>'
               : '<button class="btn btn-secondary btn-xs" disabled>Active</button>')
           + (isCreator
-              ? '<button class="btn btn-danger btn-xs" onclick="deleteClass(\'' + c.id + '\', \'' + escapeHtml(c.name) + '\')">Supprimer</button>'
-              : '<button class="btn btn-secondary btn-xs" style="color:var(--accent3);border-color:rgba(255,107,107,0.2);" onclick="leaveClass(\'' + c.id + '\', \'' + escapeHtml(c.name) + '\')">Quitter</button>')
+              ? '<button class="btn btn-danger btn-xs" onclick="event.stopPropagation();deleteClass(\'' + c.id + '\', \'' + escapeHtml(c.name) + '\')">Supprimer</button>'
+              : '<button class="btn btn-secondary btn-xs" style="color:var(--accent3);border-color:rgba(255,107,107,0.2);" onclick="event.stopPropagation();leaveClass(\'' + c.id + '\', \'' + escapeHtml(c.name) + '\')">Quitter</button>')
           + '</div>'
           + '</div>';
       }).join('');
@@ -1067,6 +1231,125 @@
       showToast('Code copié : ' + code, 'success');
     }).catch(() => {
       showToast('Code : ' + code, 'info');
+    });
+  }
+
+  // ---- CLASS DETAIL MODAL ----
+  let detailClassId = null;
+  let detailMembers = [];
+
+  function openClassDetail(classId) {
+    detailClassId = classId;
+    document.getElementById('classDetailOverlay').classList.add('show');
+    document.getElementById('classDetailName').textContent = 'Chargement…';
+    document.getElementById('classDetailCode').textContent = '——';
+    document.getElementById('classDetailCount').textContent = '👥 …';
+    document.getElementById('memberList').innerHTML = '<div class="empty-members">Chargement…</div>';
+    loadClassDetail(classId);
+  }
+
+  function closeClassDetail() {
+    document.getElementById('classDetailOverlay').classList.remove('show');
+    detailClassId = null;
+    detailMembers = [];
+  }
+  document.getElementById('classDetailOverlay').addEventListener('click', function (e) {
+    if (e.target === e.currentTarget) closeClassDetail();
+  });
+
+  async function loadClassDetail(classId) {
+    try {
+      const classDoc = await db.collection('classes').doc(classId).get();
+      if (!classDoc.exists) {
+        document.getElementById('memberList').innerHTML = '<div class="empty-members">Classe introuvable.</div>';
+        return;
+      }
+      const classData = classDoc.data();
+      document.getElementById('classDetailName').textContent = classData.name || 'Sans nom';
+      document.getElementById('classDetailCode').textContent = '#' + classData.code;
+      document.getElementById('classDetailCode').onclick = function () { copyCode(classData.code); };
+      document.getElementById('classDetailCode').style.cursor = 'pointer';
+      document.getElementById('classDetailCode').title = 'Copier le code';
+
+      const memberSnap = await db.collection('classMembers')
+        .where('classId', '==', classId)
+        .get();
+
+      detailMembers = [];
+      memberSnap.forEach(doc => {
+        detailMembers.push({ id: doc.id, ...doc.data() });
+      });
+
+      document.getElementById('classDetailCount').textContent = '👥 ' + detailMembers.length + ' membre' + (detailMembers.length > 1 ? 's' : '');
+
+      if (detailMembers.length === 0) {
+        document.getElementById('memberList').innerHTML = '<div class="empty-members">Aucun membre.</div>';
+        return;
+      }
+
+      const isCreator = classData.creatorId === currentUser?.uid;
+
+      let html = '';
+      for (const m of detailMembers) {
+        const isMemberYou = m.userId === currentUser?.uid;
+        const isMemberCreator = m.userId === classData.creatorId;
+        let displayName = m.userEmail || 'Inconnu';
+        let initials = '?';
+        try {
+          const userDoc = await db.collection('users').doc(m.userId).get();
+          if (userDoc.exists) {
+            const u = userDoc.data();
+            displayName = ((u.prenom || '') + ' ' + (u.nom || '')).trim() || u.email || m.userEmail || 'Inconnu';
+            initials = (u.prenom?.[0] || u.email?.[0] || '?').toUpperCase();
+          } else {
+            initials = (m.userEmail?.[0] || '?').toUpperCase();
+          }
+        } catch (e) {
+          initials = (m.userEmail?.[0] || '?').toUpperCase();
+        }
+        html += '<div class="member-item">'
+          + '<div class="member-avatar">' + initials + '</div>'
+          + '<div class="member-info">'
+          + '<strong>' + escapeHtml(displayName) + '</strong>'
+          + '<span>' + escapeHtml(m.userEmail || '') + '</span>'
+          + '</div>'
+          + '<div class="member-actions">'
+          + (isMemberCreator ? '<span class="badge-creator">Créateur</span>' : '')
+          + (isMemberYou ? '<span class="badge-you">Vous</span>' : '')
+          + (isCreator && !isMemberCreator
+              ? '<button class="btn btn-danger btn-xs" onclick="removeMember(\'' + classId + '\', \'' + m.id + '\', \'' + escapeHtml(m.userEmail || '') + '\')">Retirer</button>'
+              : '')
+          + '</div>'
+          + '</div>';
+      }
+      document.getElementById('memberList').innerHTML = html;
+    } catch (e) {
+      console.error('loadClassDetail error:', e);
+      document.getElementById('memberList').innerHTML = '<div class="empty-members">Erreur de chargement des membres.</div>';
+    }
+  }
+
+  async function removeMember(classId, memberDocId, userEmail) {
+    if (!currentUser) return;
+    const classDoc = await db.collection('classes').doc(classId).get();
+    if (!classDoc.exists || classDoc.data().creatorId !== currentUser.uid) {
+      showToast('Seul le créateur de la classe peut retirer des membres.', 'error');
+      return;
+    }
+    showConfirm('Retirer ' + userEmail + ' de la classe ?', async () => {
+      try {
+        const batch = db.batch();
+        batch.delete(db.collection('classMembers').doc(memberDocId));
+        batch.update(db.collection('classes').doc(classId), {
+          memberCount: firebase.firestore.FieldValue.increment(-1)
+        });
+        await batch.commit();
+        showToast(userEmail + ' a été retiré(e).', 'success');
+        loadClassDetail(classId);
+      } catch (e) {
+        console.error('removeMember error:', e);
+        showToast('Erreur : ' + e.message, 'error');
+      }
     });
   }
 

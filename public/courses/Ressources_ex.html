@@ -1062,6 +1062,12 @@
         </select>
       </div>
       <div class="form-group">
+        <label>Classe (optionnelle)</label>
+        <select id="formClasse">
+          <option value="">Aucune classe</option>
+        </select>
+      </div>
+      <div class="form-group">
         <label>Description (optionnelle)</label>
         <textarea id="formDescription" placeholder="Description du cours…"></textarea>
       </div>
@@ -1129,12 +1135,15 @@
   auth.onAuthStateChanged(function(user) {
     if (user) {
       authEmail = user.email;
+      currentUser = { uid: user.uid, email: user.email };
       let userData = { uid: user.uid, email: user.email };
       localStorage.setItem('currentUser', JSON.stringify(userData));
       updateUserUI(userData);
+      loadFormClasses();
       db.collection('users').doc(user.uid).get().then(doc => {
         if (doc.exists) {
           Object.assign(userData, doc.data());
+          currentUser = userData;
           localStorage.setItem('currentUser', JSON.stringify(userData));
           updateUserUI(userData);
         }
@@ -1145,6 +1154,7 @@
       authEmail = currentUser.email;
       document.getElementById('loadingOverlay').classList.add('hidden');
       updateUserUI(currentUser);
+      loadFormClasses();
       syncCoursesFromFirestore().then(() => renderCourses());
     } else {
       window.location.href = '../auth/Login_Internate.html';
@@ -1321,6 +1331,7 @@
       showToast("Tu ne peux pas modifier ce cours.", "error");
       return;
     }
+    loadFormClasses();
     document.getElementById('modalOverlay').classList.add('show');
     if (course) {
       editId = course.id;
@@ -1331,8 +1342,10 @@
       updateFormSpecialite();
       setTimeout(() => {
         if (course.specialite) document.getElementById('formSpecialite').value = course.specialite;
+        if (course.classId) document.getElementById('formClasse').value = course.classId;
       }, 50);
       document.getElementById('formMatiere').value = course.matiere;
+      document.getElementById('formClasse').value = course.classId || '';
       document.getElementById('formDescription').value = course.description || '';
       document.getElementById('formFileUrl').value = course.fileUrl || '';
       document.getElementById('formFileName').value = course.fileName || '';
@@ -1340,6 +1353,8 @@
       editId = null;
       document.getElementById('modalTitle').textContent = 'Ajouter un cours';
       document.getElementById('modalOverlay').classList.add('show');
+      const activeClassId = localStorage.getItem('activeClassId');
+      if (activeClassId) document.getElementById('formClasse').value = activeClassId;
     }
     document.getElementById('formTitle').focus();
   }
@@ -1353,6 +1368,7 @@
     document.getElementById('formSpecialite').innerHTML = '';
     document.getElementById('formSpecialiteGroup').classList.remove('show');
     document.getElementById('formMatiere').value = '';
+    document.getElementById('formClasse').value = '';
     document.getElementById('formDescription').value = '';
     document.getElementById('formFileUrl').value = '';
     document.getElementById('formFileName').value = '';
@@ -1397,6 +1413,7 @@
     const annee = document.getElementById('formAnnee').value;
     const specialite = document.getElementById('formSpecialite').value;
     const matiere = document.getElementById('formMatiere').value;
+    const classId = document.getElementById('formClasse').value;
     const description = document.getElementById('formDescription').value.trim();
     const fileUrl = document.getElementById('formFileUrl').value.trim();
     const fileName = document.getElementById('formFileName').value.trim();
@@ -1421,7 +1438,7 @@
     if (editId) {
       const idx = courses.findIndex(c => c.id === editId);
       if (idx !== -1) {
-        const updated = { ...courses[idx], title, filiere, annee, specialite, matiere, matiereLabel: matiereObj.label, matiereIcon: matiereObj.icon, matiereColor: matiereObj.color, description, fileUrl, fileName: fileName || (fileUrl ? fileUrl.split('/').pop() : '') };
+        const updated = { ...courses[idx], title, filiere, annee, specialite, matiere, classId, matiereLabel: matiereObj.label, matiereIcon: matiereObj.icon, matiereColor: matiereObj.color, description, fileUrl, fileName: fileName || (fileUrl ? fileUrl.split('/').pop() : '') };
         courses[idx] = updated;
         saveCourses(courses);
         saveToFirestore(updated);
@@ -1432,7 +1449,7 @@
     } else {
       const newCourse = {
         id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-        title, filiere, annee, specialite, matiere,
+        title, filiere, annee, specialite, matiere, classId,
         matiereLabel: matiereObj.label,
         matiereIcon: matiereObj.icon,
         matiereColor: matiereObj.color,
@@ -1577,6 +1594,33 @@
       });
     } catch (e) {
       console.warn('Classes load error:', e.message);
+    }
+  }
+
+  async function loadFormClasses() {
+    const select = document.getElementById('formClasse');
+    select.innerHTML = '<option value="">Aucune classe</option>';
+    if (!currentUser) return;
+    try {
+      const memberSnap = await db.collection('classMembers')
+        .where('userId', '==', currentUser.uid)
+        .get();
+      const classIds = [];
+      memberSnap.forEach(doc => classIds.push(doc.data().classId));
+      for (const id of classIds) {
+        try {
+          const doc = await db.collection('classes').doc(id).get();
+          if (doc.exists) {
+            const d = doc.data();
+            const opt = document.createElement('option');
+            opt.value = doc.id;
+            opt.textContent = d.name || 'Sans nom';
+            select.appendChild(opt);
+          }
+        } catch (e) { /* skip */ }
+      }
+    } catch (e) {
+      console.warn('Form classes load error:', e.message);
     }
   }
 
