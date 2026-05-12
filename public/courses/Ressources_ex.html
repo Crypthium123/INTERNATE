@@ -740,6 +740,39 @@
     font-family: 'DM Sans', sans-serif;
   }
   .menu-toggle:hover { background: var(--surface2); }
+
+  /* ---- DISCUSSION ---- */
+  .discussion-btn {
+    position: absolute;
+    top: 10px; right: 78px;
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--hover-overlay-strong);
+    color: var(--accent2);
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.2s;
+    z-index: 2;
+    backdrop-filter: blur(4px);
+  }
+  .cours-card:hover .discussion-btn { opacity: 1; }
+  .discussion-btn:hover { background: rgba(0,212,170,0.2); border-color: var(--accent2); }
+
+  .comment { padding:12px 16px; border-bottom:1px solid var(--border); }
+  .comment-user { font-size:0.78rem; font-weight:600; color:var(--accent); }
+  .comment-text { font-size:0.85rem; color:var(--text2); margin-top:4px; line-height:1.5; }
+  .comment-time { font-size:0.7rem; color:var(--muted); margin-top:2px; }
+  .comment-input-area { display:flex; gap:8px; padding:16px 0; }
+  .comment-input-area textarea { flex:1; padding:10px 14px; border-radius:8px; background:var(--surface2); border:1px solid var(--border); color:var(--text); font-family:'DM Sans',sans-serif; font-size:0.85rem; resize:vertical; min-height:44px; }
+  .comment-input-area button { padding:10px 20px; border-radius:8px; background:var(--accent); color:white; border:none; cursor:pointer; font-weight:600; }
+
+  .file-upload-wrapper { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+
   @media (max-width: 900px) {
     .menu-toggle { display: flex; position: fixed; top: 12px; left: 12px; z-index: 60; }
     .sidebar { transform: translateX(-100%); transition: transform 0.3s ease; z-index: 55; width: 260px; }
@@ -819,6 +852,9 @@
   <a class="nav-item active" href="#">
     <span class="nav-icon">📚</span> Mes cours
   </a>
+  <a class="nav-item" href="../classes/">
+    <span class="nav-icon">👥</span> Classes
+  </a>
 
   <div class="nav-section-label">Outils</div>
   <a class="nav-item" href="../tools/Calculatrice_Scientifique.html">
@@ -881,6 +917,8 @@
       <h1>📚 Mes cours</h1>
       <p>Ressources et supports pédagogiques</p>
     </div>
+    <button class="btn-upload" onclick="exportJSON()" style="background:var(--surface2);font-size:0.8rem;padding:10px 16px;">📥 JSON</button>
+    <button class="btn-upload" onclick="exportCSV()" style="background:var(--surface2);font-size:0.8rem;padding:10px 16px;">📥 CSV</button>
     <button class="btn-upload"><span>＋</span> Ajouter un cours</button>
   </div>
 <!-- FILTRES -->
@@ -889,6 +927,9 @@
       <option value="">Toutes filières</option>
       <option value="generale">Générale</option>
       <option value="technologique">Technologique</option>
+    </select>
+    <select class="filter-select" id="filterClasse" onchange="applyFilters()">
+      <option value="">Toutes les classes</option>
     </select>
     <select class="filter-select" id="filterAnnee" onchange="applyFilters()">
       <option value="">Toutes années</option>
@@ -914,6 +955,17 @@
 
   <!-- COURS -->
   <div class="cours-grid" id="coursGrid"></div>
+
+  <!-- DISCUSSION -->
+  <div id="discussionSection" style="display:none;margin-top:32px;">
+    <div class="section-title" style="display:flex;justify-content:space-between;align-items:center;">
+      <span>💬 Discussion</span>
+      <button class="filter-reset" onclick="closeDiscussion()">Fermer</button>
+    </div>
+    <div id="discussionArea">
+      <div class="empty-state" id="discussionEmpty"><div class="empty-icon">💬</div><p>Sélectionne un cours pour voir les commentaires.</p></div>
+    </div>
+  </div>
 
   <!-- OUTILS -->
   <div class="section-title">Accès rapide aux outils</div>
@@ -1010,6 +1062,15 @@
       <div class="form-group">
         <label>Description (optionnelle)</label>
         <textarea id="formDescription" placeholder="Description du cours…"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Fichier (upload)</label>
+        <div class="file-upload-wrapper">
+          <input type="file" id="formFileUpload" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.gif,.zip" style="display:none;">
+          <label for="formFileUpload" class="btn btn-secondary" style="display:inline-flex;cursor:pointer;padding:9px 16px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:0.82rem;transition:all 0.2s;">📤 Choisir un fichier</label>
+          <span id="uploadFileName" style="font-size:0.78rem;color:var(--muted);"></span>
+        </div>
+        <div id="uploadStatus" style="font-size:0.78rem;color:var(--muted);margin-top:6px;"></div>
       </div>
       <div class="form-group">
         <label>URL du fichier (optionnelle)</label>
@@ -1268,6 +1329,11 @@
     document.getElementById('formDescription').value = '';
     document.getElementById('formFileUrl').value = '';
     document.getElementById('formFileName').value = '';
+    document.getElementById('uploadStatus').textContent = '';
+    const fu = document.getElementById('formFileUpload');
+    if (fu) fu.value = '';
+    const ufn = document.getElementById('uploadFileName');
+    if (ufn) ufn.textContent = '';
   }
 
   document.getElementById('modalOverlay').addEventListener('click', (e) => {
@@ -1303,15 +1369,16 @@
   }
 
   // ---- CRUD ----
-  function addCourse() {
+  async function addCourse() {
     const title = document.getElementById('formTitle').value.trim();
     const filiere = document.getElementById('formFiliere').value;
     const annee = document.getElementById('formAnnee').value;
     const specialite = document.getElementById('formSpecialite').value;
     const matiere = document.getElementById('formMatiere').value;
     const description = document.getElementById('formDescription').value.trim();
-    const fileUrl = document.getElementById('formFileUrl').value.trim();
+    const fileUrlInput = document.getElementById('formFileUrl').value.trim();
     const fileName = document.getElementById('formFileName').value.trim();
+    const fileInput = document.getElementById('formFileUpload');
 
     if (!title) { showToast('Veuillez saisir un titre.', 'error'); return; }
     if (!filiere) { showToast('Veuillez sélectionner une filière.', 'error'); return; }
@@ -1323,6 +1390,36 @@
       const label = document.getElementById('formSpecialiteLabel').textContent;
       showToast(`Veuillez sélectionner une ${label.toLowerCase()}.`, 'error');
       return;
+    }
+
+    let fileUrl = fileUrlInput;
+    if (fileInput && fileInput.files && fileInput.files[0]) {
+      const authUser = firebase.auth().currentUser;
+      if (!authUser) { showToast('Tu dois être connecté pour uploader un fichier.', 'error'); return; }
+      const statusEl = document.getElementById('uploadStatus');
+      statusEl.textContent = 'Upload en cours... 0%';
+      try {
+        const file = fileInput.files[0];
+        const storageRef = firebase.storage().ref();
+        const fileRef = storageRef.child(`uploads/${authUser.email}/${file.name}`);
+        const task = fileRef.put(file);
+        await new Promise((resolve, reject) => {
+          task.on('state_changed',
+            snapshot => {
+              const pct = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+              statusEl.textContent = `Upload en cours... ${pct}%`;
+            },
+            reject,
+            resolve
+          );
+        });
+        fileUrl = await fileRef.getDownloadURL();
+        statusEl.textContent = 'Upload terminé ✓';
+      } catch (e) {
+        showToast('Erreur lors de l\'upload du fichier.', 'error');
+        console.warn('Upload error:', e.message);
+        return;
+      }
     }
 
     let courses = getCourses();
@@ -1384,6 +1481,108 @@
     });
   }
 
+  // ---- EXPORT ----
+  function exportJSON() {
+    const data = getCourses();
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'internate_cours.json';
+    a.click(); URL.revokeObjectURL(url);
+    showToast('📥 Export JSON téléchargé !', 'success');
+  }
+  function exportCSV() {
+    const data = getCourses();
+    if (!data.length) { showToast('Aucun cours à exporter.', 'error'); return; }
+    const headers = 'Titre,Matière,Filière,Année,Spécialité,Description,URL,Date';
+    const rows = data.map(c => `"${c.title || ''}","${c.matiereLabel || ''}","${c.filiere || ''}","${c.annee || ''}","${c.specialite || ''}","${(c.description || '').replace(/"/g, '""')}","${c.fileUrl || ''}","${c.dateAdded || ''}"`);
+    const csv = [headers, ...rows].join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'internate_cours.csv';
+    a.click(); URL.revokeObjectURL(url);
+    showToast('📥 Export CSV téléchargé !', 'success');
+  }
+
+  // ---- DISCUSSION ----
+  let currentDiscussionCourseId = null;
+  function openDiscussion(courseId) {
+    currentDiscussionCourseId = courseId;
+    document.getElementById('discussionSection').style.display = 'block';
+    loadComments(courseId);
+  }
+  function closeDiscussion() {
+    document.getElementById('discussionSection').style.display = 'none';
+    currentDiscussionCourseId = null;
+  }
+  async function loadComments(courseId) {
+    const area = document.getElementById('discussionArea');
+    try {
+      const snapshot = await db.collection('comments').where('courseId', '==', courseId).orderBy('timestamp', 'asc').get();
+      if (snapshot.empty) {
+        area.innerHTML = '<div class="empty-state" id="discussionEmpty"><div class="empty-icon">💬</div><p>Aucun commentaire pour ce cours. Sois le premier à commenter !</p></div>';
+      } else {
+        let html = '';
+        snapshot.forEach(doc => {
+          const d = doc.data();
+          const time = d.timestamp && d.timestamp.toDate ? d.timestamp.toDate().toLocaleString('fr-FR') : '';
+          html += '<div class="comment">';
+          html += '<div class="comment-user">' + (d.userId || 'Anonyme') + '</div>';
+          html += '<div class="comment-text">' + (d.text || '') + '</div>';
+          if (time) html += '<div class="comment-time">' + time + '</div>';
+          html += '</div>';
+        });
+        area.innerHTML = html;
+      }
+    } catch (e) {
+      area.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><p>Erreur lors du chargement des commentaires.</p></div>';
+      console.warn('Comments load error:', e.message);
+    }
+    const inputArea = document.createElement('div');
+    inputArea.className = 'comment-input-area';
+    inputArea.innerHTML = '<textarea id="commentText" placeholder="Écris un commentaire…"></textarea><button onclick="addComment()">Envoyer</button>';
+    area.appendChild(inputArea);
+  }
+  async function addComment() {
+    const text = document.getElementById('commentText').value.trim();
+    if (!text) { showToast('Veuillez écrire un commentaire.', 'error'); return; }
+    if (!currentDiscussionCourseId) return;
+    const authUser = firebase.auth().currentUser;
+    if (!authUser) { showToast('Tu dois être connecté pour commenter.', 'error'); return; }
+    try {
+      await db.collection('comments').add({
+        courseId: currentDiscussionCourseId,
+        userId: authUser.email,
+        text: text,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      document.getElementById('commentText').value = '';
+      showToast('Commentaire ajouté !', 'success');
+      loadComments(currentDiscussionCourseId);
+    } catch (e) {
+      showToast('Erreur lors de l\'envoi du commentaire.', 'error');
+      console.warn('Comment add error:', e.message);
+    }
+  }
+
+  // ---- LOAD CLASSES ----
+  async function loadClasses() {
+    try {
+      const snapshot = await db.collection('classes').get();
+      const select = document.getElementById('filterClasse');
+      snapshot.forEach(doc => {
+        const d = doc.data();
+        const opt = document.createElement('option');
+        opt.value = doc.id;
+        opt.textContent = d.name || d.nom || doc.id;
+        select.appendChild(opt);
+      });
+    } catch (e) {
+      console.warn('Classes load error:', e.message);
+    }
+  }
+
   // ---- URL HASH ----
   function checkUrlHash() {
     const hash = window.location.hash;
@@ -1425,6 +1624,7 @@
 
   function resetFilters() {
     document.getElementById('filterFiliere').value = '';
+    document.getElementById('filterClasse').value = '';
     document.getElementById('filterAnnee').value = '';
     document.getElementById('filterSpecialite').innerHTML = '<option value="">Toutes spécialités/séries</option>';
     document.getElementById('filterMatiere').value = '';
@@ -1447,6 +1647,8 @@
     if (filiere) filtered = filtered.filter(c => c.filiere === filiere);
     if (annee) filtered = filtered.filter(c => c.annee === annee);
     if (specialite) filtered = filtered.filter(c => c.specialite === specialite);
+    const classe = document.getElementById('filterClasse').value;
+    if (classe) filtered = filtered.filter(c => c.classId === classe);
     if (matiere) filtered = filtered.filter(c => c.matiere === matiere);
 
     if (sortBy === 'date-desc') filtered.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
@@ -1496,6 +1698,7 @@
         <div class="cours-card" id="cours-${c.id}" style="cursor:default;">
           <button class="edit-btn" onclick="openModal(getCourses().find(x => x.id === '${c.id}'))" title="Modifier">✎</button>
           <button class="delete-btn" onclick="deleteCourse('${c.id}')" title="Supprimer">✕</button>
+          <button class="discussion-btn" onclick="openDiscussion('${c.id}')" title="Commentaires">💬</button>
           <button class="share-btn" onclick="shareCourse('${c.id}')" title="Partager">↗</button>
           <div class="cours-thumb" style="background: linear-gradient(135deg, ${color}22, ${color}44);">
             <div class="cours-thumb-bg"></div>
@@ -1530,6 +1733,17 @@
     matiereFilter.appendChild(opt);
   });
 
+  // File input - show filename
+  const fileUploadEl = document.getElementById('formFileUpload');
+  if (fileUploadEl) {
+    fileUploadEl.addEventListener('change', function() {
+      document.getElementById('uploadFileName').textContent = this.files[0] ? this.files[0].name : '';
+    });
+  }
+
+  // Load classes
+  loadClasses();
+
   renderCourses();
   checkUrlHash();
 
@@ -1548,6 +1762,7 @@ document.addEventListener('click', function(e) {
   Des retours ? <a href="../help/" style="color:var(--accent2);text-decoration:none;font-weight:500;">💬 Aide &amp; retours</a>
 </div>
 <script src="../js/theme.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-storage-compat.js"></script>
 <script>navigator.serviceWorker && navigator.serviceWorker.register('/sw.js');</script>
 </body>
 </html>

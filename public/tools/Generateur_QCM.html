@@ -263,6 +263,61 @@
   }
   @keyframes spin { to { transform: rotate(360deg); } }
   .loading-overlay p { color: var(--muted); font-size: 0.85rem; margin-top: 16px; }
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .modal-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .modal-content {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  .modal-content h2 {
+    font-family: 'Syne', sans-serif;
+    margin-bottom: 16px;
+  }
+  .modal-content table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  .modal-content th, .modal-content td {
+    text-align: left;
+    padding: 10px 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .modal-content th {
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+  }
+  .modal-close {
+    float: right;
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-size: 1.5rem;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .modal-close:hover { color: var(--text); }
 </style>
 </head>
 <body>
@@ -281,6 +336,7 @@
 <div class="container" id="tool-content">
   <h1>📋 Générateur de QCM</h1>
   <button onclick="exportPDF('tool-content', 'Generateur_QCM.pdf')" class="btn btn-secondary" style="padding:6px 14px;font-size:0.8rem;">📄 Exporter en PDF</button>
+  <button onclick="showScoresModal()" class="btn btn-secondary" style="padding:6px 14px;font-size:0.8rem;">📊 Voir mes scores</button>
   
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('create')">➕ Créer</button>
@@ -446,8 +502,10 @@ function displayQuestion() {
         <div style="margin-top: 16px; color: var(--accent2); font-size: 1.1rem;">${Math.round(score / quiz.questions.length * 100)}%</div>
       </div>
       <button onclick="switchTab('create')">← Retour à l'éditeur</button>
+      <button class="secondary" onclick="showScoresModal()" style="margin-left:8px;">📊 Voir mes scores</button>
       <button class="secondary" onclick="goBack()">← Retour au dashboard</button>
     `;
+    saveQuizResult();
     return;
   }
   
@@ -496,6 +554,70 @@ function goBack() {
   window.location.href = '../dashboard/Connected_internate.html';
 }
 
+function saveQuizResult() {
+  try {
+    const user = firebase.auth().currentUser;
+    if (!user) return;
+    const classId = localStorage.getItem('activeClassId') || '';
+    firebase.firestore().collection('quizResults').add({
+      userId: user.email,
+      score: score,
+      total: quiz.questions.length,
+      quizTitle: quiz.title || 'QCM sans titre',
+      classId: classId,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    }).catch(function(err) { console.warn('Firestore save failed:', err); });
+  } catch (err) {
+    console.warn('Firestore unavailable:', err);
+  }
+}
+
+function showScoresModal() {
+  var modal = document.getElementById('scoresModal');
+  modal.classList.add('open');
+  var container = document.getElementById('scoresTableContainer');
+  container.innerHTML = '<p style="color:var(--muted)">Chargement...</p>';
+
+  try {
+    var user = firebase.auth().currentUser;
+    if (!user) {
+      container.innerHTML = '<p style="color:var(--muted)">Connecte-toi pour voir tes scores.</p>';
+      return;
+    }
+
+    firebase.firestore().collection('quizResults')
+      .where('userId', '==', user.email)
+      .orderBy('timestamp', 'desc')
+      .limit(20)
+      .get()
+      .then(function(snapshot) {
+        if (snapshot.empty) {
+          container.innerHTML = '<p style="color:var(--muted)">Aucun score enregistré.</p>';
+          return;
+        }
+        var html = '<table><thead><tr><th>Date</th><th>Quiz</th><th>Score</th><th>Questions</th></tr></thead><tbody>';
+        snapshot.forEach(function(doc) {
+          var d = doc.data();
+          var date = d.timestamp && d.timestamp.toDate ? d.timestamp.toDate().toLocaleDateString('fr-FR') : '—';
+          html += '<tr><td>' + date + '</td><td>' + (d.quizTitle || '—') + '</td><td>' + d.score + '</td><td>' + d.total + '</td></tr>';
+        });
+        html += '</tbody></table>';
+        container.innerHTML = html;
+      })
+      .catch(function(err) {
+        console.warn('Firestore query failed:', err);
+        container.innerHTML = '<p style="color:var(--muted)">Impossible de charger les scores. Vérifie ta connexion.</p>';
+      });
+  } catch (err) {
+    console.warn('Firestore unavailable:', err);
+    container.innerHTML = '<p style="color:var(--muted)">Firestore indisponible.</p>';
+  }
+}
+
+function closeScoresModal() {
+  document.getElementById('scoresModal').classList.remove('open');
+}
+
 const loadingOverlay = document.getElementById('loadingOverlay');
 const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
 if (user.email) {
@@ -504,6 +626,16 @@ if (user.email) {
   window.location.href = '../auth/Login_Internate.html';
 }
 </script>
+<div class="modal-overlay" id="scoresModal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeScoresModal()">&times;</button>
+    <h2>📊 Mes scores</h2>
+    <div id="scoresTableContainer">
+      <p style="color:var(--muted)">Chargement...</p>
+    </div>
+  </div>
+</div>
+
 <div style="text-align:center;padding:16px;font-size:0.75rem;color:var(--muted);margin-top:20px;">
   <a href="../help/" style="color:var(--accent2);text-decoration:none;">💬 Aide & retours</a>
 </div>
