@@ -63,6 +63,8 @@
 
   function flushPending() {
     if (synced) return;
+    const user = typeof firebase !== 'undefined' && firebase.app ? firebase.auth().currentUser : null;
+    if (!user) return;
     if (pendingPage) {
       trackFirestore('pageview', { page: pendingPage });
       pendingPage = null;
