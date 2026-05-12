@@ -854,9 +854,6 @@
   <a class="nav-item" href="../classes/">
     <span class="nav-icon">👥</span> Classes
   </a>
-  <a class="nav-item" href="../profile/index.html">
-    <span class="nav-icon">👤</span> Mon profil
-  </a>
 
   <div class="nav-section-label">Outils</div>
   <a class="nav-item" href="../tools/Calculatrice_Scientifique.html">
@@ -901,6 +898,9 @@
         <span id="userEmailEl">—</span>
       </div>
     </div>
+    <a href="../profile/index.html" class="logout-btn" style="text-decoration:none;">
+      <span>👤</span> Mon profil
+    </a>
     <button class="logout-btn" onclick="logout()">
       <span>🚪</span> Se déconnecter
     </button>
@@ -1107,19 +1107,40 @@
 </script>
 
 <script>
-  // Auth check
-  const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
-  if (user.email) {
-    document.getElementById('loadingOverlay').classList.add('hidden');
-    syncCoursesFromFirestore().then(() => renderCourses());
-  } else {
-    window.location.href = '../auth/Login_Internate.html';
+  let currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+
+  function updateUserUI(userData) {
+    currentUser = userData;
+    const prenom = userData.prenom || '';
+    const nom = userData.nom || '';
+    const initial = ((prenom?.[0] || '') + (nom?.[0] || '')).toUpperCase() || '?';
+    document.getElementById('avatarEl').textContent = initial;
+    document.getElementById('userNameEl').textContent = (prenom + ' ' + nom).trim() || 'Utilisateur';
+    document.getElementById('userEmailEl').textContent = userData.email || '';
   }
 
-  const initials = (user.prenom?.[0] || '?') + (user.nom?.[0] || '');
-  document.getElementById('avatarEl').textContent = initials.toUpperCase();
-  document.getElementById('userNameEl').textContent = `${user.prenom || ''} ${user.nom || ''}`.trim();
-  document.getElementById('userEmailEl').textContent = user.email || '';
+  auth.onAuthStateChanged(function(user) {
+    if (user) {
+      let userData = { uid: user.uid, email: user.email };
+      localStorage.setItem('currentUser', JSON.stringify(userData));
+      updateUserUI(userData);
+      db.collection('users').doc(user.uid).get().then(doc => {
+        if (doc.exists) {
+          Object.assign(userData, doc.data());
+          localStorage.setItem('currentUser', JSON.stringify(userData));
+          updateUserUI(userData);
+        }
+      }).catch(() => {});
+      document.getElementById('loadingOverlay').classList.add('hidden');
+      syncCoursesFromFirestore().then(() => renderCourses());
+    } else if (currentUser.email) {
+      document.getElementById('loadingOverlay').classList.add('hidden');
+      updateUserUI(currentUser);
+      syncCoursesFromFirestore().then(() => renderCourses());
+    } else {
+      window.location.href = '../auth/Login_Internate.html';
+    }
+  });
 
   function logout() {
     auth.signOut().then(() => {
@@ -1287,7 +1308,7 @@
   let editId = null;
 
   function openModal(course) {
-    if (course && course.userId !== user.email) {
+    if (course && course.userId !== currentUser.email) {
       showToast("Tu ne peux pas modifier ce cours.", "error");
       return;
     }
@@ -1409,7 +1430,7 @@
         description, fileUrl,
         fileName: fileName || (fileUrl ? fileUrl.split('/').pop() : ''),
         dateAdded: now,
-        userId: user.email || 'unknown'
+        userId: currentUser.email || 'unknown'
       };
       courses.push(newCourse);
       saveCourses(courses);
@@ -1423,7 +1444,7 @@
   function deleteCourse(id) {
     const target = getCourses().find(c => c.id === id);
     if (!target) return;
-    if (target.userId !== user.email) {
+    if (target.userId !== currentUser.email) {
       showToast("Tu ne peux pas supprimer ce cours.", "error");
       return;
     }
@@ -1484,30 +1505,32 @@
   async function loadComments(courseId) {
     const area = document.getElementById('discussionArea');
     try {
-      const snapshot = await db.collection('comments').where('courseId', '==', courseId).orderBy('timestamp', 'asc').get();
+      let snapshot;
+      try {
+        snapshot = await db.collection('comments').where('courseId', '==', courseId).orderBy('timestamp', 'asc').get();
+      } catch (indexErr) {
+        if (indexErr.code === 'failed-precondition') {
+          console.warn('Index manquant pour comments, fallback sans tri:', indexErr.message);
+          snapshot = await db.collection('comments').where('courseId', '==', courseId).get();
+        } else {
+          throw indexErr;
+        }
+      }
+      let html = '<div class="comment-input-area"><textarea id="commentText" placeholder="Écris un commentaire…"></textarea><button onclick="addComment()">Envoyer</button></div>';
       if (snapshot.empty) {
-        area.innerHTML = '<div class="empty-state" id="discussionEmpty"><div class="empty-icon">💬</div><p>Aucun commentaire pour ce cours. Sois le premier à commenter !</p></div>';
+        html += '<div class="empty-state"><div class="empty-icon">💬</div><p>Aucun commentaire pour ce cours. Sois le premier à commenter !</p></div>';
       } else {
-        let html = '';
         snapshot.forEach(doc => {
           const d = doc.data();
           const time = d.timestamp && d.timestamp.toDate ? d.timestamp.toDate().toLocaleString('fr-FR') : '';
-          html += '<div class="comment">';
-          html += '<div class="comment-user">' + (d.userId || 'Anonyme') + '</div>';
-          html += '<div class="comment-text">' + (d.text || '') + '</div>';
-          if (time) html += '<div class="comment-time">' + time + '</div>';
-          html += '</div>';
+          html += '<div class="comment"><div class="comment-user">' + (d.userId || 'Anonyme') + '</div><div class="comment-text">' + (d.text || '') + '</div>' + (time ? '<div class="comment-time">' + time + '</div>' : '') + '</div>';
         });
-        area.innerHTML = html;
       }
+      area.innerHTML = html;
     } catch (e) {
-      area.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><p>Erreur lors du chargement des commentaires.</p></div>';
+      area.innerHTML = '<div class="comment-input-area"><textarea id="commentText" placeholder="Écris un commentaire…"></textarea><button onclick="addComment()">Envoyer</button></div><div class="empty-state"><div class="empty-icon">⚠️</div><p>Erreur lors du chargement des commentaires. Vérifie la console.</p></div>';
       console.warn('Comments load error:', e.message);
     }
-    const inputArea = document.createElement('div');
-    inputArea.className = 'comment-input-area';
-    inputArea.innerHTML = '<textarea id="commentText" placeholder="Écris un commentaire…"></textarea><button onclick="addComment()">Envoyer</button>';
-    area.appendChild(inputArea);
   }
   async function addComment() {
     const text = document.getElementById('commentText').value.trim();
@@ -1657,7 +1680,7 @@
 
       const dateStr = c.dateAdded ? new Date(c.dateAdded).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) : '';
       const creator = c.userId ? c.userId.replace(/@.*/, '') : '';
-      const isOwner = creator && user && c.userId === user.email;
+      const isOwner = creator && currentUser.email && c.userId === currentUser.email;
 
       return `
         <div class="cours-card" id="cours-${c.id}" style="cursor:default;">
