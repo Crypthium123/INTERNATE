@@ -1287,6 +1287,10 @@
   let editId = null;
 
   function openModal(course) {
+    if (course && course.userId !== user.email) {
+      showToast("Tu ne peux pas modifier ce cours.", "error");
+      return;
+    }
     document.getElementById('modalOverlay').classList.add('show');
     if (course) {
       editId = course.id;
@@ -1417,12 +1421,16 @@
   }
 
   function deleteCourse(id) {
+    const target = getCourses().find(c => c.id === id);
+    if (!target) return;
+    if (target.userId !== user.email) {
+      showToast("Tu ne peux pas supprimer ce cours.", "error");
+      return;
+    }
     showConfirm('Supprimer ce cours ?', () => {
-      const all = getCourses();
-      const target = all.find(c => c.id === id);
-      const courses = all.filter(c => c.id !== id);
+      const courses = getCourses().filter(c => c.id !== id);
       saveCourses(courses);
-      if (target) deleteFromFirestore(target.firestoreId || target.id);
+      deleteFromFirestore(target.firestoreId || target.id);
       renderCourses();
       showToast('Cours supprimé.', 'success');
     });
@@ -1653,8 +1661,8 @@
 
       return `
         <div class="cours-card" id="cours-${c.id}" style="cursor:default;">
-          <button class="edit-btn" onclick="openModal(getCourses().find(x => x.id === '${c.id}'))" title="Modifier">✎</button>
-          <button class="delete-btn" onclick="deleteCourse('${c.id}')" title="Supprimer">✕</button>
+          ${isOwner ? `<button class="edit-btn" onclick="openModal(getCourses().find(x => x.id === '${c.id}'))" title="Modifier">✎</button>` : ''}
+          ${isOwner ? `<button class="delete-btn" onclick="deleteCourse('${c.id}')" title="Supprimer">✕</button>` : ''}
           <button class="discussion-btn" onclick="openDiscussion('${c.id}')" title="Commentaires">💬</button>
           <button class="share-btn" onclick="shareCourse('${c.id}')" title="Partager">↗</button>
           <div class="cours-thumb" style="background: linear-gradient(135deg, ${color}22, ${color}44);">
