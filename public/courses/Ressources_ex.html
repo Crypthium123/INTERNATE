@@ -580,8 +580,39 @@
     backdrop-filter: blur(4px);
   }
   .cours-card:hover .delete-btn,
-  .cours-card:hover .edit-btn { opacity: 1; }
+  .cours-card:hover .edit-btn,
+  .cours-card:hover .share-btn { opacity: 1; }
   .delete-btn:hover { background: rgba(255,107,107,0.2); border-color: var(--accent3); }
+
+  .share-btn {
+    position: absolute;
+    top: 10px; right: 10px;
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--hover-overlay-strong);
+    color: var(--accent);
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.2s;
+    z-index: 2;
+    backdrop-filter: blur(4px);
+  }
+  .share-btn:hover { background: rgba(108,99,255,0.2); border-color: var(--accent); }
+
+  .cours-card.highlight {
+    animation: highlightPulse 1.5s ease;
+    border-color: var(--accent);
+    box-shadow: 0 0 20px rgba(108,99,255,0.2);
+  }
+  @keyframes highlightPulse {
+    0%, 100% { box-shadow: 0 0 20px rgba(108,99,255,0.2); }
+    50% { box-shadow: 0 0 40px rgba(108,99,255,0.4); }
+  }
 
   .edit-btn {
     position: absolute;
@@ -710,23 +741,32 @@
   }
   .menu-toggle:hover { background: var(--surface2); }
   @media (max-width: 900px) {
-    .menu-toggle { display: flex; position: fixed; }
-    .sidebar { transform: translateX(-100%); transition: transform 0.3s ease; z-index: 55; }
+    .menu-toggle { display: flex; position: fixed; top: 12px; left: 12px; z-index: 60; }
+    .sidebar { transform: translateX(-100%); transition: transform 0.3s ease; z-index: 55; width: 260px; }
     .sidebar.open { transform: translateX(0); }
     .main { margin-left: 0; width: 100%; max-width: 100%; }
-    .page-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .page-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .page-header h1 { font-size: 1.3rem; }
   }
   @media (max-width: 600px) {
-    .main { padding: 16px 12px; padding-top: 60px; }
-    .filter-bar { flex-direction: column; }
+    .main { padding: 14px 10px; padding-top: 64px; }
+    .page-header h1 { font-size: 1.1rem; }
+    .page-header p { font-size: 0.8rem; }
+    .filter-bar { flex-direction: column; gap: 8px; }
     .filter-select { width: 100%; min-width: unset; }
-    .modal { padding: 24px 20px; max-width: 100vw; }
+    .cours-grid { grid-template-columns: 1fr; gap: 12px; }
+    .modal { padding: 20px 16px; max-width: 100vw; margin: 10px; border-radius: 12px; }
     .form-row { grid-template-columns: 1fr; }
+    .tools-row { gap: 8px; }
     .tools-row { grid-template-columns: 1fr 1fr; }
+    .cours-card .share-btn { width: 32px; height: 32px; font-size: 0.85rem; }
   }
   @media (max-width: 400px) {
     .sidebar { width: 220px; }
     .tools-row { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .stat-card { padding: 14px; }
+    .stat-value { font-size: 1.3rem; }
   }
 
   /* Loading spinner overlay */
@@ -1334,6 +1374,32 @@
     });
   }
 
+  // ---- SHARE ----
+  function shareCourse(id) {
+    const url = window.location.origin + window.location.pathname + '#cours-' + id;
+    navigator.clipboard.writeText(url).then(() => {
+      showToast('🔗 Lien copié ! Partage-le avec tes camarades.', 'success');
+    }).catch(() => {
+      showToast('📋 Copie manuelle : ' + url, 'info');
+    });
+  }
+
+  // ---- URL HASH ----
+  function checkUrlHash() {
+    const hash = window.location.hash;
+    if (hash && hash.startsWith('#cours-')) {
+      const id = hash.replace('#cours-', '');
+      const el = document.getElementById('cours-' + id);
+      if (el) {
+        setTimeout(() => {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          el.classList.add('highlight');
+          setTimeout(() => el.classList.remove('highlight'), 3000);
+        }, 500);
+      }
+    }
+  }
+
   // ---- FILTERS ----
   function applyFilters() {
     renderCourses();
@@ -1423,11 +1489,14 @@
         : '';
 
       const dateStr = c.dateAdded ? new Date(c.dateAdded).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) : '';
+      const creator = c.userId ? c.userId.replace(/@.*/, '') : '';
+      const isOwner = creator && user && c.userId === user.email;
 
       return `
-        <div class="cours-card" style="cursor:default;">
+        <div class="cours-card" id="cours-${c.id}" style="cursor:default;">
           <button class="edit-btn" onclick="openModal(getCourses().find(x => x.id === '${c.id}'))" title="Modifier">✎</button>
           <button class="delete-btn" onclick="deleteCourse('${c.id}')" title="Supprimer">✕</button>
+          <button class="share-btn" onclick="shareCourse('${c.id}')" title="Partager">↗</button>
           <div class="cours-thumb" style="background: linear-gradient(135deg, ${color}22, ${color}44);">
             <div class="cours-thumb-bg"></div>
             <span style="position:relative; z-index:1;">${icon}</span>
@@ -1438,6 +1507,10 @@
             <div class="cours-title">${c.title}</div>
             ${c.description ? `<p style="font-size:0.78rem; color:var(--muted); margin-bottom:12px; line-height:1.4;">${c.description}</p>` : ''}
             <div class="cours-meta">${metaTags}${dateStr ? `<span style="margin-left:auto;font-size:0.7rem;color:var(--muted)">${dateStr}</span>` : ''}</div>
+            <div style="font-size:0.7rem;color:var(--muted);margin-top:8px;display:flex;align-items:center;gap:4px;">
+              <span>👤 ${creator || 'inconnu'}</span>
+              ${!isOwner ? `<span style="color:var(--accent2);font-weight:500;">partagé</span>` : ''}
+            </div>
           </div>
           ${fileSection}
         </div>`;
@@ -1458,8 +1531,7 @@
   });
 
   renderCourses();
-
-
+  checkUrlHash();
 
 function toggleSidebar() {
   document.querySelector('.sidebar').classList.toggle('open');
