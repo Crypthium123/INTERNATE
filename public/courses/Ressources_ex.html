@@ -1815,6 +1815,7 @@
     if (activeId) {
       filtered = filtered.filter(c => c.classId === activeId);
     } else {
+      filtered = filtered.filter(c => !c.classId);
       const classe = document.getElementById('filterClasse').value;
       if (classe) filtered = filtered.filter(c => c.classId === classe);
     }
