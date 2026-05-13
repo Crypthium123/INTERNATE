@@ -3,6 +3,9 @@ const CACHE_NAME = 'internate-v3-cache-v1';
 const PRECACHE_URLS = [
   '/',
   '/index.html',
+  '/404.html',
+  '/favicon.svg',
+  '/contact.html',
   '/css/style.css',
   '/css/theme.css',
   '/js/firebase-config.js',
@@ -10,8 +13,12 @@ const PRECACHE_URLS = [
   '/js/pdf-export.js',
   '/auth/Login_Internate.html',
   '/auth/Register_internate.html',
-  '/404.html',
-  '/favicon.svg'
+  '/dashboard/Connected_internate.html',
+  '/courses/Ressources_ex.html',
+  '/classes/index.html',
+  '/profile/index.html',
+  '/help/index.html',
+  '/legal/Legal.html'
 ];
 
 self.addEventListener('install', event => {

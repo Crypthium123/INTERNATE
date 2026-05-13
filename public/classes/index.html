@@ -1138,6 +1138,7 @@
       });
 
       document.getElementById('createClassName').value = '';
+      localStorage.setItem('activeClassId', classRef.id);
       showToast('Classe "' + name + '" créée ! Code : ' + code, 'success');
       loadUserClasses();
     } catch (e) {

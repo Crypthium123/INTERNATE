@@ -2,20 +2,48 @@
 
 ## Supported Versions
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
+Only the latest deployed version (V3) receives security updates.  
+The repository's `main` branch is always synchronized with the production deployment.
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+| Version | Supported |
+|---------|-----------|
+| V3 (latest) | ✅ |
+| V2 | ❌ (maintained for reference only) |
+| V1 | ❌ |
 
 ## Reporting a Vulnerability
 
-Use this section to tell people how to report a vulnerability.
+If you discover a security vulnerability in Internate, please report it privately:
 
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+- **Email:** internatesupport@gmail.com
+- **Contact form:** https://internate.web.app/contact.html
+
+We will acknowledge receipt within 48 hours and aim to resolve critical issues within 7 days.
+
+## What to include
+
+- A clear description of the vulnerability
+- Steps to reproduce (if applicable)
+- Any relevant screenshots or logs
+
+## Scope
+
+The following are in scope:
+- Firebase Authentication bypass
+- Firestore unauthorized data access
+- XSS or injection vulnerabilities
+- Session hijacking
+
+The following are out of scope:
+- API keys exposed in client-side code (Firebase API keys are designed to be public by design — security relies on Firestore rules and App Check)
+- Phishing attacks requiring user interaction
+- Rate-limiting issues
+
+## Security measures in place
+
+- **Firestore Security Rules** restrict read/write access per collection
+- **Firebase Authentication** handles user identity (email/password + Google)
+- **Input sanitization** via `escapeHtml()` on all user-generated content
+- **No tracking scripts**, analytics, or third-party cookies
+- **Service Worker** with cache-first strategy for offline resilience
+- **Content Security Policy** respected via Firebase Hosting defaults
