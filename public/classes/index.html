@@ -34,7 +34,7 @@
   }
 
   .sidebar {
-    width: 240px;
+    width: 260px;
     flex-shrink: 0;
     background: var(--surface);
     border-right: 1px solid var(--border);
@@ -153,10 +153,10 @@
   .logout-btn:hover { color: var(--accent3); background: var(--btn-danger-bg); }
 
   .main {
-    margin-left: 240px;
+    margin-left: 260px;
     flex: 1;
     padding: 40px 48px;
-    max-width: calc(100vw - 240px);
+    max-width: calc(100vw - 260px);
     animation: fadeIn 0.5s ease 0.2s both;
   }
 
@@ -312,6 +312,22 @@
     padding: 4px 10px;
     font-size: 0.72rem;
     border-radius: 6px;
+  }
+  @media (hover: none) and (pointer: coarse) {
+    .btn-xs {
+      min-width: 44px;
+      min-height: 44px;
+      padding: 10px 14px;
+      font-size: 0.8rem;
+    }
+  }
+  @media (max-width: 600px) {
+    .btn-xs {
+      min-width: 44px;
+      min-height: 44px;
+      padding: 10px 14px;
+      font-size: 0.8rem;
+    }
   }
 
   .section-header {
@@ -556,6 +572,11 @@
     .input-group .btn { width: 100%; justify-content: center; }
     .class-card { padding: 18px 18px; }
     .classes-grid { gap: 10px; }
+    .modal { padding: 20px 16px; max-width: 98vw; margin: 8px; border-radius: 12px; max-height: 90vh; }
+    .member-item { padding: 8px 10px; }
+    .member-avatar { width: 32px; height: 32px; font-size: 0.75rem; }
+    .toast-container { top: 12px; right: 50%; transform: translateX(50%); }
+    .toast { max-width: 90vw; }
   }
   @media (max-width: 400px) {
     .sidebar { width: 220px; }
@@ -564,6 +585,17 @@
     .class-actions .btn { width: 100%; justify-content: center; }
   }
 
+    /* Touch devices: always show class action buttons */
+  @media (hover: none) and (pointer: coarse) {
+    .class-actions .btn { opacity: 1; }
+    .cours-card .delete-btn,
+    .cours-card .edit-btn,
+    .cours-card .share-btn,
+    .cours-card .discussion-btn { opacity: 1; }
+  }
+  @media (max-width: 600px) {
+    .class-actions .btn { opacity: 1; }
+  }
   .loading-overlay {
     position: fixed;
     inset: 0;
@@ -1332,13 +1364,15 @@
           showToast('Tu ne peux pas supprimer cette classe.', 'error');
           return;
         }
-        const memberSnap = await db.collection('classMembers')
-          .where('classId', '==', classId)
-          .get();
+        const [memberSnap, msgSnap] = await Promise.all([
+          db.collection('classMembers').where('classId', '==', classId).get(),
+          db.collection('classMessages').where('classId', '==', classId).get()
+        ]);
 
         const batch = db.batch();
         batch.delete(db.collection('classes').doc(classId));
         memberSnap.forEach(doc => batch.delete(doc.ref));
+        msgSnap.forEach(doc => batch.delete(doc.ref));
         await batch.commit();
 
         const activeId = localStorage.getItem('activeClassId');
