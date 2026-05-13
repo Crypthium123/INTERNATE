@@ -2,7 +2,7 @@
 
 **Plateforme éducative collaborative** — centralise les cours, outils de révision et espaces de classe dans un environnement sécurisé, sans publicité et sans tracking.
 
-![Version](https://img.shields.io/badge/version-3.0-6c63ff) ![Firebase](https://img.shields.io/badge/Firebase-Auth%20|%20Firestore%20|%20Hosting-00d4aa) ![License](https://img.shields.io/badge/license-MIT-6c63ff) ![Status](https://img.shields.io/badge/status-production-00d4aa)
+![Version](https://img.shields.io/badge/version-3.0-6c63ff) ![Firebase](https://img.shields.io/badge/Firebase-Auth%20|%20Firestore%20|%20Hosting-00d4aa) ![Status](https://img.shields.io/badge/status-production-00d4aa)
 
 🔗 **Site en ligne :** [https://internate.web.app](https://internate.web.app)
 
@@ -200,7 +200,7 @@ firebase deploy
 
 ## Licence
 
-MIT © 2026 Internate
+© 2026 Internate — Tous droits réservés
 
 ---
 
