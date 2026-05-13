@@ -9,7 +9,6 @@ const PRECACHE_URLS = [
   '/css/style.css',
   '/css/theme.css',
   '/js/firebase-config.js',
-  '/js/theme.js',
   '/js/pdf-export.js',
   '/auth/Login_Internate.html',
   '/auth/Register_internate.html',
@@ -18,7 +17,10 @@ const PRECACHE_URLS = [
   '/classes/index.html',
   '/profile/index.html',
   '/help/index.html',
-  '/legal/Legal.html'
+  '/legal/Legal.html',
+  '/manifest.json',
+  '/icons/icon-192.svg',
+  '/icons/icon-512.svg'
 ];
 
 self.addEventListener('install', event => {

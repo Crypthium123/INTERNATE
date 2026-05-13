@@ -444,6 +444,39 @@ function goBack() {
   window.location.href = '../dashboard/Connected_internate.html';
 }
 
+function showToast(msg, type) {
+  var c = document.getElementById('toastContainer');
+  if (!c) return;
+  var e = document.createElement('div');
+  e.className = 'toast toast-' + (type || 'info');
+  e.textContent = msg;
+  c.appendChild(e);
+  setTimeout(function() {
+    e.style.animation = 'toastOut 0.3s ease both';
+    setTimeout(function() { e.remove(); }, 300);
+  }, 3500);
+}
+var confirmCallback = null;
+function showConfirm(msg, cb) {
+  confirmCallback = cb;
+  document.getElementById('confirmMessage').textContent = msg;
+  document.getElementById('confirmOverlay').classList.add('show');
+}
+function closeConfirm() {
+  document.getElementById('confirmOverlay').classList.remove('show');
+  confirmCallback = null;
+}
+document.addEventListener('DOMContentLoaded', function() {
+  var btn = document.getElementById('confirmBtn');
+  if (btn) btn.addEventListener('click', function() {
+    if (confirmCallback) confirmCallback();
+    closeConfirm();
+  });
+  var overlay = document.getElementById('confirmOverlay');
+  if (overlay) overlay.addEventListener('click', function(e) {
+    if (e.target === e.currentTarget) closeConfirm();
+  });
+});
 const loadingOverlay = document.getElementById('loadingOverlay');
 const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
 if (user.email) {
@@ -455,9 +488,19 @@ if (user.email) {
 renderFiches();
 </script>
 <div style="text-align:center;padding:16px;font-size:0.75rem;color:var(--muted);margin-top:20px;">
+<div class="toast-container" id="toastContainer"></div>
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <p id="confirmMessage">Confirmer ?</p>
+    <div class="confirm-actions">
+      <button class="btn-cancel" onclick="closeConfirm()">Annuler</button>
+      <button class="btn-confirm" id="confirmBtn">Confirmer</button>
+    </div>
+  </div>
+</div>
   <a href="../help/" style="color:var(--accent2);text-decoration:none;">💬 Aide & retours</a>
 </div>
-<script src="../js/theme.js"></script>
+
 <script src="../js/pdf-export.js"></script>
 <script>navigator.serviceWorker && navigator.serviceWorker.register('/sw.js');</script>
 </body>

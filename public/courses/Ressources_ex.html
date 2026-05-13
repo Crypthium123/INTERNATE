@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cours & Ressources — Internate</title>
+<link rel="manifest" href="/manifest.json">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
@@ -925,6 +926,10 @@
   <a class="nav-item" href="../classes/">
     <span class="nav-icon">👥</span> Classes
   </a>
+  <button class="notif-btn" onclick="openNotifPanel()">
+    <span class="nav-icon">🔔</span> Notifications
+    <span class="notif-badge" id="notifBadge">0</span>
+  </button>
 
   <div class="nav-section-label">Outils</div>
   <a class="nav-item" href="../tools/Calculatrice_Scientifique.html">
@@ -969,6 +974,9 @@
         <span id="userEmailEl">—</span>
       </div>
     </div>
+    <button class="logout-btn" id="installBtn" onclick="installPWA()" style="display:none;">
+      <span>⬇️</span> Installer l'app
+    </button>
     <a href="../profile/index.html" class="logout-btn" style="text-decoration:none;">
       <span>👤</span> Mon profil
     </a>
@@ -994,6 +1002,11 @@
     <button class="btn-upload" onclick="exportCSV()" style="background:var(--surface2);font-size:0.8rem;padding:10px 16px;">📥 CSV</button>
     <button class="btn-upload" id="addCourseBtn"><span>＋</span> Ajouter un cours</button>
   </div>
+<!-- RECHERCHE -->
+  <div class="filter-bar" style="margin-bottom:10px;">
+    <input type="text" class="filter-select" id="searchInput" placeholder="🔍 Rechercher un cours..." oninput="applyFilters()" style="flex:1;min-width:200px;">
+  </div>
+
 <!-- FILTRES -->
   <div class="filter-bar">
     <select class="filter-select" id="filterFiliere" onchange="applyFilters()">
@@ -1033,8 +1046,17 @@
     <button class="banner-btn" onclick="deactivateActiveClass()">✕ Désactiver</button>
   </div>
 
+  <!-- BARRE DE PROGRESSION -->
+  <div style="margin-bottom:16px;display:none;" id="progressSection">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+      <span style="font-size:0.78rem;color:var(--muted);font-weight:500;">Progression</span>
+      <span class="progress-text" id="progressLabel">0 / 0</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  </div>
+
   <!-- COURS -->
-  <div class="cours-grid" id="coursGrid"></div>
+  <div class="cours-grid" id="coursGrid" ondrop="onDrop(event)" ondragover="onDragOver(event)"></div>
 
   <!-- DISCUSSION -->
   <div id="discussionSection" style="display:none;margin-top:32px;">
@@ -1043,7 +1065,8 @@
       <button class="filter-reset" onclick="closeDiscussion()">Fermer</button>
     </div>
     <div id="discussionArea">
-      <div class="empty-state" id="discussionEmpty"><div class="empty-icon">💬</div><p>Sélectionne un cours pour voir les commentaires.</p></div>
+      <div class="comment-input-area"><textarea id="commentText" placeholder="Écris un commentaire…"></textarea><button onclick="addComment()">Envoyer</button></div>
+      <div id="discussionComments"><div class="empty-state"><div class="empty-icon">💬</div><p>Sélectionne un cours pour voir les commentaires.</p></div></div>
     </div>
   </div>
 
@@ -1218,6 +1241,7 @@
       localStorage.setItem('currentUser', JSON.stringify(userData));
       updateUserUI(userData);
       loadFormClasses();
+      startNotificationPolling();
       db.collection('users').doc(user.uid).get().then(doc => {
         if (doc.exists) {
           Object.assign(userData, doc.data());
@@ -1327,6 +1351,7 @@
         const ref = await db.collection('cours').add(data);
         course.firestoreId = ref.id;
         course.id = ref.id;
+        addGamificationXP(20, 'create_course');
       }
       return true;
     } catch (e) {
@@ -1617,25 +1642,25 @@
   }
 
   function subscribeComments(courseId) {
-    const area = document.getElementById('discussionArea');
+    const commentsEl = document.getElementById('discussionComments');
     if (commentListener) { commentListener(); commentListener = null; }
-    area.innerHTML = '<div class="comment-input-area"><textarea id="commentText" placeholder="Écris un commentaire…"></textarea><button onclick="addComment()">Envoyer</button></div><div class="empty-state"><div class="empty-icon">💬</div><p>Chargement…</p></div>';
+    commentsEl.innerHTML = '<div class="empty-state"><div class="empty-icon">💬</div><p>Chargement…</p></div>';
 
     commentListener = db.collection('comments')
       .where('courseId', '==', courseId)
       .orderBy('timestamp', 'asc')
       .onSnapshot(snap => {
-        let html = '<div class="comment-input-area"><textarea id="commentText" placeholder="Écris un commentaire…"></textarea><button onclick="addComment()">Envoyer</button></div>';
         if (snap.empty) {
-          html += '<div class="empty-state"><div class="empty-icon">💬</div><p>Aucun commentaire pour ce cours. Sois le premier à commenter !</p></div>';
+          commentsEl.innerHTML = '<div class="empty-state"><div class="empty-icon">💬</div><p>Aucun commentaire pour ce cours. Sois le premier à commenter !</p></div>';
         } else {
+          let html = '';
           snap.forEach(doc => {
             const d = doc.data();
             const time = d.timestamp && d.timestamp.toDate ? d.timestamp.toDate().toLocaleString('fr-FR') : '';
             html += '<div class="comment"><div class="comment-user">' + escapeHtml(d.userId || 'Anonyme') + '</div><div class="comment-text">' + escapeHtml(d.text || '') + '</div>' + (time ? '<div class="comment-time">' + time + '</div>' : '') + '</div>';
           });
+          commentsEl.innerHTML = html;
         }
-        area.innerHTML = html;
       }, err => {
         if (err.code === 'failed-precondition') {
           console.warn('Comment index missing, fallback without orderBy');
@@ -1643,24 +1668,24 @@
           commentListener = db.collection('comments')
             .where('courseId', '==', courseId)
             .onSnapshot(snap2 => {
-              let html = '<div class="comment-input-area"><textarea id="commentText" placeholder="Écris un commentaire…"></textarea><button onclick="addComment()">Envoyer</button></div>';
               if (snap2.empty) {
-                html += '<div class="empty-state"><div class="empty-icon">💬</div><p>Aucun commentaire pour ce cours.</p></div>';
+                commentsEl.innerHTML = '<div class="empty-state"><div class="empty-icon">💬</div><p>Aucun commentaire pour ce cours.</p></div>';
               } else {
                 const comments = [];
                 snap2.forEach(doc => comments.push(doc.data()));
                 comments.sort((a, b) => (a.timestamp?.toMillis() || 0) - (b.timestamp?.toMillis() || 0));
+                let html = '';
                 comments.forEach(d => {
                   const time = d.timestamp && d.timestamp.toDate ? d.timestamp.toDate().toLocaleString('fr-FR') : '';
                   html += '<div class="comment"><div class="comment-user">' + escapeHtml(d.userId || 'Anonyme') + '</div><div class="comment-text">' + escapeHtml(d.text || '') + '</div>' + (time ? '<div class="comment-time">' + time + '</div>' : '') + '</div>';
                 });
+                commentsEl.innerHTML = html;
               }
-              area.innerHTML = html;
             }, err2 => {
-              area.innerHTML = '<div class="comment-input-area"><textarea id="commentText" placeholder="Écris un commentaire…"></textarea><button onclick="addComment()">Envoyer</button></div><div class="empty-state"><div class="empty-icon">⚠️</div><p>Erreur de chargement.</p></div>';
+              commentsEl.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><p>Erreur de chargement.</p></div>';
             });
         } else {
-          area.innerHTML = '<div class="comment-input-area"><textarea id="commentText" placeholder="Écris un commentaire…"></textarea><button onclick="addComment()">Envoyer</button></div><div class="empty-state"><div class="empty-icon">⚠️</div><p>Erreur de chargement.</p></div>';
+          commentsEl.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><p>Erreur de chargement.</p></div>';
           console.warn('Comments subscribe error:', err.message);
         }
       });
@@ -1680,6 +1705,7 @@
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       });
       document.getElementById('commentText').value = '';
+      addGamificationXP(5, 'comment');
     } catch (e) {
       showToast('Erreur lors de l\'envoi du commentaire.', 'error');
       console.warn('Comment add error:', e.message);
@@ -1817,7 +1843,7 @@
   }
 
   // ---- RENDER ----
-  function renderCourses() {
+  async function renderCourses() {
     const grid = document.getElementById('coursGrid');
     const countEl = document.getElementById('filterCount');
     const allCourses = getCourses();
@@ -1829,6 +1855,15 @@
     const matiere = document.getElementById('filterMatiere').value;
 
     let filtered = allCourses;
+    const searchVal = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+    if (searchVal) {
+      filtered = filtered.filter(c =>
+        (c.title || '').toLowerCase().includes(searchVal) ||
+        (c.matiereLabel || c.matiere || '').toLowerCase().includes(searchVal) ||
+        (c.description || '').toLowerCase().includes(searchVal) ||
+        (c.userId || '').toLowerCase().includes(searchVal)
+      );
+    }
     if (filiere) filtered = filtered.filter(c => c.filiere === filiere);
     if (annee) filtered = filtered.filter(c => c.annee === annee);
     if (specialite) filtered = filtered.filter(c => c.specialite === specialite);
@@ -1865,6 +1900,14 @@
     let filiereLabel = { 'generale': 'Générale', 'technologique': 'Technologique' };
     let anneeLabel = { '2nde': '2nde', '1ere': '1ère', 'terminale': 'Terminale' };
 
+    var progressData = {};
+    try {
+      if (auth.currentUser) {
+        var pSnap = await db.collection('courseProgress').where('userId', '==', auth.currentUser.uid).get();
+        pSnap.forEach(function(d) { progressData[d.data().courseId] = d.data().completed; });
+      }
+    } catch(e){}
+
     grid.innerHTML = filtered.map(c => {
       const color = matiereColors[c.matiere] || '#6c63ff';
       const icon = c.matiereIcon || '📁';
@@ -1885,9 +1928,10 @@
       const creator = c.userId ? c.userId.replace(/@.*/, '') : '';
       const userEmail = getUserEmail().toLowerCase();
       const isOwner = creator && userEmail && c.userId.toLowerCase() === userEmail;
+      var completed = progressData[c.id] || false;
 
       return `
-        <div class="cours-card" id="cours-${c.id}" style="cursor:default;">
+        <div class="cours-card${completed ? ' completed' : ''}" id="cours-${c.id}" draggable="${isOwner ? 'true' : 'false'}" style="cursor:default;">
           ${isOwner ? `<button class="edit-btn" onclick="openModal(getCourses().find(x => x.id === '${c.id}'))" title="Modifier">✎</button>` : ''}
           ${isOwner ? `<button class="delete-btn" onclick="deleteCourse('${c.id}')" title="Supprimer">✕</button>` : ''}
           <button class="discussion-btn" onclick="event.stopPropagation();openDiscussion('${c.id}')" title="Commentaires">💬</button>
@@ -1906,10 +1950,15 @@
               <span>👤 ${creator || 'inconnu'}</span>
               ${!isOwner ? `<span style="color:var(--accent2);font-weight:500;">partagé</span>` : ''}
             </div>
+            <label class="course-complete-toggle" onclick="event.stopPropagation()">
+              <input type="checkbox" ${completed ? 'checked' : ''} onchange="toggleCourseComplete('${c.id}', this.checked)">
+              <label>${completed ? 'Terminé' : 'Marquer comme terminé'}</label>
+            </label>
           </div>
           ${fileSection}
         </div>`;
     }).join('');
+    updateProgressBar(filtered.length);
   }
 
   // ---- INIT ----
@@ -1942,11 +1991,117 @@ document.addEventListener('click', function(e) {
     sidebar.classList.remove('open');
   }
 });
+
+function toggleCourseComplete(courseId, completed) {
+  var user = auth && auth.currentUser;
+  if (!user) return;
+  var ref = db.collection('courseProgress').doc(user.uid + '_' + courseId);
+  ref.set({ userId: user.uid, courseId: courseId, completed: completed, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true }).then(function() {
+    if (completed) addGamificationXP(10, 'complete_course');
+    renderCourses();
+  }).catch(function(err) {
+    console.error('Error saving progress:', err);
+  });
+}
+
+function updateProgressBar(total) {
+  if (!total) {
+    var cards = document.querySelectorAll('.cours-card');
+    total = cards.length;
+  }
+  var completed = document.querySelectorAll('.cours-card.completed').length;
+  var section = document.getElementById('progressSection');
+  var fill = document.getElementById('progressFill');
+  var label = document.getElementById('progressLabel');
+  if (total > 0 && completed > 0) {
+    section.style.display = 'block';
+    fill.style.width = (completed / total * 100) + '%';
+    label.textContent = completed + ' / ' + total + ' terminés';
+  } else {
+    section.style.display = 'none';
+  }
+}
+
+var draggedItem = null;
+function onDragOver(e) { e.preventDefault(); }
+function onDrop(e) {
+  e.preventDefault();
+  if (!draggedItem) return;
+  var target = e.target.closest('.cours-card');
+  if (!target || target === draggedItem) return;
+  var grid = document.getElementById('coursGrid');
+  var items = Array.from(grid.children);
+  var fromIdx = items.indexOf(draggedItem);
+  var toIdx = items.indexOf(target);
+  if (fromIdx < toIdx) grid.insertBefore(draggedItem, target.nextSibling);
+  else grid.insertBefore(draggedItem, target);
+  var order = Array.from(grid.children).map(function(el, i) {
+    var id = el.id.replace('cours-', '');
+    return { id: id, order: i };
+  });
+  localStorage.setItem('courseOrder', JSON.stringify(order));
+}
+document.addEventListener('dragstart', function(e) {
+  var card = e.target.closest('.cours-card');
+  if (card) { draggedItem = card; e.dataTransfer.effectAllowed = 'move'; }
+});
+document.addEventListener('dragend', function() { draggedItem = null; });
 </script>
 <div style="text-align:center;padding:20px;font-size:0.78rem;color:var(--muted);border-top:1px solid var(--border);margin-top:40px;">
   Des retours ? <a href="../help/" style="color:var(--accent2);text-decoration:none;font-weight:500;">💬 Aide &amp; retours</a>
 </div>
-<script src="../js/theme.js"></script>
+<script src="../js/app.js"></script>
+
 <script>navigator.serviceWorker && navigator.serviceWorker.register('/sw.js');</script>
+
+<!-- NOTIFICATION PANEL -->
+<div class="notif-panel" id="notifPanel">
+  <div class="notif-panel-header">
+    <h3>🔔 Notifications</h3>
+    <button class="notif-panel-close" onclick="closeNotifPanel()">✕</button>
+  </div>
+  <div class="notif-list" id="notifList">
+    <div class="notif-empty">Aucune notification pour le moment.</div>
+  </div>
+  <div class="notif-mark-read" onclick="markAllNotifRead()">Tout marquer comme lu</div>
+</div>
+<script>
+function openNotifPanel() {
+  document.getElementById('notifPanel').classList.add('open');
+  loadNotifications();
+}
+function closeNotifPanel() {
+  document.getElementById('notifPanel').classList.remove('open');
+}
+function loadNotifications() {
+  var user = auth && auth.currentUser;
+  if (!user) return;
+  var list = document.getElementById('notifList');
+  db.collection('notifications').where('userId', '==', user.uid).orderBy('createdAt', 'desc').limit(50).get().then(function(snap) {
+    if (snap.empty) { list.innerHTML = '<div class="notif-empty">Aucune notification pour le moment.</div>'; return; }
+    list.innerHTML = '';
+    snap.forEach(function(doc) {
+      var d = doc.data();
+      var iconClass = d.type === 'levelup' ? 'levelup' : d.type === 'comment' ? 'comment' : 'class';
+      var iconEmoji = d.type === 'levelup' ? '🎉' : d.type === 'comment' ? '💬' : '👥';
+      var cls = d.read ? '' : 'unread';
+      var time = d.createdAt ? new Date(d.createdAt.seconds*1000).toLocaleDateString('fr-FR', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
+      list.innerHTML += '<div class="notif-item ' + cls + '" onclick="markNotifRead(\'' + doc.id + '\')"><div class="notif-icon ' + iconClass + '">' + iconEmoji + '</div><div class="notif-body"><div class="notif-title">' + d.title + '</div><p>' + (d.body || '') + '</p><div class="notif-time">' + time + '</div></div></div>';
+    });
+  }).catch(function() {});
+}
+function markNotifRead(id) {
+  db.collection('notifications').doc(id).update({ read: true }).then(function() { updateNotificationBadge(); loadNotifications(); });
+}
+function markAllNotifRead() {
+  var user = auth && auth.currentUser;
+  if (!user) return;
+  db.collection('notifications').where('userId', '==', user.uid).where('read', '==', false).get().then(function(snap) {
+    var batch = db.batch();
+    snap.forEach(function(doc) { batch.update(doc.ref, { read: true }); });
+    return batch.commit();
+  }).then(function() { updateNotificationBadge(); loadNotifications(); });
+}
+</script>
 </body>
 </html>

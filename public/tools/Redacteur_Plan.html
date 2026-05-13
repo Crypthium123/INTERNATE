@@ -212,6 +212,23 @@
   }
   @keyframes spin { to { transform: rotate(360deg); } }
   .loading-overlay p { color: var(--muted); font-size: 0.85rem; margin-top: 16px; }
+.toast-container { position: fixed; top: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+  .toast { padding: 14px 20px; border-radius: 10px; font-size: 0.87rem; font-weight: 500; color: white; box-shadow: 0 8px 32px rgba(0,0,0,0.4); backdrop-filter: blur(8px); animation: toastIn 0.3s ease both; max-width: 380px; pointer-events: auto; display: flex; align-items: center; gap: 10px; }
+  .toast-success { background: rgba(0,212,170,0.9); }
+  .toast-error { background: rgba(255,107,107,0.9); }
+  .toast-info { background: rgba(108,99,255,0.9); }
+  @keyframes toastIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes toastOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(40px); } }
+  .confirm-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 9998; align-items: center; justify-content: center; }
+  .confirm-overlay.show { display: flex; }
+  .confirm-box { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px 32px; width: 360px; max-width: 90vw; animation: modalIn 0.2s ease both; }
+  .confirm-box p { font-size: 0.92rem; margin-bottom: 20px; line-height: 1.5; color: var(--text); }
+  .confirm-actions { display: flex; gap: 10px; justify-content: flex-end; }
+  .btn-cancel { padding: 10px 22px; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 0.87rem; cursor: pointer; transition: all 0.2s; }
+  .btn-cancel:hover { color: var(--text); border-color: rgba(255,255,255,0.15); }
+  .btn-confirm { padding: 10px 22px; background: #ff6b6b; border: none; border-radius: 8px; color: white; font-family: 'DM Sans', sans-serif; font-size: 0.87rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .btn-confirm:hover { opacity: 0.9; }
+  @keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
 </style>
 </head>
 <body id="tool-content">
@@ -348,6 +365,39 @@ function updateItem(idx, value) {
   plan[idx] = indent + value;
 }
 
+function showToast(msg, type) {
+  var c = document.getElementById('toastContainer');
+  if (!c) return;
+  var e = document.createElement('div');
+  e.className = 'toast toast-' + (type || 'info');
+  e.textContent = msg;
+  c.appendChild(e);
+  setTimeout(function() {
+    e.style.animation = 'toastOut 0.3s ease both';
+    setTimeout(function() { e.remove(); }, 300);
+  }, 3500);
+}
+var confirmCallback = null;
+function showConfirm(msg, cb) {
+  confirmCallback = cb;
+  document.getElementById('confirmMessage').textContent = msg;
+  document.getElementById('confirmOverlay').classList.add('show');
+}
+function closeConfirm() {
+  document.getElementById('confirmOverlay').classList.remove('show');
+  confirmCallback = null;
+}
+document.addEventListener('DOMContentLoaded', function() {
+  var btn = document.getElementById('confirmBtn');
+  if (btn) btn.addEventListener('click', function() {
+    if (confirmCallback) confirmCallback();
+    closeConfirm();
+  });
+  var overlay = document.getElementById('confirmOverlay');
+  if (overlay) overlay.addEventListener('click', function(e) {
+    if (e.target === e.currentTarget) closeConfirm();
+  });
+});
 function addItem() {
   plan.push('Nouvelle section');
   renderPlan();
@@ -410,10 +460,20 @@ if (user.email) {
 
 loadTemplate('dissertation');
 </script>
+<div class="toast-container" id="toastContainer"></div>
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <p id="confirmMessage">Confirmer ?</p>
+    <div class="confirm-actions">
+      <button class="btn-cancel" onclick="closeConfirm()">Annuler</button>
+      <button class="btn-confirm" id="confirmBtn">Confirmer</button>
+    </div>
+  </div>
+</div>
 <div style="text-align:center;padding:16px;font-size:0.75rem;color:var(--muted);margin-top:20px;">
   <a href="../help/" style="color:var(--accent2);text-decoration:none;">💬 Aide & retours</a>
 </div>
-<script src="../js/theme.js"></script>
+
 <script src="../js/pdf-export.js"></script>
 <script>navigator.serviceWorker && navigator.serviceWorker.register('/sw.js');</script>
 </body>

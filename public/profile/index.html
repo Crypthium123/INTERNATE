@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Profil - Internate</title>
+<link rel="manifest" href="/manifest.json">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
@@ -143,6 +144,7 @@
   <a class="nav-item" href="../dashboard/Connected_internate.html"><span class="ni">&#9679;</span> Dashboard</a>
   <a class="nav-item" href="../courses/Ressources_ex.html"><span class="ni">&#128218;</span> Mes cours</a>
   <a class="nav-item" href="../classes/"><span class="ni">👥</span> Classes</a>
+  <button class="notif-btn" onclick="openNotifPanel()"><span class="ni">🔔</span> Notifications<span class="notif-badge" id="notifBadge">0</span></button>
   <div class="nav-label">Outils</div>
   <a class="nav-item" href="../tools/Calculatrice_Scientifique.html"><span class="ni">&#128200;</span> Calculatrice</a>
   <a class="nav-item" href="../tools/Convertisseur_Unites.html"><span class="ni">&#8646;</span> Convertisseur</a>
@@ -163,6 +165,7 @@
         <div class="user-role" id="userRoleEl">&#9679; En ligne</div>
       </div>
     </div>
+    <button class="btn-logout" id="installBtn" onclick="installPWA()" style="display:none;"><span>⬇️</span> Installer l'app</button>
     <button class="btn-logout" onclick="logout()"><span>&#128682;</span> Se d&eacute;connecter</button>
     <a href="../contact.html" class="btn-logout" style="text-decoration:none;margin-top:2px;"><span>&#9993;</span> Contact & retours</a>
   </div>
@@ -171,9 +174,18 @@
   <button class="menu-toggle" onclick="toggleSidebar()" aria-label="Menu">&#9776;</button>
   <div class="topbar"><div><div class="page-title">Mon profil</div></div></div>
   <div class="profile-card">
-    <div class="profile-avatar" id="profileAvatar">?</div>
+    <div class="avatar-upload" onclick="document.getElementById('avatarInput').click()">
+      <div class="profile-avatar" id="profileAvatar">?</div>
+      <div class="avatar-overlay">📷</div>
+    </div>
+    <input type="file" id="avatarInput" accept="image/*" style="display:none" onchange="uploadAvatar(event)">
     <h2 id="profileName">Utilisateur</h2>
     <div class="email-display" id="profileEmail">email@example.com</div>
+    <div style="display:flex;gap:12px;justify-content:center;margin:12px 0 4px;flex-wrap:wrap;">
+      <span class="xp-badge" id="xpDisplay">⚡ 0 XP</span>
+      <span class="level-badge" id="levelDisplay">1</span>
+      <span class="streak-badge" id="streakDisplay">🔥 0 jours</span>
+    </div>
     <div id="successAlert" class="alert alert-success">&#10003; Profil mis &agrave; jour avec succ&egrave;s !</div>
     <div id="errorAlert" class="alert alert-error">&#9888; Erreur lors de la mise &agrave; jour.</div>
     <form id="profileForm" onsubmit="saveProfile(event)">
@@ -206,7 +218,100 @@ async function saveProfile(e){e.preventDefault();var prenom=document.getElementB
 <div style="text-align:center;padding:20px;font-size:0.78rem;color:var(--muted);border-top:1px solid var(--border);margin-top:40px;">
   Des retours ? <a href="../help/" style="color:var(--accent2);text-decoration:none;font-weight:500;">💬 Aide &amp; retours</a>
 </div>
-<script src="../js/theme.js"></script>
+<script src="../js/app.js"></script>
+
 <script>navigator.serviceWorker && navigator.serviceWorker.register('/sw.js');</script>
+
+<!-- NOTIFICATION PANEL -->
+<div class="notif-panel" id="notifPanel">
+  <div class="notif-panel-header">
+    <h3>🔔 Notifications</h3>
+    <button class="notif-panel-close" onclick="closeNotifPanel()">✕</button>
+  </div>
+  <div class="notif-list" id="notifList">
+    <div class="notif-empty">Aucune notification pour le moment.</div>
+  </div>
+  <div class="notif-mark-read" onclick="markAllNotifRead()">Tout marquer comme lu</div>
+</div>
+<script>
+function openNotifPanel() {
+  document.getElementById('notifPanel').classList.add('open');
+  loadNotifications();
+}
+function closeNotifPanel() {
+  document.getElementById('notifPanel').classList.remove('open');
+}
+function loadNotifications() {
+  var user = auth && auth.currentUser;
+  if (!user) return;
+  var list = document.getElementById('notifList');
+  db.collection('notifications').where('userId', '==', user.uid).orderBy('createdAt', 'desc').limit(50).get().then(function(snap) {
+    if (snap.empty) { list.innerHTML = '<div class="notif-empty">Aucune notification pour le moment.</div>'; return; }
+    list.innerHTML = '';
+    snap.forEach(function(doc) {
+      var d = doc.data();
+      var iconClass = d.type === 'levelup' ? 'levelup' : d.type === 'comment' ? 'comment' : 'class';
+      var iconEmoji = d.type === 'levelup' ? '🎉' : d.type === 'comment' ? '💬' : '👥';
+      var cls = d.read ? '' : 'unread';
+      var time = d.createdAt ? new Date(d.createdAt.seconds*1000).toLocaleDateString('fr-FR', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
+      list.innerHTML += '<div class="notif-item ' + cls + '" onclick="markNotifRead(\'' + doc.id + '\')"><div class="notif-icon ' + iconClass + '">' + iconEmoji + '</div><div class="notif-body"><div class="notif-title">' + d.title + '</div><p>' + (d.body || '') + '</p><div class="notif-time">' + time + '</div></div></div>';
+    });
+  }).catch(function() {});
+}
+function markNotifRead(id) {
+  db.collection('notifications').doc(id).update({ read: true }).then(function() { updateNotificationBadge(); loadNotifications(); });
+}
+function markAllNotifRead() {
+  var user = auth && auth.currentUser;
+  if (!user) return;
+  db.collection('notifications').where('userId', '==', user.uid).where('read', '==', false).get().then(function(snap) {
+    var batch = db.batch();
+    snap.forEach(function(doc) { batch.update(doc.ref, { read: true }); });
+    return batch.commit();
+  }).then(function() { updateNotificationBadge(); loadNotifications(); });
+}
+function uploadAvatar(e) {
+  var file = e.target.files[0];
+  if (!file) return;
+  var user = auth.currentUser;
+  var ref = storage.ref('avatars/' + user.uid);
+  ref.put(file).then(function(snap) { return snap.ref.getDownloadURL(); }).then(function(url) {
+    return db.collection('users').doc(user.uid).set({ avatarUrl: url }, { merge: true });
+  }).then(function() {
+    showToast('Photo de profil mise à jour !', 'success');
+    loadProfileAvatar();
+  }).catch(function(err) {
+    showToast('Erreur: ' + err.message, 'error');
+  });
+}
+function loadProfileAvatar() {
+  var user = auth.currentUser;
+  if (!user) return;
+  db.collection('users').doc(user.uid).get().then(function(doc) {
+    if (doc.exists && doc.data().avatarUrl) {
+      document.getElementById('profileAvatar').innerHTML = '<img src="' + doc.data().avatarUrl + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+      document.getElementById('avatarEl').innerHTML = '<img src="' + doc.data().avatarUrl + '" style="width:100%;height:100%;object-fit:cover;border-radius:9px;">';
+    }
+  }).catch(function() {});
+}
+function loadGamificationStats() {
+  var user = auth && auth.currentUser;
+  if (!user) return;
+  db.collection('userStats').doc(user.uid).get().then(function(doc) {
+    if (doc.exists) {
+      var d = doc.data();
+      document.getElementById('xpDisplay').textContent = '⚡ ' + (d.xp || 0) + ' XP';
+      document.getElementById('levelDisplay').textContent = d.level || 1;
+      document.getElementById('streakDisplay').textContent = '🔥 ' + (d.streak || 0) + ' jours';
+    }
+  }).catch(function() {});
+}
+auth.onAuthStateChanged(function(user) {
+  if (user) {
+    loadProfileAvatar();
+    loadGamificationStats();
+  }
+});
+</script>
 </body>
 </html>

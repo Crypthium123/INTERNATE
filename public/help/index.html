@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="/manifest.json">
 <title>Aide — Internate</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -134,6 +135,29 @@
   }
   .faq-answer a { color: var(--accent); text-decoration: none; }
   .faq-answer a:hover { text-decoration: underline; }
+
+  @media (max-width: 768px) {
+    .hero-card { padding: 32px 24px; }
+    h1 { font-size: 1.3rem; }
+    .faq-title { font-size: 1.1rem; }
+  }
+  @media (max-width: 600px) {
+    .hero-card { padding: 24px 16px; }
+    .container { max-width: 100%; padding: 0 8px; }
+    body { padding: 24px 12px; }
+    h1 { font-size: 1.1rem; }
+    p { font-size: 0.85rem; }
+    .btn { width: 100%; justify-content: center; padding: 12px 20px; font-size: 0.88rem; }
+    .links { width: 100%; }
+    .links a { width: 100%; }
+    summary.faq-question { font-size: 0.85rem; padding: 14px 16px; }
+    .faq-answer { font-size: 0.82rem; padding: 0 16px 14px; }
+  }
+  @media (max-width: 400px) {
+    body { padding: 16px 8px; }
+    .hero-card { padding: 20px 12px; }
+    .icon { font-size: 2.2rem; }
+  }
 </style>
 </head>
 <body>
@@ -284,7 +308,8 @@
 
   <a href="../index.html" class="back" style="display:block;text-align:center;color:var(--muted);font-size:0.82rem;text-decoration:none;margin-bottom:40px;">← Retour à l'accueil</a>
 </div>
-<script src="../js/theme.js"></script>
+<script src="../js/app.js"></script>
+
 <script>navigator.serviceWorker && navigator.serviceWorker.register('/sw.js');</script>
 </body>
 </html>
