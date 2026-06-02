@@ -15,7 +15,7 @@ L'administration ne repose plus sur une adresse email hardcodée.
 ```bash
 cd dev/INTERNATE-V3
 npm install
-GOOGLE_APPLICATION_CREDENTIALS="./internate-service-account.json" node admin/set-admin.js gc05122008@gmail.com true
+GOOGLE_APPLICATION_CREDENTIALS="./internate-service-account.json" node admin/set-admin.cjs gc05122008@gmail.com true
 ```
 
 > L'utilisateur doit se **déconnecter puis reconnecter** pour activer le token admin.
@@ -23,7 +23,7 @@ GOOGLE_APPLICATION_CREDENTIALS="./internate-service-account.json" node admin/set
 ### Étape 3 : Ajouter d'autres admins
 
 ```bash
-node admin/set-admin.js autre.email@gmail.com true
+node admin/set-admin.cjs autre.email@gmail.com true
 ```
 
 ---
