@@ -1,8 +1,13 @@
 // firebase-config.example.js
-// Template de configuration Firebase - À remplir avec vos clés
-// ATTENTION: NE PAS COMMITER vos vraies clés API ! Utilisez firebase-config.js (privé)
+// Template de configuration Firebase (version Vite / modules ES)
+// ATTENTION: NE PAS COMMITER vos vraies clés API !
+// Copier ce fichier vers firebase-config.js et remplir les valeurs.
 
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/auth';
+import 'firebase/compat/firestore';
+import 'firebase/compat/analytics';
+
 const firebaseConfig = {
   apiKey: "VOTRE_API_KEY",
   authDomain: "VOTRE_PROJET.firebaseapp.com",
@@ -13,11 +18,14 @@ const firebaseConfig = {
   measurementId: "VOTRE_MEASUREMENT_ID"
 };
 
-// Initialisez Firebase
 firebase.initializeApp(firebaseConfig);
 
-// Exportez les services
-const auth = firebase.auth();
-const db = firebase.firestore();
+window.firebase = firebase;
+window.auth = firebase.auth();
+window.db = firebase.firestore();
 
-console.log("✅ Firebase initialisé avec succès !");
+try { window.storage = firebase.storage(); } catch(e) { window.storage = null; }
+
+if (typeof firebase.analytics === 'function') {
+  window.analytics = firebase.analytics();
+}
