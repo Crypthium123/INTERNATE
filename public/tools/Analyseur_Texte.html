@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analyseur de Texte — Internate</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  .tool-topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 24px;
+    background: var(--surface-glass);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    z-index: 100;
+  }
+  .tool-topbar a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.82rem;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  .tool-topbar a:hover { color: var(--text); }
+  .tool-topbar .sep { color: var(--border); font-size: 0.7rem; }
+  .tool-topbar .current { color: var(--accent); font-size: 0.82rem; font-weight: 600; }
+  .back-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text);
+    text-decoration: none;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .back-btn:hover { background: var(--accent); border-color: var(--accent); color: white; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding: 52px 20px 20px;
+  }
+
+  .container {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 24px 0;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  textarea {
+    width: 100%;
+    height: 260px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  textarea:focus {
+    border-color: var(--accent);
+  }
+  textarea::placeholder {
+    color: var(--muted);
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+    margin: 20px 0;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    text-align: center;
+  }
+  .stat-card .label {
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+  .stat-card .value {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .extra-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 20px 0;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .card h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.95rem;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+
+  .word-list {
+    list-style: none;
+  }
+  .word-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.85rem;
+  }
+  .word-list li:last-child { border-bottom: none; }
+  .word-list .count {
+    color: var(--accent2);
+    font-weight: 600;
+  }
+
+  .longest-word {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--accent2);
+    word-break: break-all;
+  }
+
+  .actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin: 20px 0;
+  }
+
+  .actions button {
+    padding: 10px 24px;
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+    font-family: 'Syne', sans-serif;
+  }
+  .actions button:hover {
+    background: var(--overlay-accent);
+    border-color: var(--accent);
+  }
+  .actions button.primary {
+    background: var(--overlay-accent-hover);
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  .actions button.primary:hover {
+    background: var(--overlay-accent-strong);
+  }
+
+  .loading-overlay {
+    position: fixed; inset: 0;
+    background: var(--bg);
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.4s ease;
+  }
+  .loading-overlay.hidden { opacity: 0; pointer-events: none; }
+  .spinner {
+    width: 40px; height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-overlay p { color: var(--muted); font-size: 0.85rem; margin-top: 16px; }
+
+  footer {
+    text-align: center;
+    padding: 16px;
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 20px;
+  }
+  footer a {
+    color: var(--accent2);
+    text-decoration: none;
+  }
+  footer a:hover { text-decoration: underline; }
+
+  @media (max-width: 768px) {
+    body { padding: 52px 12px 12px; }
+    .tool-topbar { padding: 10px 16px; font-size: 0.8rem; }
+    .tool-topbar a, .tool-topbar .current { font-size: 0.75rem; }
+    .extra-section { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 480px) {
+    body { padding: 48px 8px 8px; }
+    .tool-topbar { padding: 8px 12px; gap: 8px; }
+    .tool-topbar a, .tool-topbar .current { font-size: 0.7rem; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .actions { flex-direction: column; align-items: center; }
+    .actions button { width: 100%; max-width: 280px; }
+  }
+</style>
+<script src="../js/escape.js"></script>
+</head>
+<body>
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <p>Chargement...</p>
+</div>
+<div class="tool-topbar">
+  <a href="../dashboard/connected_internate.html" class="back-btn">← Retour</a>
+  <span class="sep">›</span>
+  <a href="../courses/Ressources_ex.html">Cours</a>
+  <span class="sep">›</span>
+  <span class="current">Analyseur de Texte</span>
+  </div>
+
+<div class="container" id="mainContent">
+  <h1>Analyseur de Texte</h1>
+  
+
+  <textarea id="textInput" placeholder="Collez ou tapez votre texte ici..."></textarea>
+
+  <div class="stats-grid" id="statsGrid">
+    <div class="stat-card"><div class="label">Caractères (avec espaces)</div><div class="value" id="charWithSpaces">0</div></div>
+    <div class="stat-card"><div class="label">Caractères (sans espaces)</div><div class="value" id="charWithoutSpaces">0</div></div>
+    <div class="stat-card"><div class="label">Mots</div><div class="value" id="wordCount">0</div></div>
+    <div class="stat-card"><div class="label">Phrases</div><div class="value" id="sentenceCount">0</div></div>
+    <div class="stat-card"><div class="label">Paragraphes</div><div class="value" id="paraCount">0</div></div>
+    <div class="stat-card"><div class="label">Temps de lecture</div><div class="value" id="readingTime">0 min</div></div>
+    <div class="stat-card"><div class="label">Lignes</div><div class="value" id="lineCount">0</div></div>
+  </div>
+
+<div class="extra-section">
+    <div class="card">
+      <h2>Mots les plus fréquents</h2>
+      <ul class="word-list" id="freqList"><li style="color:var(--muted);font-size:0.8rem;">Écrivez du texte pour voir les mots fréquents...</li></ul>
+    </div>
+    <div class="card">
+      <h2>Mot le plus long</h2>
+      <div class="longest-word" id="longestWord">—</div>
+    </div>
+    <div class="card">
+      <h2>Verbes détectés</h2>
+      <div id="verbsOutput" style="font-size:0.85rem;color:var(--muted);">Écrivez du texte pour détecter les verbes...</div>
+    </div>
+    <div class="card">
+      <h2>Suggestions orthographiques</h2>
+      <div id="spellOutput" style="font-size:0.85rem;color:var(--muted);">Écrivez du texte pour voir les suggestions...</div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="primary" id="copyBtn">Copier les résultats</button>
+    <button id="clearBtn">Effacer</button>
+  </div>
+
+  <footer>
+    <a href="../help/" style="color:var(--accent2);text-decoration:none;">💬 Aide & retours</a>
+  </footer>
+</div>
+
+<script>
+const stopWords = new Set([
+  "le","la","les","de","du","des","un","une","et","est","sont","dans","pour","sur","avec",
+  "que","qui","pas","ne","ce","ces","ses","son","sa","se","si","mais","ou","où","donc",
+  "car","ni","par","au","aux","en","à","il","elle","ils","elles","nous","vous","on",
+  "je","tu","me","te","lui","leur","eux","cette","tout","tous","toute","toutes","plus",
+  "comme","très","être","avoir","faire","peut","peux","peu","mon","ton","mes","tes",
+  "nos","vos","leur","leurs","cet","celle","celui","ceux","celles","même","bien","donc",
+  "alors","aussi","autre","autres","fois","fait","faits","entre","vers","chez","sans",
+  "sous","derrière","devant","après","avant","pendant","depuis","jusque","selon","grâce",
+  "malgré","contre","sauf","hormis","voici","voilà","y","c","d","j","m","n","s","t",
+  "qu","l","étaient","était","suis","êtes","sommes","ont","a","ai","avait","avaient",
+  "auront","aura","sera","seront","soit","soient","étés","sois","fut","furent"
+]);
+
+// ── Dictionnaire de verbes français (formes courantes) ──
+const frenchVerbs = new Set([
+  "aller","vais","vas","va","allons","allez","vont","allé","allée","allés","allées",
+  "être","suis","es","est","sommes","êtes","sont","été",
+  "avoir","ai","as","a","avons","avez","ont","eu",
+  "faire","fais","fait","faisons","faites","font","faisait","faisaient","ferai","feras","fera",
+  "pouvoir","peux","peut","pouvons","pouvez","peuvent","pourrait","pourraient","pourra",
+  "vouloir","veux","veut","voulons","voulez","veulent","voulait","voudrait",
+  "devoir","dois","doit","devons","devez","doivent","devait","devrait","devraient",
+  "savoir","sais","sait","savons","savez","savent","savait","saurai","saura",
+  "venir","viens","vient","venons","venez","viennent","venait","viendrai","viendra",
+  "prendre","prends","prend","prenons","prenez","prennent","prenait","prendrai","prendra",
+  "mettre","mets","met","mettons","mettez","mettent","mettait","mettrai","mettra",
+  "dire","dis","dit","disons","dites","disent","disait","dirai","dira",
+  "voir","vois","voit","voyons","voyez","voient","voyait","verrai","verra",
+  "croire","crois","croit","croyons","croyez","croient","croyait","croirai","croira",
+  "parler","parle","parles","parlons","parlez","parlent","parlait","parlerai","parlera",
+  "donner","donne","donnes","donnons","donnez","donnent","donnait","donnerai","donnera",
+  "passer","passe","passes","passons","passez","passent","passait","passerai","passera",
+  "trouver","trouve","trouves","trouvons","trouvez","trouvent","trouvait","trouverai",
+  "laisser","laisse","laisses","laissons","laissez","laissent","laissait","laisserai",
+  "appeler","appelle","appelles","appelons","appelez","appellent","appelait","appellerai",
+  "comprendre","comprends","comprend","comprenons","comprenez","comprennent","comprenait",
+  "demander","demande","demandes","demandons","demandez","demandent","demandait",
+  "tenir","tiens","tient","tenons","tenez","tiennent","tenait","tiendrai","tiendra",
+  "chercher","cherche","cherches","cherchons","cherchez","cherchent","cherchait",
+  "aimer","aime","aimes","aimons","aimez","aiment","aimait","aimerai","aimera",
+  "devenir","deviens","devient","devenons","devenez","deviennent","devenait","deviendra",
+  "rester","reste","restes","restons","restez","restent","restait","resterai",
+  "partir","pars","part","partons","partez","partent","partait","partirai","partira",
+  "sentir","sens","sent","sentons","sentez","sentent","sentait","sentirai","sentira",
+  "sortir","sors","sort","sortons","sortez","sortent","sortait","sortirai","sortira",
+  "suivre","suis","suit","suivons","suivez","suivent","suivait","suivrai","suivra",
+  "vivre","vis","vit","vivons","vivez","vivent","vivait","vivrai","vivra",
+  "mourir","meurs","meurt","mourons","mourez","meurent","mourait","mourrai","mourra",
+  "naître","nais","naît","naissons","naissez","naissent","naissait","naîtrai","naîtra",
+  "écrire","écris","écrit","écrivons","écrivez","écrivent","écrivait","écrirai","écrira",
+  "lire","lis","lit","lisons","lisez","lisent","lisait","lirai","lira",
+  "courir","cours","court","courons","courez","courent","courait","courrai","courra",
+  "répondre","réponds","répond","répondons","répondez","répondent","répondait",
+  "attendre","attends","attend","attendons","attendez","attendent","attendait",
+  "rendre","rends","rend","rendons","rendez","rendent","rendait",
+  "ouvrir","ouvre","ouvres","ouvrons","ouvrez","ouvrent","ouvrait","ouvrirai",
+  "offrir","offre","offres","offrons","offrez","offrent","offrait","offrirai",
+  "découvrir","découvre","découvres","découvrons","découvrez","découvrent",
+  "penser","pense","penses","pensons","pensez","pensent","pensait","penserai",
+  "sembler","semble","sembles","semblons","semblez","semblent","semblait",
+  "monter","monte","montes","montons","montez","montent","montait",
+  "descendre","descends","descend","descendons","descendez","descendent",
+  "entrer","entre","entres","entrons","entrez","entrent","entrait",
+  "sortir","sors","sort","sortons","sortez","sortent","sortait",
+  "arriver","arrive","arrives","arrivons","arrivez","arrivent","arrivait","arrivera",
+  "tomber","tombe","tombes","tombons","tombez","tombent","tombait",
+  "marcher","marche","marches","marchons","marchez","marchent","marchait",
+  "jouer","joue","joues","jouons","jouez","jouent","jouait",
+  "manger","mange","manges","mangeons","mangez","mangent","mangeait",
+  "boire","bois","boit","buvons","buvez","boivent","buvait","buvais",
+  "dormir","dors","dort","dormons","dormez","dorment","dormait",
+  "connaître","connais","connaît","connaissons","connaissez","connaissent",
+  "recevoir","reçois","reçoit","recevons","recevez","reçoivent","recevait",
+  "envoyer","envoie","envoies","envoyons","envoyez","envoient","envoyait",
+  "créer","crée","crées","créons","créez","créent","créait",
+  "utiliser","utilise","utilises","utilisons","utilisez","utilisent","utilisait",
+  "travailler","travaille","travailles","travaillons","travaillez","travaillent",
+  "étudier","étudie","étudies","étudions","étudiez","étudient","étudiait",
+  "apprendre","apprends","apprend","apprenons","apprenez","apprennent","apprenait",
+  "enseigner","enseigne","enseignes","enseignons","enseignez","enseignent",
+  "expliquer","explique","expliques","expliquons","expliquez","expliquent",
+  "montrer","montre","montres","montrons","montrez","montrent","montrait"
+]);
+
+// ── Dictionnaire orthographique français (mots courants) ──
+const frenchWords = new Set([
+  "abord","absent","absolu","accepter","accord","acheter","actif","action","admettre",
+  "adresse","affaire","âge","agent","agir","aide","aimer","ainsi","air","ajouter",
+  "aller","alors","amour","ancien","anglais","animal","année","apercevoir","apparaître",
+  "appel","apporter","apprendre","après","arbre","argent","arme","arrêt","arrêter",
+  "arrière","arriver","art","article","aspect","assez","assister","assurer","atteindre",
+  "attendre","attention","aujourd","auparavant","aussitôt","autant","auteur","automne",
+  "autorité","autour","autre","avance","avant","avec","avenir","avis","avocat",
+  "avoir","banc","base","bas","beau","beaucoup","besoin","bien","bientôt","billet",
+  "blanc","bleu","boire","bois","bon","bonheur","bord","bouche","bout","branche",
+  "bras","bruit","brûler","bureau","cacher","campagne","capable","caractère","carte",
+  "cause","ceci","cela","celui","centaine","central","centre","certain","certes",
+  "cesse","chacun","chaise","chaleur","chambre","champ","chance","changement","chanter",
+  "chapeau","chaque","charge","chasser","chat","chaud","chef","chemin","chemise",
+  "chercher","cheval","cheveu","chez","chien","chiffre","choisir","choix","chose",
+  "ciel","cinéma","cinq","cinquième","circonstance","cité","citoyen","civil","clair",
+  "classe","clef","client","cœur","coin","colère","collectif","collège","combat",
+  "combien","comité","commander","comme","commencer","comment","commerce","commun",
+  "compagnie","compagnon","complet","complètement","composer","comprendre","compte",
+  "compter","conclure","condition","conduire","confiance","confirmer","connaître",
+  "consacrer","conscience","conseil","conséquence","conservateur","considérer",
+  "constater","construire","consulter","contact","contenir","content","continuer",
+  "contraire","contre","contrôle","conversation","copain","corps","correct","correspondre",
+  "côté","coucher","couleur","coup","couper","cour","courage","courant","courir",
+  "cours","course","court","coût","coûter","couverts","crainte","crayon","créer",
+  "crédit","crier","critique","croire","croix","cuisine","curieux","dame","danger",
+  "dans","davantage","de","debout","début","décider","déclarer","découvrir","dedans",
+  "défaut","défendre","dehors","déjà","delà","demain","demander","démarche","démontrer",
+  "dent","départ","dépasser","dépendre","déplacer","depuis","dernier","derrière",
+  "dès","descendre","description","désigner","désir","désirer","dessiner","dessus",
+  "détail","détruire","deux","deuxième","devant","développer","devenir","deviner",
+  "devoir","diable","dialogue","dieu","différent","difficile","digne","dimanche",
+  "dimension","dire","direct","diriger","discours","discussion","disparaître","distance",
+  "distinguer","divers","divin","dix","dixième","docteur","document","doigt","domaine",
+  "domicile","donc","donner","dont","dormir","dos","dossier","doucement","douche",
+  "douleur","doute","douter","doux","douze","drame","droit","droite","drôle","dur",
+  "durant","durer","eau","échapper","échec","éclair","école","économie","écouter",
+  "écraser","écrire","écrit","édifice","éducation","effet","effort","égal","église",
+  "élève","élever","elle","éloigner","embrasser","émission","emmener","empêcher",
+  "emploi","employer","emporter","en","encore","endroit","énergie","enfance","enfant",
+  "enfin","enformer","enlever","ennemi","énorme","enquête","enfin","ensemble","ensuite",
+  "entendre","entier","entourer","entraîner","entre","entrée","entreprendre","entreprise",
+  "entrer","envie","environ","envoyer","espèce","espérer","espoir","esprit","essai",
+  "essayer","essentiel","est","estimer","et","établir","étage","étape","état","été",
+  "étendre","étendue","éternel","étranger","être","étroit","étude","étudiant","étudier",
+  "euro","eux","éveiller","événement","éviter","évolution","exact","examen","examiner",
+  "exemple","excellent","excepté","excuse","exécuter","exemple","exercer","exercice",
+  "exiger","existence","exister","expérience","expliquer","exploitation","explorer",
+  "exposer","exprès","exprimer","extraordinaire","face","facile","façon","faible",
+  "faim","faire","fait","famille","fatigue","faute","faux","faveur","femme","fenêtre",
+  "ferme","fermer","fête","feu","feuille","février","fiche","fidèle","fier","figure",
+  "filer","fil",fille","film","fils","fin","final","finir","fixe","fixer","flamme",
+  "fleur","fleuve","fois","folie","fonction","fond","fondamental","fonder","force",
+  "forcer","forêt","forme","former","formidable","formule","fort","forum","fou",
+  "foule","frais","franc","français","franchir","franchement","frapper","frère",
+  "froid","fromage","front","fruit","fuir","fumée","fumer","fusil","futur","gagner",
+  "garage","garçon","garde","garder","gare","gaz","général","génération","genou",
+  "genre","gens","geste","glace","goût","goutte","gouvernement","grâce","grand",
+  "grandir","gras","gratuit","grave","gris","gros","groupe","guerre","guider",
+  "habiller","habitant","habitat","habitude","haut","hauteur","herbe","heure",
+  "heureux","hier","histoire","hiver","homme","honneur","honnête","hôpital","horizon",
+  "hors","hôtel","hui","humain","humour","idée","identifier","ignorer","île","image",
+  "imaginer","immédiat","immense","importance","important","importer","impossible",
+  "impression","imprimer","incapable","incident","inclure","indépendant","indiquer",
+  "individu","industrie","infini","influence","information","informer","injure",
+  "inquiétude","inscrire","insecte","insister","inspecter","installation","installer",
+  "instant","instinct","instruction","instrument","intelligence","intense","intention",
+  "interdit","intéressant","intérêt","intérieur","intermédiaire","international",
+  "interroger","intervenir","introduction","inutile","inventer","inverse","invitation",
+  "inviter","isoler","italien","ivre","jeter","jeu","jeune","jeunesse","joie","joli",
+  "joue","jouer","jour","journal","journée","juge","juger","juillet","juin","jurer",
+  "jusque","juste","justice","la","là","laboratoire","laisser","lait","lampe","langage",
+  "langue","large","larme","le","leçon","lecture","léger","lendemain","lent","lequel",
+  "lettre","leur","lever","lèvre","liberté","libre","licence","lien","lier","lieu",
+  "ligne","limite","linge","lire","lis","lit","livre","livrer","loi","loin","long",
+  "longtemps","lors","lorsque","lot","louer","lourd","lui","lumière","lundi","lune",
+  "lunettes","lutte","lutter","machine","madame","magasin","magnifique","mai","main",
+  "maintenant","maintien","mais","maison","maître","mal","malade","maladie","malgré",
+  "maman","manger","manière","manquer","manteau","manufacture","marchand","marché",
+  "marcher","mardi","marie","marier","marque","marquer","masse","matière","matin",
+  "mauvais","me","médecin","médecine","médical","meilleur","mélanger","même","mémoire",
+  "menacer","mener","mensonge","mental","mentir","mer","mercredi"," mère","mesure",
+  "mesurer","métier","mètre","mettre","meuble","midi","mien","mieux","milieu","militaire",
+  "mille","millier","million","mince","mine","ministère","ministre","minorité","minuit",
+  "minute","miracle","miroir","mobile","mode","modèle","moderne","modeste","modifier",
+  "moi","moindre","moins","mois","moitié","moment","mon","monde","monnaie","monsieur",
+  "montagne","monter","montre","montrer","moquer","moral","morceau","mort","mot",
+  "motif","mou","mouche","mouchoir","mouillé","mourir","mouton","mouvement","moyen",
+  "muet","mur","mûr","musée","musique","naissance","naître","nation","nature",
+  "naturel","naturellement","naviguer","ne","néanmoins","nécessaire","négliger",
+  "neige","nerveux","net","nettoyer","neuf","nez","ni","niveau","noces","noir",
+  "noire","nombre","nombreux","nom","non","nord","normal","nos","notre","notre",
+  "nourrir","nourriture","nous","nouveau","nouvelle","nuage","nuire","nuit","nul",
+  "numéro","obéir","objet","obligation","obliger","observer","obstacle","obtenir",
+  "occasion","occuper","odeur","œil","œuvre","offre","offrir","oiseau","ombre",
+  "oncle","onze","opération","opinion","opposer","or","orage","oral","orange","ordre",
+  "oreille","organisation","organiser","organisme","orientation","origine","ortie",
+  "oser","ou","où","oublier","ouest","oui","outil","outre","ouvert","ouverture",
+  "ouvrage","ouvrier","ouvrir","page","paier","pain","paire","paix","palais","pâle",
+  "panier","paon","papier","paquet","par","parc","parce","parcourir","parcours",
+  "pareil","parent","parfait","parfois","parfum","parier","parler","parmi","parole",
+  "part","partager","parti","participation","particulier","partie","partir","partout",
+  "parvenir","pas","passage","passé","passer","passion","pastèque","patate","patient",
+  "patron","patte","pause","pauvre","pavé","pays","paysage","paysan","peau","pêche",
+  "peindre","peine","peintre","peinture","pelle","pelouse","pencher","pendant",
+  "penderie","pénétrer","pensée","penser","pension","percer","perdre","père","perfect",
+  "période","permettre","permis","personnage","personnalité","personne","personnel",
+  "perspective","persuader","peser","petit","pétrole","peu","peuple","peur","phrase",
+  "physique","pièce","pied","pierre","pile","pilote","pinceau","piquer","piscine",
+  "piste","pitié","place","placer","plage","plaindre","plaire","plaisir","plan",
+  "planche","plante","planter","plat","plateau","plein","pleurer","pleuvoir","plonger",
+  "pluie","plume","plupart","plus","plusieurs","plutôt","poche","poème","poésie",
+  "poids","poing","point","pointe","pointu","poire","poisson","poitrine","poivre",
+  "poli","police","politesse","politique","pomme","pomme","pompe","pont","populaire",
+  "population","porc","port","porte","portée","porter","portier","portion","poser",
+  "position","positif","posséder","possibilité","possible","poste","pot","potage",
+  "poteau","poudre","poule","pouls","poumon","poupée","pour","pourcentage","pourquoi",
+  "poursuite","poursuivre","pourtant","pourvoir","pousser","poussière","pouvoir",
+  "pratique","précieux","précipiter","précis","préciser","préférence","préférer",
+  "premier","prendre","prénom","préparer","près","présence","présent","présenter",
+  "président","presque","presser","pression","prêt","prêter","preuve","prévenir",
+  "prévoir","prier","prière","primaire","prince","principal","principe","printemps",
+  "prise","prison","privé","prix","problème","procédé","procéder","prochain","proche",
+  "procurer","produire","produit","professeur","profession","professionnel","profiter",
+  "profond","programme","progrès","projet","promener","promesse","promettre","prononcer",
+  "propos","proposer","propre","propriétaire","propriété","protéger","prouver",
+  "provenir","province","provision","prudence","prudent","psychologie","public","publier",
+  "puis","puisque","puissance","puissant","pull","punir","pur","pureté","quai",
+  "qualité","quand","quant","quantité","quarante","quart","quartier","quatorze",
+  "quatre","quatrième","que","quel","quelconque","quelque","quelquefois","quelques",
+  "qu estion","queue","qui","quinze","quitter","quoi","quotidien","race","raconter",
+  "radical","radio","raison","ralentir","ramasser","ramener","rang","rapide",
+  "rapidement","rappeler","rapport","rapporter","rare","ras","rassembler","rat",
+  "rater","rayon","réaliser","réalité","recevoir","récent","réception","recette",
+  "recherche","rechercher","récit","réclamation","réclamer","reconnaître","record",
+  "recours","recouvrir","récréation","recteur","reçu","recueillir","recul","reculer",
+  "réduction","réduire","refaire","référer","réfléchir","réflexion","réforme",
+  "refroidir","refus","refuser","regard","regarder","règle","régler","règne","regret",
+  "regretter","reine","rejet","rejeter"," rejoindre","relation","relever","relier",
+  "religion","remarquer","remercier","remettre","remonter","remplaçant","remplacer",
+  "remplir","remporter","rencontre","rencontrer","rendre","renommer","renoncer",
+  "renseignement","renseigner","rentrer","renverser","renvoyer","reparler","repartir",
+  "repas","repenser","répéter","répondre","réponse","reposer","repousser","reprendre",
+  "représenter","reproche","reproduire","réputation","réseau","réserver","résidence",
+  "résister","résolu","résoudre","respect","respecter","respirer","responsable",
+  "ressembler","ressentir","ressource","reste","rester","restreindre","résultat",
+  "retard","retenir","retirer","retomber","retour","retourner","retrait","retraite",
+  "retrouver","réunion","réunir","réussir","rêve","réveiller","révéler","revenir",
+  "revenir","rêver","revers","revêtir","revue","rez","rhume","riche","rideau",
+  "rien","rigoureux","rire","risque","risquer","rivage","rivière","robe","roche",
+  "rocher","roi","rôle","romain","roman","rompre","rond","rose","roseau","rotation",
+  "roue","rouge","rough","rouler","route","routine","royaume","rue","rugby","ruine",
+  "ruisseau","ruminer","rupture","rural","rythme","sable","sac","saint","saisir",
+  "saison","sale","salir","salle","salon","saluer","salut","samedi","sandale",
+  "sang","sans","santé","sauce","sauf","saut","sauter","sauvage","sauver","savoir",
+  "scandale","scène","schéma","science","scolaire","score","se","sec","sécheresse",
+  "second","seconde","secours","secret","secrétaire","section","sécurité","séduire",
+  "sein","séjour","sel","selon","semaine","semblable","sembler","semence","semer",
+  "sens","sensation","sensibilité","sensible","sentier","sentiment","sentir","séparer",
+  "sept","septembre","série","sérieux","serpent","serré","serrer","service","servir",
+  "seuil","seul","sévère","sexe","si","siècle","siège","sien","signe","signer",
+  "significatif","silence","silencieux","simple","simplement","simulation","simuler",
+  "sincère","singe","singulier","sinon","situation","six","sixième","ski","social",
+  "société","sœur","soi","soie","soif","soin","soir","soirée","soit","soldat",
+  "soleil","solide","solution","sombre","somme","sommeil","sommet","son","songer",
+  "sonner","sorte","sorti","sortie","sortir","souci","soudain","souffler","souffrance",
+  "souffrir","souhaiter","soulager","soulever","souligner","soumettre","soupçon",
+  "soupe","souple","source","sourcil","sourd","sourire","souris","sous","soutenir",
+  "souvenir","souvent","spécial","spécialiste","spectacle","spectateur","sport",
+  "stade","stage","statue","statut","style","stylo","sucre","sueur","suffire",
+  "suffisant","suggestion","suisse","suite","suivant","suivi","suivre","sujet",
+  "supérieur","supporter","supposer","sûr","sur","sûrement","surface","surmonter",
+  "surnom","surtout","surveiller","survenir","survivre","suspect","symbole",
+  "sympathique","syndicat","système","table","tableau","tablier","tâche","taille",
+  "tailler","taire","tandis","tant","tante","taper","tard","tas","tasse","taux",
+  "te","tel","téléphone","télévision","tellement","témoigner","témoin","tempête",
+  "temps","tendance","tendre","tenir","tennis","tension","tentative","tenter","terme",
+  "terminer","terrain","terre","terrible","territoire","tête","thé","théâtre","thème",
+  "théorie","tiens","tiers","timbre","timide","tirer","tiroir","tissu","titre",
+  "toi","toile","toilette","toit","tomate","tombe","tomber","ton","tonnerre","torche",
+  "tordre","tort","tôt","toucher","toujours","tour","tourisme","touriste","tourner",
+  "tous","tout","toutefois","tracé","trace","tradition","traduction","traduire",
+  "train","traineau","traite","traité","traitement","traiter","trajet","tranche",
+  "tranquille","transformer","transmettre","transport","transporter","travail",
+  "travailler","travers","traverser","treize","trente","très","trésor","tresse",
+  "tribu","tribunal","tricher","triste","trois","troisième","tromper","trop",
+  "trottoir","trou","troubler","trouver","tu","tube","tuer","tuyau","type",
+  "typique","un","unique","unité","univers","université","urgence","usage","user",
+  "usine","utile","utiliser","vacance","vache","vague","vaincre","valeur","valise",
+  "valoir","vaste","veau","végétal","véhicule","veiller","veine","vendre","vendredi",
+  "venir","vent","vente","ventre","verbe","verdure","vérifier","vérité","verre",
+  "vers","verser","vert","veste","vêtement","vêtir","vêtue","veuf","viande","vibration",
+  "victime","victoire","vide","vidéo","vie","vieil","vieillard","vieux","vilain",
+  "village","ville","vin","vingt","vingtième","violence","violent","violet","violon",
+  "visage","visite","visiter","visiteur","visuel","vit","vite","vitesse","vivant",
+  "vivre","vocabulaire","vocation","veu","vogue","voici","voie","voilà","voile",
+  "voir","voisin","voiture","voix","vol","voler","volet","volonté","volume","votre",
+  "vouloir","vous","voûte","voyage","voyager","vrai","vue","week","y","yeux","zéro",
+  "zone"
+]);
+
+// Levenshtein distance pour suggestions orthographiques
+function levenshtein(a, b) {
+  const m = a.length, n = b.length;
+  const dp = Array.from({ length: m + 1 }, () => Array(n + 1).fill(0));
+  for (let i = 0; i <= m; i++) dp[i][0] = i;
+  for (let j = 0; j <= n; j++) dp[0][j] = j;
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      dp[i][j] = a[i - 1] === b[j - 1]
+        ? dp[i - 1][j - 1]
+        : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+    }
+  }
+  return dp[m][n];
+}
+
+
+const textarea = document.getElementById('textInput');
+const loadingOverlay = document.getElementById('loadingOverlay');
+
+const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+if (user && user.uid) {
+  loadingOverlay.classList.add('hidden');
+} else {
+  window.location.href = '../auth/Login_Internate.html';
+}
+
+function analyze() {
+  const text = textarea.value;
+
+  document.getElementById('charWithSpaces').textContent = text.length;
+  document.getElementById('charWithoutSpaces').textContent = text.replace(/\s/g, '').length;
+
+  const words = text.trim() ? text.trim().split(/\s+/) : [];
+  document.getElementById('wordCount').textContent = words.length;
+
+  const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+  document.getElementById('sentenceCount').textContent = sentences.length;
+
+  const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 0);
+  document.getElementById('paraCount').textContent = paragraphs.length;
+
+  const wpm = 200;
+  const readingMinutes = words.length / wpm;
+  document.getElementById('readingTime').textContent = readingMinutes < 1 ? '< 1 min' : Math.ceil(readingMinutes) + ' min';
+
+  const lines = text.split('\n');
+  document.getElementById('lineCount').textContent = lines.length;
+
+  const freq = {};
+  let longest = '';
+  for (const w of words) {
+    const cleaned = w.replace(/[^a-zA-ZàâäéèêëîïôöùûüÿçÀÂÄÉÈÊËÎÏÔÖÙÛÜŸÇ'-]/g, '').toLowerCase();
+    if (cleaned && !stopWords.has(cleaned)) {
+      freq[cleaned] = (freq[cleaned] || 0) + 1;
+      if (cleaned.length > longest.length) longest = cleaned;
+    }
+  }
+
+  const sorted = Object.entries(freq).sort((a, b) => b[1] - a[1]).slice(0, 10);
+  const freqList = document.getElementById('freqList');
+  if (sorted.length === 0) {
+    freqList.innerHTML = '<li style="color:var(--muted);font-size:0.8rem;">Aucun mot fréquent trouvé.</li>';
+  } else {
+    freqList.innerHTML = sorted.map(([word, count]) =>
+      `<li><span>${word}</span><span class="count">${count}</span></li>`
+    ).join('');
+  }
+
+  document.getElementById('longestWord').textContent = longest || '—';
+
+  window._verbList = [];
+  window._spellSuggestions = [];
+
+  // ── Verbes détectés ──
+  const verbSet = new Set();
+  for (const w of words) {
+    const cleaned = w.replace(/[^a-zA-ZàâäéèêëîïôöùûüÿçÀÂÄÉÈÊËÎÏÔÖÙÛÜŸÇ'-]/g, '').toLowerCase();
+    if (cleaned && frenchVerbs.has(cleaned)) verbSet.add(cleaned);
+  }
+  window._verbList = [...verbSet].sort();
+  document.getElementById('verbsOutput').innerHTML = window._verbList.length > 0
+    ? verbList.map(v => `<span style="display:inline-block;background:var(--surface2);border-radius:4px;padding:2px 8px;margin:2px;font-size:0.82rem;color:var(--accent2);">${v}</span>`).join('')
+    : '<span style="color:var(--muted);font-size:0.8rem;">Aucun verbe connu détecté.</span>';
+
+  // ── Suggestions orthographiques ──
+  const misspelled = [];
+  for (const w of words) {
+    const cleaned = w.replace(/[^a-zA-ZàâäéèêëîïôöùûüÿçÀÂÄÉÈÊËÎÏÔÖÙÛÜŸÇ'-]/g, '').toLowerCase();
+    if (cleaned && cleaned.length >= 4 && !stopWords.has(cleaned) && !frenchVerbs.has(cleaned) && !frenchWords.has(cleaned)) {
+      let bestDist = Infinity, bestWord = '';
+      for (const dictWord of frenchWords) {
+        if (Math.abs(dictWord.length - cleaned.length) > 2) continue;
+        const dist = levenshtein(cleaned, dictWord);
+        if (dist < bestDist && dist <= 2) {
+          bestDist = dist;
+          bestWord = dictWord;
+        }
+      }
+      if (bestWord) misspelled.push({ original: cleaned, suggestion: bestWord });
+    }
+  }
+  const uniqueMisspelled = [];
+  const seen = new Set();
+  for (const m of misspelled) {
+    const key = m.original + '→' + m.suggestion;
+    if (!seen.has(key)) { seen.add(key); uniqueMisspelled.push(m); }
+  }
+  window._spellSuggestions = uniqueMisspelled.slice(0, 15).map(m => `  ${m.original} → ${m.suggestion}`);
+  document.getElementById('spellOutput').innerHTML = uniqueMisspelled.length > 0
+    ? uniqueMisspelled.slice(0, 15).map(m =>
+      `<div style="font-size:0.82rem;margin:3px 0;"><span style="color:var(--red);">${m.original}</span> → <span style="color:var(--accent2);">${m.suggestion}</span></div>`
+    ).join('') + (uniqueMisspelled.length > 15 ? `<div style="color:var(--muted);font-size:0.78rem;margin-top:4px;">… et ${uniqueMisspelled.length - 15} autres</div>` : '')
+    : '<span style="color:var(--muted);font-size:0.8rem;">Aucune faute évidente détectée.</span>';
+}
+
+textarea.addEventListener('input', analyze);
+
+document.getElementById('clearBtn').addEventListener('click', () => {
+  textarea.value = '';
+  analyze();
+  textarea.focus();
+});
+
+document.getElementById('copyBtn').addEventListener('click', () => {
+  const text = textarea.value;
+  if (!text.trim()) return;
+
+  const words = text.trim() ? text.trim().split(/\s+/) : [];
+  const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+  const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 0);
+  const lines = text.split('\n');
+  const wpm = 200;
+  const readingMinutes = words.length / wpm;
+
+  const freq = {};
+  let longest = '';
+  for (const w of words) {
+    const cleaned = w.replace(/[^a-zA-ZàâäéèêëîïôöùûüÿçÀÂÄÉÈÊËÎÏÔÖÙÛÜŸÇ'-]/g, '').toLowerCase();
+    if (cleaned && !stopWords.has(cleaned)) {
+      freq[cleaned] = (freq[cleaned] || 0) + 1;
+      if (cleaned.length > longest.length) longest = cleaned;
+    }
+  }
+  const topWords = Object.entries(freq).sort((a, b) => b[1] - a[1]).slice(0, 10);
+
+  const verbListCopy = [...verbSet].sort().join(', ');
+  const spellSuggestions = uniqueMisspelled.slice(0, 15).map(m => `  ${m.original} → ${m.suggestion}`).join('\n');
+
+  const result = `RÉSULTATS DE L'ANALYSE
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+Caractères (avec espaces) : ${text.length}
+Caractères (sans espaces) : ${text.replace(/\s/g, '').length}
+Mots : ${words.length}
+Phrases : ${sentences.length}
+Paragraphes : ${paragraphs.length}
+Temps de lecture : ${readingMinutes < 1 ? '< 1 min' : Math.ceil(readingMinutes) + ' min'}
+Lignes : ${lines.length}
+Mot le plus long : ${longest || '—'}
+Mots les plus fréquents :
+${topWords.map(([w, c]) => `  ${w} : ${c}`).join('\n')}
+Verbes détectés : ${(window._verbList || []).join(', ') || 'aucun'}
+Suggestions orthographiques :
+${(window._spellSuggestions || ['  Aucune faute évidente.']).join('\n')}`;
+
+  navigator.clipboard.writeText(result).then(() => {
+    const btn = document.getElementById('copyBtn');
+    const orig = btn.textContent;
+    btn.textContent = 'Copié !';
+    setTimeout(() => { btn.textContent = orig; }, 2000);
+  }).catch(() => {
+    const btn = document.getElementById('copyBtn');
+    const orig = btn.textContent;
+    btn.textContent = 'Erreur';
+    setTimeout(() => { btn.textContent = orig; }, 2000);
+  });
+});
+
+textarea.focus();
+</script>
+
+
+</body>
+</html>

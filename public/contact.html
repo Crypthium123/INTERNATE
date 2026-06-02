@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="/manifest.json">
+<title>Contact — Internate</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 20px;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 48px 40px;
+    max-width: 560px;
+    width: 100%;
+    text-align: center;
+  }
+  .icon { font-size: 3rem; margin-bottom: 20px; }
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.6rem;
+    margin-bottom: 8px;
+  }
+  .subtitle {
+    color: var(--muted);
+    font-size: 0.88rem;
+    margin-bottom: 28px;
+  }
+  p {
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+  .contact-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+  .contact-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--text);
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    text-align: left;
+  }
+  .contact-item:hover {
+    border-color: var(--accent2);
+    background: var(--overlay-green);
+    transform: translateY(-1px);
+  }
+  .contact-item .ci-icon { font-size: 1.2rem; flex-shrink: 0; }
+  .contact-item .ci-label { color: var(--muted); font-size: 0.78rem; font-weight: 400; }
+  .contact-item .ci-wrap { display: flex; flex-direction: column; gap: 2px; }
+  .story-brief {
+    background: var(--surface2);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.6;
+    border: 1px solid var(--border);
+  }
+  .story-brief strong { color: var(--text); }
+  .back {
+    display: inline-block;
+    margin-top: 20px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: color 0.2s;
+  }
+  .back:hover { color: var(--text); }
+  @media (max-width: 600px) {
+    .card { padding: 32px 24px; }
+    h1 { font-size: 1.3rem; }
+    .contact-item { padding: 12px 16px; font-size: 0.85rem; }
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="icon">💬</div>
+  <h1>Nous contacter</h1>
+  <p class="subtitle">Une question, une idée, un bug ? On est à l'écoute.</p>
+
+  <div class="story-brief">
+    <strong>Internate</strong> est né en Seconde d'une frustration simple : des cours partout, nulle part. Ce qui a commencé comme un dossier HTML est devenu une plateforme utilisée par des lycéens de plusieurs établissements. <strong>Et on ne compte pas s'arrêter là.</strong>
+  </div>
+
+  <div class="contact-list">
+    <a class="contact-item" href="help/">
+      <span class="ci-icon">💬</span>
+      <span class="ci-wrap">
+        <span>Aide &amp; retours</span>
+        <span class="ci-label">Formulaire de contact intégré</span>
+      </span>
+    </a>
+    <a class="contact-item" href="mailto:internatesupport@gmail.com">
+      <span class="ci-icon">📧</span>
+      <span class="ci-wrap">
+        <span>internatesupport@gmail.com</span>
+        <span class="ci-label">Réponse sous 24-48h</span>
+      </span>
+    </a>
+    <a class="contact-item" href="https://github.com/Crypthium123/INTERNATE" target="_blank" rel="noopener">
+      <span class="ci-icon">🐙</span>
+      <span class="ci-wrap">
+        <span>GitHub</span>
+        <span class="ci-label">Code source ouvert — contributions bienvenues</span>
+      </span>
+    </a>
+    <a class="contact-item" href="legal/Legal.html">
+      <span class="ci-icon">📜</span>
+      <span class="ci-wrap">
+        <span>Mentions légales</span>
+        <span class="ci-label">Conditions d'utilisation</span>
+      </span>
+    </a>
+  </div>
+
+  <a class="back" href="javascript:history.back()">← Retour</a>
+</div>
+
+</body>
+</html>

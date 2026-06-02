@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Administration — Internate</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  :root {
+    --bg: #09090f; --surface: #11111c; --surface2: #1a1a2e;
+    --border: rgba(255,255,255,0.07); --accent: #6c63ff; --accent2: #00d4aa;
+    --text: #e8e8f0; --muted: #6b6b8a; --red: #ff4757;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'DM Sans', sans-serif; min-height: 100vh;
+    padding: 40px 48px; max-width: 900px; margin: 0 auto;
+  }
+  h1 {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 2rem; letter-spacing: -0.03em; margin-bottom: 6px;
+  }
+  .subtitle { color: var(--muted); font-size: 0.9rem; margin-bottom: 36px; }
+  .stats-row {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 16px; margin-bottom: 32px;
+  }
+  .stat-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 24px 28px;
+  }
+  .stat-card .num {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: 2.2rem; color: var(--accent2);
+  }
+  .stat-card .label {
+    font-size: 0.8rem; color: var(--muted);
+    margin-top: 4px; text-transform: uppercase; letter-spacing: 0.08em;
+  }
+  .actions { display: flex; gap: 12px; margin-bottom: 32px; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 10px 20px; border-radius: 8px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.87rem;
+    font-weight: 600; cursor: pointer; border: none;
+    transition: all 0.2s; text-decoration: none;
+  }
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 0 30px rgba(108,99,255,0.4); }
+  .btn-secondary { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+  .btn-secondary:hover { color: var(--text); border-color: rgba(255,255,255,0.15); }
+  .btn-danger { background: rgba(255,71,87,0.1); color: var(--red); border: 1px solid rgba(255,71,87,0.2); }
+  .btn-danger:hover { background: rgba(255,71,87,0.2); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+  .section-title {
+    font-family: 'Syne', sans-serif; font-weight: 600;
+    font-size: 1.1rem; margin-bottom: 16px;
+  }
+  .users-table {
+    width: 100%; border-collapse: collapse;
+    background: var(--surface); border-radius: 12px; overflow: hidden;
+    font-size: 0.85rem;
+  }
+  .users-table th {
+    text-align: left; padding: 12px 16px;
+    background: var(--surface2); color: var(--muted);
+    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em;
+    font-weight: 600;
+  }
+  .users-table td {
+    padding: 11px 16px; border-top: 1px solid var(--border);
+  }
+  .users-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .msg {
+    padding: 12px 16px; border-radius: 8px; font-size: 0.85rem;
+    margin-bottom: 16px; display: none;
+  }
+  .msg.success { display: block; background: rgba(0,212,170,0.1); border: 1px solid rgba(0,212,170,0.2); color: var(--accent2); }
+  .msg.error { display: block; background: rgba(255,71,87,0.1); border: 1px solid rgba(255,71,87,0.2); color: var(--red); }
+  .loading { text-align: center; padding: 60px; color: var(--muted); font-size: 0.9rem; }
+  .small { font-size: 0.78rem; color: var(--muted); }
+  .top-link { display: inline-flex; align-items: center; gap: 6px; color: var(--accent); text-decoration: none; font-size: 0.85rem; font-weight: 500; margin-bottom: 24px; }
+  .top-link:hover { text-decoration: underline; }
+  @media (max-width: 600px) {
+    body { padding: 20px 16px; }
+    .stats-row { grid-template-columns: 1fr; }
+    .users-table { font-size: 0.78rem; }
+    .users-table th, .users-table td { padding: 8px 10px; }
+  }
+</style>
+</head>
+<body>
+  <a href="../dashboard/connected_internate.html" class="top-link">← Dashboard</a>
+  <h1>⚙️ Administration</h1>
+  <p class="subtitle">Panneau d'administration Internate</p>
+
+  <div class="msg" id="msg"></div>
+
+  <div class="stats-row" id="statsRow">
+    <div class="stat-card"><div class="num" id="statUsers">—</div><div class="label">Utilisateurs</div></div>
+    <div class="stat-card"><div class="num" id="statCours">—</div><div class="label">Cours</div></div>
+    <div class="stat-card"><div class="num" id="statClasses">—</div><div class="label">Classes</div></div>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-primary" id="refreshBtn" onclick="loadStats()">🔄 Rafraîchir</button>
+    <button class="btn btn-secondary" id="seedBtn" onclick="seedStats()">📊 Seed stats</button>
+  </div>
+
+  <div class="section-title">👥 Utilisateurs récents</div>
+  <div id="usersContainer">
+    <div class="loading" id="usersLoading">Chargement…</div>
+    <table class="users-table" id="usersTable" style="display:none;">
+      <thead><tr><th>Email</th><th>Nom</th><th>Date</th><th>UID</th></tr></thead>
+      <tbody id="usersBody"></tbody>
+    </table>
+  </div>
+
+<script type="module" src="/js/firebase-config.js"></script>
+<script type="module">
+  var msgEl = document.getElementById('msg');
+
+  function showMsg(text, type) {
+    msgEl.textContent = text;
+    msgEl.className = 'msg ' + type;
+    setTimeout(function() { msgEl.style.display = 'none'; }, 5000);
+  }
+
+  function escapeHtml(str) {
+    if (!str && str !== 0) return '';
+    var div = document.createElement('div');
+    div.appendChild(document.createTextNode(String(str)));
+    return div.innerHTML;
+  }
+
+  window.loadStats = function() {
+    var btn = document.getElementById('refreshBtn');
+    btn.disabled = true;
+    btn.textContent = '🔄 Chargement…';
+
+    Promise.all([
+      db.collection('users').get(),
+      db.collection('cours').get(),
+      db.collection('classes').get()
+    ]).then(function(results) {
+      document.getElementById('statUsers').textContent = results[0].size;
+      document.getElementById('statCours').textContent = results[1].size;
+      document.getElementById('statClasses').textContent = results[2].size;
+      btn.disabled = false;
+      btn.textContent = '🔄 Rafraîchir';
+    }).catch(function(e) {
+      showMsg('Erreur chargement stats : ' + e.message, 'error');
+      btn.disabled = false;
+      btn.textContent = '🔄 Rafraîchir';
+    });
+  };
+
+  window.seedStats = function() {
+    var btn = document.getElementById('seedBtn');
+    btn.disabled = true;
+    btn.textContent = '📊 Comptage…';
+
+    Promise.all([
+      db.collection('users').get(),
+      db.collection('cours').get(),
+      db.collection('classes').get()
+    ]).then(function(results) {
+      return db.collection('_stats').doc('public').set({
+        users: results[0].size,
+        cours: results[1].size,
+        classes: results[2].size,
+        updatedAt: new Date().toISOString()
+      });
+    }).then(function() {
+      showMsg('✅ Stats mises à jour !', 'success');
+      loadStats();
+    }).catch(function(e) {
+      showMsg('❌ Erreur seed : ' + e.message, 'error');
+    }).finally(function() {
+      btn.disabled = false;
+      btn.textContent = '📊 Seed stats';
+    });
+  };
+
+  function loadUsers() {
+    var loading = document.getElementById('usersLoading');
+    var table = document.getElementById('usersTable');
+    var body = document.getElementById('usersBody');
+
+    db.collection('users').orderBy('createdAt', 'desc').limit(50).get().then(function(snap) {
+      loading.style.display = 'none';
+      table.style.display = '';
+      if (snap.empty) {
+        body.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:24px;">Aucun utilisateur.</td></tr>';
+        return;
+      }
+      var html = '';
+      snap.forEach(function(doc) {
+        var d = doc.data();
+        var name = ((d.prenom || '') + ' ' + (d.nom || '')).trim() || '—';
+        var date = d.createdAt ? new Date(d.createdAt.seconds * 1000 || d.createdAt).toLocaleDateString('fr-FR') : '—';
+        html += '<tr><td>' + escapeHtml(d.email || '—') + '</td><td>' + escapeHtml(name) + '</td><td>' + date + '</td><td class="small">' + doc.id.slice(0, 12) + '…</td></tr>';
+      });
+      body.innerHTML = html;
+    }).catch(function(e) {
+      loading.textContent = 'Erreur : ' + e.message;
+    });
+  }
+
+  auth.onAuthStateChanged(function(user) {
+    if (!user) {
+      window.location.href = '../auth/Login_Internate.html';
+      return;
+    }
+    user.getIdTokenResult(true).then(function(t) {
+      if (t.claims.admin !== true) {
+        document.body.innerHTML = '<div style="text-align:center;padding:80px 20px;"><h2 style="font-family:Syne,sans-serif;">⛔ Accès refusé</h2><p style="color:var(--muted);margin-top:12px;">Tu n\'es pas administrateur.</p><a href="../dashboard/connected_internate.html" style="color:var(--accent);text-decoration:none;font-weight:600;">← Retour au dashboard</a></div>';
+        return;
+      }
+      loadStats();
+      loadUsers();
+    });
+  });
+</script>
+</body>
+</html>

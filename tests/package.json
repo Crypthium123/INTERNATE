@@ -1,0 +1,13 @@
+{
+  "name": "internate-tests",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "node validate.js",
+    "test:rules": "node firestore-rules-test.js",
+    "ci": "node validate.js"
+  },
+  "dependencies": {
+    "@firebase/rules-unit-testing": "^3.0.0"
+  }
+}

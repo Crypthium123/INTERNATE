@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Générateur de QCM — Internate</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  :root {
+    --accent3: #ff6b6b;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  .tool-topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 24px;
+    background: var(--surface-glass);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    z-index: 100;
+  }
+  .tool-topbar a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.82rem;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  .tool-topbar a:hover { color: var(--text); }
+  .tool-topbar .sep { color: var(--border); font-size: 0.7rem; }
+  .tool-topbar .current { color: var(--accent); font-size: 0.82rem; font-weight: 600; }
+  .back-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text);
+    text-decoration: none;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .back-btn:hover { background: var(--accent); border-color: var(--accent); color: white; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    padding: 52px 20px 40px;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    margin-bottom: 24px;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tab-btn {
+    padding: 12px 20px;
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-weight: 600;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+
+  .tab-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  .tab-content {
+    display: none;
+  }
+
+  .tab-content.active {
+    display: block;
+  }
+
+  .creator, .quiz {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+
+  .form-group {
+    margin-bottom: 16px;
+  }
+
+  label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  input, textarea {
+    width: 100%;
+    padding: 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.9rem;
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+
+  input:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--overlay-accent);
+  }
+
+  .answer-group {
+    margin-top: 12px;
+    padding: 12px;
+    background: rgba(255,255,255,0.02);
+    border-radius: 8px;
+  }
+
+  .answer-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .answer-row input[type="radio"] {
+    width: auto;
+    flex-shrink: 0;
+  }
+
+  .answer-row input[type="text"] {
+    flex: 1;
+  }
+
+  button {
+    padding: 12px 20px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  button:hover {
+    background: var(--accent);
+    transform: translateY(-2px);
+  }
+
+  button.secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  button.secondary:hover {
+    background: var(--hover-overlay);
+  }
+
+  .btn-group {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .question {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  .question-text {
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .answer-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    margin: 8px 0;
+    background: rgba(255,255,255,0.03);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .answer-option:hover {
+    background: var(--overlay-accent);
+  }
+
+  .answer-option input[type="radio"] {
+    cursor: pointer;
+  }
+
+  .score {
+    background: var(--overlay-accent);
+    border: 1px solid var(--overlay-accent-strong);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+    font-size: 1.2rem;
+    margin-bottom: 16px;
+  }
+
+  .score-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  @media (max-width: 768px) {
+    body { padding: 52px 12px 12px; }
+    .tool-topbar { padding: 10px 16px; font-size: 0.8rem; }
+    .tool-topbar a, .tool-topbar .current { font-size: 0.75rem; }
+  }
+  @media (max-width: 480px) {
+    body { padding: 48px 8px 8px; }
+    .tool-topbar { padding: 8px 12px; gap: 8px; }
+    .tool-topbar a, .tool-topbar .current { font-size: 0.7rem; }
+  }
+  .loading-overlay {
+    position: fixed; inset: 0;
+    background: var(--bg);
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.4s ease;
+  }
+  .loading-overlay.hidden { opacity: 0; pointer-events: none; }
+  .spinner {
+    width: 40px; height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-overlay p { color: var(--muted); font-size: 0.85rem; margin-top: 16px; }
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .modal-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .modal-content {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  .modal-content h2 {
+    font-family: 'Syne', sans-serif;
+    margin-bottom: 16px;
+  }
+  .modal-content table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  .modal-content th, .modal-content td {
+    text-align: left;
+    padding: 10px 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .modal-content th {
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+  }
+  .modal-close {
+    float: right;
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-size: 1.5rem;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .modal-close:hover { color: var(--text); }
+.toast-container { position: fixed; top: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+  .toast { padding: 14px 20px; border-radius: 10px; font-size: 0.87rem; font-weight: 500; color: white; box-shadow: 0 8px 32px rgba(0,0,0,0.4); backdrop-filter: blur(8px); animation: toastIn 0.3s ease both; max-width: 380px; pointer-events: auto; display: flex; align-items: center; gap: 10px; }
+  .toast-success { background: rgba(0,212,170,0.9); }
+  .toast-error { background: rgba(255,107,107,0.9); }
+  .toast-info { background: rgba(108,99,255,0.9); }
+  @keyframes toastIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes toastOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(40px); } }
+</style>
+</head>
+<body>
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <p>Chargement...</p>
+</div>
+<div class="toast-container" id="toastContainer"></div>
+<div class="tool-topbar">
+  <a href="../dashboard/connected_internate.html" class="back-btn">← Retour</a>
+  <span class="sep">›</span>
+  <a href="../courses/Ressources_ex.html">Cours</a>
+  <span class="sep">›</span>
+  <span class="current">QCM</span>
+  </div>
+
+<div class="container" id="tool-content">
+  <h1>📋 Générateur de QCM</h1>
+  
+  <button onclick="showScoresModal()" class="btn btn-secondary" style="padding:6px 14px;font-size:0.8rem;">📊 Voir mes scores</button>
+  
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('create')">➕ Créer</button>
+    <button class="tab-btn" onclick="switchTab('play')">🎮 Jouer</button>
+  </div>
+  
+  <!-- TAB: CREATE -->
+  <div id="create" class="tab-content active">
+    <div class="creator">
+      <div class="form-group">
+        <label>Titre du QCM</label>
+        <input type="text" id="quizTitle" placeholder="ex: QCM Photosynthèse">
+      </div>
+      
+      <div class="form-group">
+        <label>Question</label>
+        <textarea id="questionText" placeholder="Écris ta question…"></textarea>
+      </div>
+      
+      <div class="form-group">
+        <label>Réponses</label>
+        <div class="answer-group" id="answersContainer">
+          <div class="answer-row">
+            <input type="radio" name="correct" checked>
+            <input type="text" placeholder="Réponse 1 (correcte)">
+          </div>
+          <div class="answer-row">
+            <input type="radio" name="correct">
+            <input type="text" placeholder="Réponse 2">
+          </div>
+          <div class="answer-row">
+            <input type="radio" name="correct">
+            <input type="text" placeholder="Réponse 3">
+          </div>
+          <div class="answer-row">
+            <input type="radio" name="correct">
+            <input type="text" placeholder="Réponse 4">
+          </div>
+        </div>
+        <button class="secondary" style="margin-top: 8px; width: 100%;" onclick="addAnswerField()">+ Ajouter une réponse</button>
+      </div>
+      
+      <div class="btn-group">
+        <button onclick="addQuestion()">✅ Ajouter la question</button>
+        <button class="secondary" onclick="finishQuiz()">🎯 Terminer et jouer</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- TAB: PLAY -->
+  <div id="play" class="tab-content">
+    <div class="quiz" id="quizContainer">
+      <p style="color: var(--muted);">Créez un QCM d'abord pour jouer</p>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+let quiz = { title: '', questions: [] };
+let currentQuestion = 0;
+let score = 0;
+
+function switchTab(tab, e) {
+  e = e || window.event;
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(tab).classList.add('active');
+  e.target.classList.add('active');
+  
+  if (tab === 'play') startQuiz();
+}
+
+function addAnswerField() {
+  const container = document.getElementById('answersContainer');
+  const div = document.createElement('div');
+  div.className = 'answer-row';
+  div.innerHTML = `
+    <input type="radio" name="correct">
+    <input type="text" placeholder="Nouvelle réponse">
+  `;
+  container.appendChild(div);
+}
+
+function showToast(msg, type) {
+  var c = document.getElementById('toastContainer');
+  if (!c) return;
+  var e = document.createElement('div');
+  e.className = 'toast toast-' + (type || 'info');
+  e.textContent = msg;
+  c.appendChild(e);
+  setTimeout(function() {
+    e.style.animation = 'toastOut 0.3s ease both';
+    setTimeout(function() { e.remove(); }, 300);
+  }, 3500);
+}
+function addQuestion() {
+  const title = document.getElementById('quizTitle').value;
+  const text = document.getElementById('questionText').value;
+  const rows = document.querySelectorAll('#answersContainer .answer-row');
+  
+  if (!title || !text || rows.length < 2) {
+    alert('⚠️ Remplis le titre, la question et ajoute au moins 2 réponses');
+    return;
+  }
+  
+  quiz.title = title;
+  
+  const answers = [];
+  let correctIdx = -1;
+  rows.forEach((row, idx) => {
+    const input = row.querySelector('input[type="text"]');
+    const isCorrect = row.querySelector('input[type="radio"]:checked') === row.querySelector('input[type="radio"]');
+    if (input.value) {
+      answers.push({ text: input.value, correct: isCorrect });
+      if (isCorrect) correctIdx = answers.length - 1;
+    }
+  });
+  
+  if (correctIdx === -1) {
+    alert('⚠️ Marque une réponse correcte');
+    return;
+  }
+  
+  quiz.questions.push({ text, answers });
+  
+  document.getElementById('questionText').value = '';
+  document.getElementById('answersContainer').innerHTML = `
+    <div class="answer-row">
+      <input type="radio" name="correct" checked>
+      <input type="text" placeholder="Réponse 1 (correcte)">
+    </div>
+    <div class="answer-row">
+      <input type="radio" name="correct">
+      <input type="text" placeholder="Réponse 2">
+    </div>
+    <div class="answer-row">
+      <input type="radio" name="correct">
+      <input type="text" placeholder="Réponse 3">
+    </div>
+    <div class="answer-row">
+      <input type="radio" name="correct">
+      <input type="text" placeholder="Réponse 4">
+    </div>
+  `;
+  
+  alert(`✅ Question ${quiz.questions.length} ajoutée !`);
+}
+
+function finishQuiz() {
+  if (quiz.questions.length === 0) {
+    showToast('Ajoute au moins une question', 'error');
+    return;
+  }
+  currentQuestion = 0;
+  score = 0;
+  switchTab('play');
+}
+
+function startQuiz() {
+  if (quiz.questions.length === 0) return;
+  
+  displayQuestion();
+}
+
+function displayQuestion() {
+  const q = quiz.questions[currentQuestion];
+  const container = document.getElementById('quizContainer');
+  
+  if (currentQuestion >= quiz.questions.length) {
+    container.innerHTML = `
+      <div class="score">
+        <div>Score final</div>
+        <div class="score-value">${score}/${quiz.questions.length}</div>
+        <div style="margin-top: 16px; color: var(--accent2); font-size: 1.1rem;">${Math.round(score / quiz.questions.length * 100)}%</div>
+      </div>
+      <button onclick="switchTab('create')">← Retour à l'éditeur</button>
+      <button class="secondary" onclick="showScoresModal()" style="margin-left:8px;">📊 Voir mes scores</button>
+    `;
+    saveQuizResult();
+    return;
+  }
+  
+  let html = `
+    <div style="margin-bottom: 16px; color: var(--muted); font-size: 0.9rem;">
+      Question ${currentQuestion + 1}/${quiz.questions.length}
+    </div>
+    <div class="question-text">${escapeHtml(q.text)}</div>
+  `;
+  
+  q.answers.forEach((ans, idx) => {
+    html += `
+      <label class="answer-option">
+        <input type="radio" name="answer" value="${idx}">
+        <span>${escapeHtml(ans.text)}</span>
+      </label>
+    `;
+  });
+  
+  html += `
+    <div class="btn-group" style="margin-top: 24px;">
+      <button onclick="checkAnswer()">✅ Valider</button>
+    </div>
+  `;
+  
+  container.innerHTML = html;
+}
+
+function checkAnswer() {
+  const selected = document.querySelector('input[name="answer"]:checked');
+  if (!selected) {
+    alert('Sélectionne une réponse');
+    return;
+  }
+  
+  const q = quiz.questions[currentQuestion];
+  if (q.answers[selected.value].correct) {
+    score++;
+  }
+  
+  currentQuestion++;
+  displayQuestion();
+}
+
+function saveQuizResult() {
+  try {
+    const user = firebase.auth().currentUser;
+    if (!user) return;
+    const classId = localStorage.getItem('activeClassId') || '';
+    firebase.firestore().collection('quizResults').add({
+      userId: user.email,
+      score: score,
+      total: quiz.questions.length,
+      quizTitle: quiz.title || 'QCM sans titre',
+      classId: classId,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    }).catch(function(err) { console.warn('Firestore save failed:', err); });
+  } catch (err) {
+    console.warn('Firestore unavailable:', err);
+  }
+}
+
+function showScoresModal() {
+  var modal = document.getElementById('scoresModal');
+  modal.classList.add('open');
+  var container = document.getElementById('scoresTableContainer');
+  container.innerHTML = '<p style="color:var(--muted)">Chargement...</p>';
+
+  try {
+    var user = firebase.auth().currentUser;
+    if (!user) {
+      container.innerHTML = '<p style="color:var(--muted)">Connecte-toi pour voir tes scores.</p>';
+      return;
+    }
+
+    firebase.firestore().collection('quizResults')
+      .where('userId', '==', user.email)
+      .orderBy('timestamp', 'desc')
+      .limit(20)
+      .get()
+      .then(function(snapshot) {
+        if (snapshot.empty) {
+          container.innerHTML = '<p style="color:var(--muted)">Aucun score enregistré.</p>';
+          return;
+        }
+        var html = '<table><thead><tr><th>Date</th><th>Quiz</th><th>Score</th><th>Questions</th></tr></thead><tbody>';
+        snapshot.forEach(function(doc) {
+          var d = doc.data();
+          var date = d.timestamp && d.timestamp.toDate ? d.timestamp.toDate().toLocaleDateString('fr-FR') : '—';
+          html += '<tr><td>' + date + '</td><td>' + escapeHtml(d.quizTitle || '—') + '</td><td>' + d.score + '</td><td>' + d.total + '</td></tr>';
+        });
+        html += '</tbody></table>';
+        container.innerHTML = html;
+      })
+      .catch(function(err) {
+        console.warn('Firestore query failed:', err);
+        container.innerHTML = '<p style="color:var(--muted)">Impossible de charger les scores. Vérifie ta connexion.</p>';
+      });
+  } catch (err) {
+    console.warn('Firestore unavailable:', err);
+    container.innerHTML = '<p style="color:var(--muted)">Firestore indisponible.</p>';
+  }
+}
+
+window.closeScoresModal = function() {
+  document.getElementById('scoresModal').classList.remove('open');
+};
+
+const loadingOverlay = document.getElementById('loadingOverlay');
+const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+if (user && user.uid) {
+  loadingOverlay.classList.add('hidden');
+} else {
+  window.location.href = '../auth/Login_Internate.html';
+}
+window.switchTab = switchTab;
+window.addAnswerField = addAnswerField;
+window.addQuestion = addQuestion;
+window.finishQuiz = finishQuiz;
+window.showScoresModal = showScoresModal;
+window.checkAnswer = checkAnswer;
+</script>
+<div class="modal-overlay" id="scoresModal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeScoresModal()">&times;</button>
+    <h2>📊 Mes scores</h2>
+    <div id="scoresTableContainer">
+      <p style="color:var(--muted)">Chargement...</p>
+    </div>
+  </div>
+</div>
+
+<div style="text-align:center;padding:16px;font-size:0.75rem;color:var(--muted);margin-top:20px;">
+  <a href="../help/" style="color:var(--accent2);text-decoration:none;">💬 Aide & retours</a>
+</div>
+
+<script type="module" src="/js/firebase-config.js"></script>
+<script type="module" src="/js/app.js"></script>
+
+</body>
+</html>
+

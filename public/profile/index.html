@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profil — Internate</title>
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  :root {
+    --bg: #09090f; --surface: #11111c; --surface2: #1a1a2e; --surface3: rgba(255,255,255,0.03);
+    --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12);
+    --accent: #6c63ff; --accent2: #00d4aa; --red: #ff4757;
+    --text: #eeeef5; --text2: #b0b0cc; --muted: #5a5a7a;
+    --sidebar-w: 260px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'DM Sans', sans-serif; min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  body::after {
+    content: ''; position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 9999;
+  }
+  .app-layout { display: flex; min-height: 100vh; }
+  .sidebar {
+    width: var(--sidebar-w); flex-shrink: 0;
+    background: var(--surface); border-right: 1px solid var(--border);
+    position: fixed; height: 100vh;
+    display: flex; flex-direction: column;
+    padding: 24px 14px; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none;
+    z-index: 50; transition: transform 0.3s ease;
+  }
+  .sidebar::-webkit-scrollbar { display: none; }
+  .sidebar-logo {
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5rem;
+    letter-spacing: -0.04em;
+    background: linear-gradient(135deg, #6c63ff, #00d4aa);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; padding: 4px 10px 20px; text-decoration: none; display: block;
+  }
+  .nav-label {
+    font-size: 0.62rem; font-weight: 700; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--muted);
+    padding: 0 10px; margin: 20px 0 6px;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 10px; border-radius: 8px;
+    text-decoration: none; color: var(--muted);
+    font-size: 0.85rem; font-weight: 500;
+    transition: all 0.18s; cursor: pointer;
+    border: none; background: none; width: 100%; text-align: left;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .nav-item .ni { font-size: 1rem; width: 22px; text-align: center; flex-shrink: 0; }
+  .nav-item:hover { color: var(--text); background: var(--hover-overlay); }
+  .nav-item.active { color: var(--accent); background: var(--overlay-accent); font-weight: 600; }
+  .sidebar-footer { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 4px; }
+  .user-tile { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 10px; cursor: pointer; transition: background 0.2s; }
+  .user-tile:hover { background: var(--hover-overlay); }
+  .avatar {
+    width: 36px; height: 36px; border-radius: 9px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.85rem;
+    color: white; flex-shrink: 0; overflow: hidden;
+  }
+  .user-name { font-size: 0.85rem; font-weight: 600; }
+  .user-role { font-size: 0.7rem; color: var(--muted); }
+  .btn-logout { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; color: var(--muted); font-size: 0.82rem; cursor: pointer; border: none; background: none; width: 100%; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .btn-logout:hover { color: var(--red); background: var(--btn-danger-bg); }
+  .main-content { margin-left: var(--sidebar-w); flex: 1; padding: 36px 44px; min-height: 100vh; animation: fadeUp 0.4s ease both; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+  .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 40px; }
+  .page-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.9rem; letter-spacing: -0.04em; }
+  .profile-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 40px; max-width: 560px; margin: 0 auto; }
+  .profile-avatar { width: 80px; height: 80px; border-radius: 20px; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 2rem; color: white; margin: 0 auto 24px; box-shadow: 0 0 30px rgba(108,99,255,0.3); }
+  .profile-card h2 { text-align: center; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.4rem; margin-bottom: 4px; }
+  .profile-card .email-display { text-align: center; color: var(--muted); font-size: 0.88rem; margin-bottom: 32px; }
+  .form-group { margin-bottom: 20px; }
+  .form-group label { display: block; font-size: 0.76rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-bottom: 7px; }
+  .form-group input { width: 100%; padding: 13px 16px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.92rem; outline: none; transition: all 0.22s; }
+  .form-group input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--overlay-accent); background: var(--hover-overlay); }
+  .form-group input:disabled { opacity: 0.5; cursor: not-allowed; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: 9px; font-family: 'DM Sans', sans-serif; font-size: 0.87rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; text-decoration: none; }
+  .btn-primary { background: var(--accent); color: white; box-shadow: 0 0 20px rgba(108,99,255,0.35); }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 0 35px rgba(108,99,255,0.55); }
+  .btn-secondary { background: var(--hover-overlay); color: var(--text); border: 1px solid var(--border); }
+  .btn-secondary:hover { background: var(--hover-overlay-strong); }
+  .form-actions { display: flex; gap: 12px; margin-top: 32px; justify-content: flex-end; }
+  .alert { display: none; align-items: center; gap: 10px; padding: 12px 16px; border-radius: 9px; font-size: 0.85rem; margin-bottom: 20px; }
+  .alert-success { background: var(--overlay-green); border: 1px solid rgba(0,212,170,0.2); color: var(--accent2); }
+  .alert-error { background: var(--overlay-red); border: 1px solid rgba(255,71,87,0.2); color: var(--red); }
+  .menu-toggle { display: none; position: fixed; top: 12px; left: 12px; z-index: 60; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; width: 40px; height: 40px; cursor: pointer; align-items: center; justify-content: center; font-size: 1.3rem; color: var(--text); transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+  .menu-toggle:hover { background: var(--surface2); }
+  .loading-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.4s ease; }
+  .loading-overlay.hidden { opacity: 0; pointer-events: none; }
+  .spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-overlay p { color: var(--muted); font-size: 0.85rem; margin-top: 16px; }
+  .toast-container { position: fixed; top: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+  .toast { padding: 14px 20px; border-radius: 10px; font-size: 0.87rem; font-weight: 500; color: white; box-shadow: 0 8px 32px rgba(0,0,0,0.4); backdrop-filter: blur(8px); animation: toastIn 0.3s ease both; max-width: 380px; pointer-events: auto; display: flex; align-items: center; gap: 10px; }
+  .toast-success { background: rgba(0,212,170,0.9); }
+  .toast-error { background: rgba(255,107,107,0.9); }
+  .toast-info { background: rgba(108,99,255,0.9); }
+  @keyframes toastIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes toastOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(40px); } }
+  @media (max-width: 900px) {
+    .menu-toggle { display: flex; position: fixed; }
+    .sidebar { transform: translateX(-100%); transition: transform 0.3s ease; z-index: 55; }
+    .sidebar.open { transform: translateX(0); }
+    .main-content { margin-left: 0; padding: 24px 20px; padding-top: 60px; }
+    .topbar { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .page-title { font-size: 1.4rem; }
+    .profile-card { padding: 28px 24px; }
+  }
+  @media (max-width: 600px) {
+    .form-row { grid-template-columns: 1fr; }
+    .form-actions { flex-direction: column; }
+    .form-actions .btn { width: 100%; justify-content: center; }
+    .profile-card { padding: 20px 16px; }
+    .profile-avatar { width: 60px; height: 60px; font-size: 1.5rem; }
+    .profile-card h2 { font-size: 1.1rem; }
+    .toast-container { top: 12px; right: 50%; transform: translateX(50%); }
+    .toast { max-width: 90vw; }
+  }
+</style>
+</head>
+<body>
+<div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div><p>Chargement...</p></div>
+<div class="app-layout">
+<aside class="sidebar">
+  <header role="banner">
+    <a href="../dashboard/connected_internate.html" class="sidebar-logo">Internate</a>
+  </header>
+  <nav aria-label="Navigation principale">
+  <div class="nav-section-label">Principal</div>
+  <a class="nav-item" href="../dashboard/connected_internate.html"><span class="nav-icon">&#9679;</span> Dashboard</a>
+  <a class="nav-item" href="../courses/Ressources_ex.html"><span class="nav-icon">&#128218;</span> Mes cours</a>
+  <a class="nav-item" href="../classes/"><span class="nav-icon">👥</span> Classes</a>
+  <button class="notif-btn" onclick="openNotifPanel()"><span class="nav-icon">🔔</span> Notifications<span class="notif-badge" id="notifBadge">0</span></button>
+  <div class="nav-section-label">Outils</div>
+  <a class="nav-item" href="../tools/Calculatrice_Scientifique.html"><span class="nav-icon">&#128200;</span> Calculatrice</a>
+  <a class="nav-item" href="../tools/Convertisseur_Unites.html"><span class="nav-icon">&#8646;</span> Convertisseur</a>
+  <a class="nav-item" href="../tools/Fabricateur_Fiches.html"><span class="nav-icon">&#128203;</span> Fiches</a>
+  <a class="nav-item" href="../tools/Generateur_QCM.html"><span class="nav-icon">&#9989;</span> QCM</a>
+  <a class="nav-item" href="../tools/Minuteur_Pomodoro.html"><span class="nav-icon">&#9200;</span> Pomodoro</a>
+  <a class="nav-item" href="../tools/Redacteur_Plan.html"><span class="nav-icon">&#128220;</span> Plan</a>
+  <a class="nav-item" href="../tools/Tableau_Blanc.html"><span class="nav-icon">&#127912;</span> Tableau Blanc</a>
+  <a class="nav-item" href="../tools/Analyseur_Texte.html"><span class="nav-icon">&#x1F50D;</span> Analyseur de Texte</a>
+  <a class="nav-item" href="../tools/Calculateur_Moyenne.html"><span class="nav-icon">&#x1F4C8;</span> Calculateur de Moyenne</a>
+  <a class="nav-item" href="../tools/Conjugueur_Francais.html"><span class="nav-icon">&#x1F4D6;</span> Conjugueur Français</a>
+  <a class="nav-item" href="../tools/Generateur_Citations.html"><span class="nav-icon">&#x1F4AC;</span> Générateur de Citations</a>
+</nav>
+<div class="sidebar-footer">
+    <div class="user-tile" id="userTile" onclick="window.location.href='index.html'">
+      <div class="avatar" id="avatarEl">?</div>
+      <div>
+        <div class="user-name" id="userNameEl">Utilisateur</div>
+        <div class="user-role" id="userRoleEl">&#9679; En ligne</div>
+      </div>
+    </div>
+    <button class="btn-logout" id="installBtn" onclick="installPWA()" style="display:none;"><span>⬇️</span> Installer l'app</button>
+    <a href="../admin/" class="btn-logout" id="adminLink" style="display:none;text-decoration:none;"><span>⚙️</span> Administration</a>
+    <button class="btn-logout" onclick="logout()"><span>&#128682;</span> Se d&eacute;connecter</button>
+    <a href="../contact.html" class="btn-logout" style="text-decoration:none;margin-top:2px;"><span>&#9993;</span> Contact & retours</a>
+  </div>
+</aside>
+<main role="main" class="main-content">
+  <button class="menu-toggle" onclick="toggleSidebar()" aria-label="Menu">&#9776;</button>
+  <div class="topbar"><div><div class="page-title">Mon profil</div></div></div>
+  <div class="profile-card">
+    <div class="profile-avatar" id="profileAvatar">?</div>
+    <h2 id="profileName">Utilisateur</h2>
+    <div class="email-display" id="profileEmail">email@example.com</div>
+    <div style="display:flex;gap:12px;justify-content:center;margin:12px 0 4px;flex-wrap:wrap;">
+      <span class="xp-badge" id="xpDisplay">⚡ 0 XP</span>
+      <span class="level-badge" id="levelDisplay">1</span>
+      <span class="streak-badge" id="streakDisplay">🔥 0 jours</span>
+    </div>
+    <div id="successAlert" class="alert alert-success">&#10003; Profil mis &agrave; jour avec succ&egrave;s !</div>
+    <div id="errorAlert" class="alert alert-error">&#9888; Erreur lors de la mise &agrave; jour.</div>
+    <form id="profileForm" onsubmit="saveProfile(event)">
+      <div class="form-row">
+        <div class="form-group"><label>Pr&eacute;nom</label><input type="text" id="inputPrenom" placeholder="Ton pr&eacute;nom" required></div>
+        <div class="form-group"><label>Nom</label><input type="text" id="inputNom" placeholder="Ton nom" required></div>
+      </div>
+      <div class="form-group"><label>Email</label><input type="email" id="inputEmail" placeholder="ton@email.com" disabled></div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" onclick="window.location.href='../dashboard/connected_internate.html'">Retour</button>
+        <button type="submit" class="btn btn-primary" id="saveBtn">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+</main>
+</div>
+<div class="toast-container" id="toastContainer"></div>
+<script type="module" src="/js/firebase-config.js"></script>
+<script type="module" src="/js/app.js"></script>
+<script type="module">
+function showToast(msg,type){var c=document.getElementById('toastContainer'),e=document.createElement('div');e.className='toast toast-'+(type||'info');e.textContent=msg;c.appendChild(e);setTimeout(function(){e.style.animation='toastOut 0.3s ease both';setTimeout(function(){e.remove()},300)},3500)}
+function toggleSidebar(){document.querySelector('.sidebar').classList.toggle('open')}
+document.addEventListener('click',function(e){var s=document.querySelector('.sidebar'),t=document.querySelector('.menu-toggle');if(window.innerWidth<=900&&!s.contains(e.target)&&!t.contains(e.target)){s.classList.remove('open')}})
+function logout(){auth.signOut().then(function(){localStorage.removeItem('currentUser');window.location.href='../auth/Login_Internate.html'})}
+auth.onAuthStateChanged(async function(user){document.getElementById('loadingOverlay').classList.add('hidden');if(user){initAdminLink();var userData={};try{var userDoc=await db.collection('users').doc(user.uid).get();if(userDoc.exists)userData=userDoc.data()}catch(e){console.warn('Firestore indisponible:',e.message)}localStorage.setItem('currentUser',JSON.stringify({uid:user.uid,email:user.email}));var prenom=userData.prenom||(user.displayName?user.displayName.split(' ')[0]:'')||'Utilisateur';var nom=userData.nom||(user.displayName?user.displayName.split(' ').slice(1).join(' '):'')||'';var initial=(prenom[0]||'?').toUpperCase();document.getElementById('profileAvatar').textContent=initial;document.getElementById('profileName').textContent=(prenom+' '+nom).trim();document.getElementById('profileEmail').textContent=user.email;document.getElementById('avatarEl').textContent=initial;document.getElementById('userNameEl').textContent=(prenom+' '+nom).trim();document.getElementById('inputPrenom').value=prenom==='Utilisateur'?'':prenom;document.getElementById('inputNom').value=nom;document.getElementById('inputEmail').value=user.email;}else{window.location.href='../auth/Login_Internate.html'}})
+async function saveProfile(e){e.preventDefault();var prenom=document.getElementById('inputPrenom').value.trim();var nom=document.getElementById('inputNom').value.trim();if(!prenom||!nom){showToast('Veuillez remplir tous les champs.','error');return}var btn=document.getElementById('saveBtn');btn.disabled=true;btn.textContent='Enregistrement...';try{var user=auth.currentUser;if(!user)throw new Error('Non connecte');await db.collection('users').doc(user.uid).set({prenom:prenom,nom:nom},{merge:true});localStorage.setItem('currentUser',JSON.stringify({uid:user.uid,email:user.email}));document.getElementById('profileName').textContent=prenom+' '+nom;document.getElementById('profileAvatar').textContent=prenom[0].toUpperCase();document.getElementById('avatarEl').textContent=prenom[0].toUpperCase();document.getElementById('userNameEl').textContent=prenom+' '+nom;document.getElementById('successAlert').style.display='flex';document.getElementById('errorAlert').style.display='none';showToast('Profil mis a jour !','success');setTimeout(function(){document.getElementById('successAlert').style.display='none'},3000)}catch(err){console.error('Erreur sauvegarde profil:',err);document.getElementById('errorAlert').style.display='flex';document.getElementById('successAlert').style.display='none';showToast('Erreur: '+err.message,'error')}finally{btn.disabled=false;btn.textContent='Enregistrer'}}
+window.toggleSidebar = toggleSidebar;
+window.logout = logout;
+window.saveProfile = saveProfile;
+</script>
+
+
+
+<!-- NOTIFICATION PANEL -->
+<div class="notif-panel" id="notifPanel">
+  <div class="notif-panel-header">
+    <h3>🔔 Notifications</h3>
+    <button class="notif-panel-close" onclick="closeNotifPanel()">✕</button>
+  </div>
+  <div class="notif-list" id="notifList">
+    <div class="notif-empty">Aucune notification pour le moment.</div>
+  </div>
+  <div class="notif-mark-read" onclick="markAllNotifRead()">Tout marquer comme lu</div>
+</div>
+<script type="module">
+window.openNotifPanel = function() {
+  document.getElementById('notifPanel').classList.add('open');
+  loadNotifications();
+};
+window.closeNotifPanel = function() {
+  document.getElementById('notifPanel').classList.remove('open');
+};
+function loadNotifications() {
+  var user = auth && auth.currentUser;
+  if (!user) return;
+  var list = document.getElementById('notifList');
+  db.collection('notifications').where('userId', '==', user.uid).orderBy('createdAt', 'desc').limit(50).get().then(function(snap) {
+    if (snap.empty) { list.innerHTML = '<div class="notif-empty">Aucune notification pour le moment.</div>'; return; }
+    list.innerHTML = '';
+    snap.forEach(function(doc) {
+      var d = doc.data();
+      var iconClass = d.type === 'levelup' ? 'levelup' : d.type === 'comment' ? 'comment' : 'class';
+      var iconEmoji = d.type === 'levelup' ? '🎉' : d.type === 'comment' ? '💬' : '👥';
+      var cls = d.read ? '' : 'unread';
+      var time = d.createdAt ? new Date(d.createdAt.seconds*1000).toLocaleDateString('fr-FR', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
+      list.innerHTML += '<div class="notif-item ' + cls + '" onclick="markNotifRead(\'' + escapeJsStr(doc.id) + '\')"><div class="notif-icon ' + iconClass + '">' + iconEmoji + '</div><div class="notif-body"><div class="notif-title">' + escapeHtml(d.title || '') + '</div><p>' + escapeHtml(d.body || '') + '</p><div class="notif-time">' + escapeHtml(time) + '</div></div></div>';
+    });
+  }).catch(function() {});
+}
+window.markNotifRead = function(id) {
+  db.collection('notifications').doc(id).update({ read: true }).then(function() { updateNotificationBadge(); loadNotifications(); });
+};
+window.markAllNotifRead = function() {
+  var user = auth && auth.currentUser;
+  if (!user) return;
+  db.collection('notifications').where('userId', '==', user.uid).where('read', '==', false).get().then(function(snap) {
+    var batch = db.batch();
+    snap.forEach(function(doc) { batch.update(doc.ref, { read: true }); });
+    return batch.commit();
+  }).then(function() { updateNotificationBadge(); loadNotifications(); });
+};
+function loadGamificationStats() {
+  var user = auth && auth.currentUser;
+  if (!user) return;
+  db.collection('userStats').doc(user.uid).get().then(function(doc) {
+    if (doc.exists) {
+      var d = doc.data();
+      document.getElementById('xpDisplay').textContent = '⚡ ' + (d.xp || 0) + ' XP';
+      document.getElementById('levelDisplay').textContent = d.level || 1;
+      document.getElementById('streakDisplay').textContent = '🔥 ' + (d.streak || 0) + ' jours';
+    }
+  }).catch(function() {});
+}
+auth.onAuthStateChanged(function(user) {
+  if (user) {
+    loadGamificationStats();
+    startNotificationPolling();
+  }
+});
+</script>
+</body>
+</html>

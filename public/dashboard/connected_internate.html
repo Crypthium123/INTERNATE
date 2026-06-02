@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Internate</title>
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  :root {
+    --bg: #09090f;
+    --surface: #11111c;
+    --surface2: #1a1a2e;
+    --surface3: rgba(255,255,255,0.03);
+    --border: rgba(255,255,255,0.07);
+    --accent: #6c63ff;
+    --accent2: #00d4aa;
+    --accent3: #ff6b6b;
+    --accent4: #ffa94d;
+    --text: #e8e8f0;
+    --muted: #6b6b8a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+  }
+
+  /* ---- SIDEBAR ---- */
+  .sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 28px 16px;
+    position: fixed;
+    height: 100vh;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    z-index: 10;
+    animation: slideRight 0.4s ease both;
+  }
+  .sidebar::-webkit-scrollbar { display: none; }
+
+  @keyframes slideRight {
+    from { transform: translateX(-100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+
+  .sidebar-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.4rem;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, #6c63ff, #00d4aa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    padding: 0 12px;
+    margin-bottom: 36px;
+  }
+
+  .nav-section-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0 12px;
+    margin-bottom: 8px;
+    margin-top: 24px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--muted);
+    font-size: 0.88rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    cursor: pointer;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+  }
+
+  .nav-item:hover {
+    color: var(--text);
+    background: var(--hover-overlay);
+  }
+
+  .nav-item.active {
+    color: var(--accent);
+    background: var(--overlay-accent);
+  }
+
+  .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .user-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .user-card:hover { background: var(--hover-overlay); }
+
+  .avatar {
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .user-info strong {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .user-info span {
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+
+  .logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    color: var(--muted);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 4px;
+    border: none;
+    background: none;
+    width: 100%;
+  }
+  .logout-btn:hover { color: var(--accent3); background: var(--btn-danger-bg); }
+
+  /* ---- MAIN ---- */
+  .main {
+    margin-left: 260px;
+    flex: 1;
+    padding: 40px 48px;
+    max-width: calc(100vw - 260px);
+    animation: fadeIn 0.5s ease 0.2s both;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ---- TOPBAR ---- */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 48px;
+  }
+
+  .greeting h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.8rem;
+    letter-spacing: -0.03em;
+    margin-bottom: 4px;
+  }
+
+  .greeting p { color: var(--muted); font-size: 0.9rem; }
+
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .search-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    width: 260px;
+    transition: border-color 0.2s;
+  }
+  .search-bar:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--overlay-accent);
+  }
+
+  .search-bar input {
+    background: none;
+    border: none;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.87rem;
+    outline: none;
+    width: 100%;
+  }
+  .search-bar input::placeholder { color: var(--muted); }
+
+  /* ---- SECTION TITLE ---- */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .section-header h2 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.15rem;
+    letter-spacing: -0.02em;
+  }
+
+  .see-all {
+    font-size: 0.8rem;
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+    transition: opacity 0.2s;
+  }
+  .see-all:hover { opacity: 0.7; }
+
+  /* ---- STATS TABS ---- */
+  .stats-tabs{display:flex;gap:4px;margin-bottom:20px;border-bottom:1px solid var(--border);padding-bottom:8px}
+  .stats-tab{padding:6px 16px;border-radius:6px;border:none;background:transparent;color:var(--muted);
+  font-size:0.78rem;font-weight:600;cursor:pointer;transition:all 0.15s;font-family:'DM Sans',sans-serif}
+  .stats-tab:hover{color:var(--text);background:var(--surface2)}
+  .stats-tab.active{color:var(--accent);background:rgba(108,99,255,0.1)}
+  .stats-panel{display:none}
+  .stats-panel.active{display:block}
+
+  /* ---- STATS CARDS ---- */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 22px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .stat-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255,255,255,0.12);
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--card-accent, var(--accent));
+  }
+
+  .stat-card .card-icon {
+    font-size: 1.3rem;
+    margin-bottom: 12px;
+  }
+
+  .stat-card .card-value {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.7rem;
+    letter-spacing: -0.03em;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .stat-card .card-label {
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  /* ---- CHART ---- */
+  .chart-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:40px}
+  .chart-wrap h3{font-family:'Syne',sans-serif;font-size:0.9rem;margin-bottom:16px}
+  .chart{display:flex;align-items:flex-end;gap:6px;height:120px;padding:0 8px}
+  .chart-bar{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+  .chart-bar .bar{width:100%;border-radius:4px 4px 0 0;min-height:4px;transition:height 0.4s ease;position:relative;cursor:pointer}
+  .chart-bar .bar:hover{opacity:0.8}
+  .chart-bar .day{font-size:0.62rem;color:var(--muted);text-transform:uppercase}
+  .chart-bar .val{font-size:0.62rem;color:var(--text2);font-weight:600}
+  .chart-empty{text-align:center;color:var(--muted);font-size:0.82rem;padding:40px}
+
+  /* ---- QUICK ACTIONS ---- */
+  .quick-row{display:flex;gap:10px;margin-bottom:32px;flex-wrap:wrap}
+  .quick-btn{display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:10px;
+  border:1px solid var(--border);background:var(--surface);color:var(--text);
+  text-decoration:none;font-size:0.82rem;font-weight:500;transition:all 0.15s;cursor:pointer;
+  font-family:'DM Sans',sans-serif}
+  .quick-btn:hover{border-color:var(--accent);background:rgba(108,99,255,0.06);transform:translateY(-1px)}
+  .quick-btn .icon{font-size:1rem}
+
+  /* ---- PROGRESS SECTION ---- */
+  .progress-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:32px}
+  .progress-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px}
+  .progress-item .label{font-size:0.72rem;color:var(--muted);margin-bottom:6px}
+  .progress-item .pbar{height:6px;background:var(--surface2);border-radius:100px;overflow:hidden}
+  .progress-item .pfill{height:100%;border-radius:100px;transition:width 0.4s ease}
+  .progress-item .pfill.xp{background:linear-gradient(135deg,#6c63ff,#a78bfa)}
+  .progress-item .pfill.courses{background:linear-gradient(135deg,#00d4aa,#34d399)}
+  .progress-item .pfill.tools{background:linear-gradient(135deg,#ffa94d,#ff6b35)}
+  .progress-item .stat{font-size:0.78rem;color:var(--text2);margin-top:4px}
+
+  /* ---- TOOLS GRID ---- */
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 40px;
+  }
+
+  .tool-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 22px;
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.25s;
+    display: block;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  .tool-card::after {
+    content: '→';
+    position: absolute;
+    top: 20px; right: 20px;
+    color: var(--muted);
+    font-size: 1rem;
+    transition: all 0.2s;
+  }
+
+  .tool-card:hover {
+    background: var(--surface2);
+    border-color: var(--tool-color, var(--accent));
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+  }
+
+  .tool-card:hover::after {
+    transform: translateX(4px);
+    color: var(--tool-color, var(--accent));
+  }
+
+  .tool-card-icon {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+    margin-bottom: 16px;
+    background: var(--tool-bg, var(--overlay-accent));
+  }
+
+  .tool-card-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 6px;
+  }
+
+  .tool-card-desc {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* ---- COURS GRID ---- */
+  .cours-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+
+  .cours-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.25s;
+    display: block;
+    cursor: pointer;
+  }
+
+  .cours-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+    border-color: rgba(255,255,255,0.12);
+  }
+
+  .cours-thumb {
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    background: var(--thumb-bg, linear-gradient(135deg, #1a1a2e, #2a2040));
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cours-thumb::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--thumb-overlay, rgba(108,99,255,0.08));
+  }
+
+  .cours-body {
+    padding: 16px 18px;
+  }
+
+  .cours-matiere {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--subject-color, var(--accent));
+    margin-bottom: 6px;
+  }
+
+  .cours-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+    line-height: 1.3;
+  }
+
+  .cours-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  .cours-badge {
+    padding: 3px 8px;
+    background: var(--hover-overlay);
+    border-radius: 100px;
+    font-size: 0.7rem;
+  }
+
+  /* ---- EMPTY STATE ---- */
+  .empty-state {
+    text-align: center;
+    padding: 60px 40px;
+    grid-column: 1 / -1;
+    color: var(--muted);
+  }
+
+  .empty-state .empty-icon { font-size: 3rem; margin-bottom: 16px; }
+  .empty-state p { font-size: 0.9rem; line-height: 1.6; }
+
+  /* ---- DASHBOARD COURSE CARD OVERRIDE ---- */
+  #dashboardCoursGrid .cours-card {
+    cursor: pointer;
+  }
+
+
+
+  .menu-toggle {
+    display: none;
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 60;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    width: 40px; height: 40px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    color: var(--text);
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .menu-toggle:hover { background: var(--surface2); }
+  @media (max-width: 900px) {
+    .menu-toggle { display: flex; position: fixed; top: 12px; left: 12px; z-index: 60; }
+    .sidebar { transform: translateX(-100%); transition: transform 0.3s ease; z-index: 55; width: 260px; }
+    .sidebar.open { transform: translateX(0); }
+    .main { margin-left: 0; width: 100%; max-width: 100%; }
+    .topbar { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .search-bar { width: 100%; max-width: 100%; }
+    .topbar-right { width: 100%; }
+    .greeting h1 { font-size: 1.4rem; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .stat-card { padding: 16px; }
+    .stat-card .card-value { font-size: 1.3rem; }
+    .tools-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .cours-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .page-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .greeting p { font-size: 0.82rem; }
+  }
+  @media (max-width: 600px) {
+    .main { padding: 14px 10px; padding-top: 64px; }
+    .stats-row { grid-template-columns: 1fr; gap: 8px; }
+    .tools-grid { grid-template-columns: 1fr; gap: 8px; }
+    .cours-grid { grid-template-columns: 1fr; gap: 8px; }
+    .greeting h1 { font-size: 1.2rem; }
+    .greeting p { font-size: 0.78rem; }
+    .tool-card { padding: 14px 12px; }
+    .tool-card-icon { width: 32px; height: 32px; font-size: 1rem; }
+    .tool-card-name { font-size: 0.8rem; }
+    .section-title { font-size: 0.95rem; }
+    .topbar-right .user-info { gap: 8px; }
+    .topbar-right .avatar { width: 32px; height: 32px; font-size: 0.8rem; }
+    .topbar-right .user-name { font-size: 0.8rem; }
+  }
+  @media (max-width: 400px) {
+    .main { padding: 10px 8px; padding-top: 60px; }
+    .stat-card { padding: 10px; }
+    .stat-card .card-value { font-size: 1.1rem; }
+    .search-bar { padding: 8px 12px; }
+    .sidebar { width: 220px; }
+    .greeting h1 { font-size: 1rem; }
+  }
+
+  /* Loading spinner overlay */
+  .loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.4s ease;
+  }
+  .loading-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  .loading-overlay p {
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-top: 16px;
+  }
+</style>
+</head>
+<body>
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <p>Chargement...</p>
+</div>
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <header role="banner">
+    <a href="../dashboard/connected_internate.html" class="sidebar-logo">Internate</a>
+  </header>
+
+  <nav aria-label="Navigation principale">
+  <div class="nav-section-label">Principal</div>
+  <a class="nav-item active" href="#">
+    <span class="nav-icon">🏠</span> Dashboard
+  </a>
+  <a class="nav-item" href="../courses/Ressources_ex.html">
+    <span class="nav-icon">📚</span> Mes cours
+  </a>
+  <a class="nav-item" href="../classes/">
+    <span class="nav-icon">👥</span> Classes
+  </a>
+  <button class="notif-btn" onclick="openNotifPanel()">
+    <span class="nav-icon">🔔</span> Notifications
+    <span class="notif-badge" id="notifBadge">0</span>
+  </button>
+
+  <div class="nav-section-label">Outils</div>
+  <a class="nav-item" href="../tools/Calculatrice_Scientifique.html">
+    <span class="nav-icon">🧮</span> Calculatrice
+  </a>
+  <a class="nav-item" href="../tools/Convertisseur_Unites.html">
+    <span class="nav-icon">📊</span> Convertisseur
+  </a>
+  <a class="nav-item" href="../tools/Fabricateur_Fiches.html">
+    <span class="nav-icon">🗂️</span> Fiches
+  </a>
+  <a class="nav-item" href="../tools/Generateur_QCM.html">
+    <span class="nav-icon">📋</span> QCM
+  </a>
+  <a class="nav-item" href="../tools/Minuteur_Pomodoro.html">
+    <span class="nav-icon">⏱️</span> Pomodoro
+  </a>
+  <a class="nav-item" href="../tools/Redacteur_Plan.html">
+    <span class="nav-icon">📝</span> Plan
+  </a>
+  <a class="nav-item" href="../tools/Tableau_Blanc.html">
+    <span class="nav-icon">🎨</span> Tableau Blanc
+  </a>
+  <a class="nav-item" href="../tools/Analyseur_Texte.html">
+    <span class="nav-icon">&#x1F50D;</span> Analyseur de Texte
+  </a>
+  <a class="nav-item" href="../tools/Calculateur_Moyenne.html">
+    <span class="nav-icon">&#x1F4C8;</span> Calculateur de Moyenne
+  </a>
+  <a class="nav-item" href="../tools/Conjugueur_Francais.html">
+    <span class="nav-icon">&#x1F4D6;</span> Conjugueur Français
+  </a>
+  <a class="nav-item" href="../tools/Generateur_Citations.html">
+    <span class="nav-icon">&#x1F4AC;</span> Générateur de Citations
+  </a>
+</nav>
+
+<div class="sidebar-footer">
+    <div class="user-card" id="userCard">
+      <div class="avatar" id="avatarEl">?</div>
+      <div class="user-info">
+        <strong id="userNameEl">Utilisateur</strong>
+        <span id="userEmailEl">—</span>
+      </div>
+    </div>
+    <button class="logout-btn" id="installBtn" onclick="installPWA()" style="display:none;">
+      <span>⬇️</span> Installer l'app
+    </button>
+    <a href="../profile/index.html" class="logout-btn" style="text-decoration:none;"><span>&#128100;</span> Mon profil</a>
+    <a href="../admin/" class="logout-btn" id="adminLink" style="display:none;text-decoration:none;"><span>⚙️</span> Administration</a>
+    <button class="logout-btn" onclick="logout()">
+      <span>🚪</span> Se déconnecter
+    </button>
+    <a href="../contact.html" class="logout-btn" style="text-decoration:none;margin-top:2px;">
+      <span>💬</span> Contact & retours
+    </a>
+  </div>
+</aside>
+<button class="menu-toggle" onclick="toggleSidebar()" aria-label="Menu">&#9776;</button>
+
+<!-- MAIN -->
+<main role="main" class="main">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="greeting">
+      <h1 id="greetingTitle">Bonjour 👋</h1>
+      <p id="greetingDate">Chargement…</p>
+      <p id="dailyQuote" style="font-size:0.85rem;color:var(--accent2);margin-top:6px;font-style:italic;"></p>
+    </div>
+    <div class="topbar-right">
+      <div class="search-bar">
+        <span>🔍</span>
+        <input type="text" id="dashboardSearch" placeholder="Rechercher un cours, un outil…" oninput="filterDashboard()">
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS TABS -->
+  <div class="stats-tabs">
+    <button class="stats-tab active" onclick="switchStatsTab('cards',this)">📊 Résumé</button>
+    <button class="stats-tab" onclick="switchStatsTab('chart',this)">📈 Progression</button>
+  </div>
+
+  <!-- STATS CARDS -->
+  <div class="stats-panel active" id="statsCards">
+  <div class="stats-row">
+    <div class="stat-card" style="--card-accent: var(--accent);">
+      <div class="card-icon">📚</div>
+      <div class="card-value" id="statsCoursCount">3</div>
+      <div class="card-label">Cours disponibles</div>
+    </div>
+    <div class="stat-card" style="--card-accent: var(--accent2);">
+      <div class="card-icon">🔧</div>
+      <div class="card-value">11</div>
+      <div class="card-label">Outils intégrés</div>
+    </div>
+    <div class="stat-card" style="--card-accent: var(--accent4);">
+      <div class="card-icon">⚡</div>
+      <div class="card-value" id="statsXp">— XP</div>
+      <div class="card-label" id="statsLevel">Niveau 1</div>
+    </div>
+    <div class="stat-card" style="--card-accent: var(--accent3);">
+      <div class="card-icon">🔥</div>
+      <div class="card-value" id="statsStreak">—</div>
+      <div class="card-label">Jours de suite</div>
+    </div>
+  </div>
+  </div>
+
+  <!-- STATS CHART -->
+  <div class="stats-panel" id="statsChart">
+  <div class="chart-wrap">
+    <h3>📈 XP des 7 derniers jours</h3>
+    <div class="chart" id="xpChart"><div class="chart-empty">Connecte-toi pour voir tes stats</div></div>
+  </div>
+  </div>
+
+  <!-- QUICK ACTIONS -->
+  <div class="section-header">
+    <h2>Actions rapides</h2>
+    <span></span>
+  </div>
+  <div class="quick-row">
+    <a class="quick-btn" href="../courses/Ressources_ex.html"><span class="icon">📚</span> Voir les cours</a>
+    <a class="quick-btn" href="../profile/index.html"><span class="icon">👤</span> Mon profil</a>
+    <a class="quick-btn" href="../tools/Fabricateur_Fiches.html"><span class="icon">🗂️</span> Créer une fiche</a>
+    <a class="quick-btn" href="../tools/Generateur_QCM.html"><span class="icon">📋</span> Faire un QCM</a>
+    <a class="quick-btn" href="#" onclick="var p=document.getElementById('pomodoro');if(p){p.classList.toggle('open')};return false"><span class="icon">⏱️</span> Pomodoro</a>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="progress-summary" id="progressSummary">
+    <div class="progress-item"><div class="label">⚡ XP</div><div class="pbar"><div class="pfill xp" id="xpProgress" style="width:0%"></div></div><div class="stat" id="xpProgressLabel">0 / 500 XP</div></div>
+    <div class="progress-item"><div class="label">📚 Cours complétés</div><div class="pbar"><div class="pfill courses" id="courseProgress" style="width:0%"></div></div><div class="stat" id="courseProgressLabel">0 / 0</div></div>
+    <div class="progress-item"><div class="label">🔧 Outils utilisés</div><div class="pbar"><div class="pfill tools" id="toolProgress" style="width:0%"></div></div><div class="stat" id="toolProgressLabel">0 outils</div></div>
+  </div>
+
+  <!-- OUTILS -->
+  <div class="section-header">
+    <h2>Outils de révision</h2>
+    <span></span>
+  </div>
+  <div class="tools-grid" style="margin-bottom:48px;">
+    <a class="tool-card" href="../tools/Calculatrice_Scientifique.html" onclick="trackToolUsage('Calculatrice')" style="--tool-color: #6c63ff; --tool-bg: rgba(108,99,255,0.12);">
+      <div class="tool-card-icon">🧮</div>
+      <div class="tool-card-name">Calculatrice Scientifique</div>
+      <div class="tool-card-desc">Calculs avancés avec fonctions trigonométriques et scientifiques</div>
+    </a>
+    <a class="tool-card" href="../tools/Convertisseur_Unites.html" onclick="trackToolUsage('Convertisseur')" style="--tool-color: #00d4aa; --tool-bg: rgba(0,212,170,0.12);">
+      <div class="tool-card-icon">📊</div>
+      <div class="tool-card-name">Convertisseur d'Unités</div>
+      <div class="tool-card-desc">Convertit longueur, masse, température, vitesse, volume et énergie</div>
+    </a>
+    <a class="tool-card" href="../tools/Fabricateur_Fiches.html" onclick="trackToolUsage('Fiches')" style="--tool-color: #ffa94d; --tool-bg: rgba(255,169,77,0.12);">
+      <div class="tool-card-icon">🗂️</div>
+      <div class="tool-card-name">Fabricateur de Fiches</div>
+      <div class="tool-card-desc">Crée des fiches de révision recto-verso personnalisées</div>
+    </a>
+    <a class="tool-card" href="../tools/Generateur_QCM.html" onclick="trackToolUsage('QCM')" style="--tool-color: #a78bfa; --tool-bg: rgba(167,139,250,0.12);">
+      <div class="tool-card-icon">📋</div>
+      <div class="tool-card-name">Générateur de QCM</div>
+      <div class="tool-card-desc">Crée et joue à des QCM personnalisés</div>
+    </a>
+    <a class="tool-card" href="../tools/Minuteur_Pomodoro.html" onclick="trackToolUsage('Pomodoro')" style="--tool-color: #ff6b6b; --tool-bg: rgba(255,107,107,0.12);">
+      <div class="tool-card-icon">⏱️</div>
+      <div class="tool-card-name">Minuteur Pomodoro</div>
+      <div class="tool-card-desc">Optimise ton temps d'étude avec la méthode Pomodoro</div>
+    </a>
+    <a class="tool-card" href="../tools/Redacteur_Plan.html" onclick="trackToolUsage('Plan')" style="--tool-color: #34d399; --tool-bg: rgba(52,211,153,0.12);">
+      <div class="tool-card-icon">📝</div>
+      <div class="tool-card-name">Rédacteur de Plan</div>
+      <div class="tool-card-desc">Structure tes dissertations, comptes-rendus et exposés</div>
+    </a>
+    <a class="tool-card" href="../tools/Tableau_Blanc.html" onclick="trackToolUsage('TableauBlanc')" style="--tool-color: #f472b6; --tool-bg: rgba(244,114,182,0.12);">
+      <div class="tool-card-icon">🎨</div>
+      <div class="tool-card-name">Tableau Blanc</div>
+      <div class="tool-card-desc">Dessine, annote et exporte tes schémas</div>
+    </a>
+    <a class="tool-card" href="../tools/Analyseur_Texte.html" onclick="trackToolUsage('Analyseur')" style="--tool-color: #8b5cf6; --tool-bg: rgba(139,92,246,0.12);">
+      <div class="tool-card-icon">🔍</div>
+      <div class="tool-card-name">Analyseur de Texte</div>
+      <div class="tool-card-desc">Fréquence des mots, lisibilité, ton et statistiques</div>
+    </a>
+    <a class="tool-card" href="../tools/Calculateur_Moyenne.html" onclick="trackToolUsage('Moyenne')" style="--tool-color: #22c55e; --tool-bg: rgba(34,197,94,0.12);">
+      <div class="tool-card-icon">📈</div>
+      <div class="tool-card-name">Calculateur de Moyenne</div>
+      <div class="tool-card-desc">Calcule ta moyenne générale pondérée sur 20</div>
+    </a>
+    <a class="tool-card" href="../tools/Conjugueur_Francais.html" onclick="trackToolUsage('Conjugueur')" style="--tool-color: #eab308; --tool-bg: rgba(234,179,8,0.12);">
+      <div class="tool-card-icon">📖</div>
+      <div class="tool-card-name">Conjugueur Français</div>
+      <div class="tool-card-desc">Conjugue tous les verbes français à tous les temps</div>
+    </a>
+    <a class="tool-card" href="../tools/Generateur_Citations.html" onclick="trackToolUsage('Citations')" style="--tool-color: #ec4899; --tool-bg: rgba(236,72,153,0.12);">
+      <div class="tool-card-icon">💬</div>
+      <div class="tool-card-name">Générateur de Citations</div>
+      <div class="tool-card-desc">Découvre des citations inspirantes</div>
+    </a>
+  </div>
+
+  <!-- COURS -->
+  <div class="section-header">
+    <h2>Derniers cours</h2>
+    <a href="../courses/Ressources_ex.html" class="see-all">Tous les cours →</a>
+  </div>
+  <div class="cours-grid" id="dashboardCoursGrid"></div>
+</main>
+
+<script type="module" src="/js/firebase-config.js"></script>
+
+<script type="module">
+  window.logout = function() {
+    auth.signOut().then(() => {
+      localStorage.removeItem("currentUser");
+      window.location.href = "../auth/Login_Internate.html";
+    });
+  };
+
+  window.filterDashboard = function() {
+    const q = document.getElementById('dashboardSearch').value.toLowerCase();
+    document.querySelectorAll('.tool-card, .cours-card').forEach(el => {
+      el.style.display = el.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+  };
+
+  window.switchStatsTab = function(tab,btn){
+document.querySelectorAll('.stats-tab').forEach(function(t){t.classList.remove('active')});
+document.querySelectorAll('.stats-panel').forEach(function(p){p.classList.remove('active')});
+btn.classList.add('active');
+document.getElementById('stats'+(tab==='cards'?'Cards':'Chart')).classList.add('active');
+if(tab==='chart')renderXPChart();
+};
+
+function renderXPChart(){
+var chart=document.getElementById('xpChart');
+var days=JSON.parse(localStorage.getItem('internate_xp_days')||'{}');
+var dates=[];for(var i=6;i>=0;i--){var d=new Date();d.setDate(d.getDate()-i);dates.push(d.toDateString())}
+var values=dates.map(function(d){return days[d]||0});
+var max=Math.max.apply(null,values,1);
+if(values.every(function(v){return v===0})){
+chart.innerHTML='<div class="chart-empty">🔍 Pas encore de données cette semaine. Utilise les outils et consulte les cours pour gagner de l\'XP !</div>';return}
+chart.innerHTML=values.map(function(v,i){
+var pct=v/max*100;
+var label=dates[i];
+var dayName=new Date(label).toLocaleDateString('fr-FR',{weekday:'short'}).replace('.','');
+return'<div class="chart-bar"><div class="bar" style="height:'+Math.max(pct,4)+'%;background:linear-gradient(180deg,#6c63ff,var(--accent2,#00d4aa))" title="'+v+' XP"></div><div class="val">'+v+'</div><div class="day">'+dayName+'</div></div>';
+}).join('');
+}
+
+window.trackToolUsage = function(toolName){
+var data=JSON.parse(localStorage.getItem('internate_tool_usage')||'{}');
+data[toolName]=(data[toolName]||0)+1;
+localStorage.setItem('internate_tool_usage',JSON.stringify(data));
+updateToolProgress();
+};
+
+window.updateToolProgress = function(){
+var data=JSON.parse(localStorage.getItem('internate_tool_usage')||'{}');
+var count=Object.keys(data).length;
+var total=11;
+document.getElementById('toolProgress').style.width=Math.min((count/total)*100,100)+'%';
+document.getElementById('toolProgressLabel').textContent=count+'/'+total+' outils';
+};
+
+window.updateXPProgress = function(xp,nextLevelXp){
+var needed=nextLevelXp||500;
+var pct=needed>0?((xp%needed)/needed)*100:0;
+document.getElementById('xpProgress').style.width=Math.min(pct,100)+'%';
+document.getElementById('xpProgressLabel').textContent=(xp%needed)+' / '+needed+' XP';
+};
+
+window.loadDashboardCourses = function() {
+    const grid = document.getElementById('dashboardCoursGrid');
+    const all = JSON.parse(localStorage.getItem('internate_courses') || '[]');
+    const recent = all.slice(-3).reverse();
+
+    document.querySelector('#statsCoursCount').textContent = all.length || '0';
+
+    if (!recent.length) {
+      grid.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><p>Aucun cours pour le moment.</p></div>';
+      return;
+    }
+
+    grid.innerHTML = recent.map(c => {
+      const colors = {
+        mathematiques: '#6c63ff', 'physique-chimie': '#00d4aa', francais: '#ffa94d',
+        'histoire-geo': '#a78bfa', anglais: '#ff6b6b', espagnol: '#f97316',
+        allemand: '#eab308', svt: '#22c55e', nsi: '#3b82f6', ses: '#ec4899',
+        philosophie: '#8b5cf6', arts: '#f472b6', eps: '#14b8a6'
+      };
+      const color = colors[c.matiere] || '#6b7280';
+      return `<a class="cours-card" href="../courses/Ressources_ex.html" style="--thumb-bg: linear-gradient(135deg, ${color}22, ${color}44); --thumb-overlay: rgba(0,0,0,0.1);">
+            <div class="cours-thumb">${escapeHtml(c.matiereIcon || '📁')}</div>
+        <div class="cours-body">
+          <div class="cours-matiere" style="color:${escapeAttr(color)}">${escapeHtml(c.matiereLabel || c.matiere)}</div>
+          <div class="cours-title">${escapeHtml(c.title)}</div>
+          <div class="cours-meta"><span>${c.annee === '1ere' ? '1ère' : escapeHtml(c.annee || '')}</span></div>
+        </div>
+      </a>`;
+    }).join('');
+  };
+
+  window.setDailyQuote = function() {
+    const quotes = [
+      "Le succès, c'est d'aller d'échec en échec sans perdre son enthousiasme. — Winston Churchill",
+      "L'éducation est l'arme la plus puissante pour changer le monde. — Nelson Mandela",
+      "Le travail n'attend pas, il faut le saisir. — Proverbe français",
+      "La volonté permet de grimper sur les cimes ; sans elle, on reste au bas de la montagne. — Confucius",
+      "Il n'y a pas de génie sans un grain de folie. — Aristote",
+      "Qui veut faire quelque chose trouve un moyen ; qui ne veut rien faire trouve une excuse. — Proverbe arabe",
+      "Apprendre est un trésor qui suivra son propriétaire partout. — Proverbe chinois",
+      "L'avenir appartient à ceux qui se lèvent tôt. — Proverbe français",
+      "Le savoir est la seule chose qui grandit quand on la partage. — Socrate",
+      "Petit à petit, l'oiseau fait son nid. — Proverbe français",
+      "Rien n'est impossible, seules les limites de notre esprit définissent certaines choses comme irréalisables. — Marc Aurèle",
+      "Le succès est la somme de petits efforts répétés jour après jour. — Robert Collier",
+      "Ne remets pas à demain ce que tu peux faire aujourd'hui. — Proverbe français",
+      "La confiance en soi est le premier secret du succès. — Ralph Waldo Emerson",
+      "Qui cherche trouve. — Proverbe français",
+      "Le savoir ne pèse rien. — Proverbe français",
+      "C'est en forgeant qu'on devient forgeron. — Proverbe français",
+      "Les grandes choses sont faites de petites choses. — Vincent Van Gogh",
+      "Le courage n'est pas l'absence de peur, mais la capacité de vaincre ce qui fait peur. — Nelson Mandela",
+      "La persévérance est à la réussite ce que l'écume est au chocolat chaud. — Inconnu",
+      "Un problème sans solution est un problème mal posé. — Albert Einstein",
+      "Fais de ta vie un rêve, et d'un rêve, une réalité. — Antoine de Saint-Exupéry",
+      "Chaque jour est une nouvelle chance. — Inconnu",
+      "Le meilleur moyen de prédire l'avenir est de le créer. — Peter Drucker",
+      "L'intelligence, c'est la capacité de s'adapter au changement. — Stephen Hawking",
+      "La chute n'est pas un échec, l'échec c'est de rester là où on est tombé. — Socrate",
+      "Le vrai génie réside dans la capacité d'évaluer l'incertain. — Napoléon Bonaparte",
+      "Tout est difficile avant d'être facile. — Thomas Fuller",
+      "Celui qui n'avance pas recule. — Proverbe français",
+      "Un voyage de mille lieues commence toujours par un premier pas. — Lao Tseu",
+      "Goutte à goutte, l'eau creuse la pierre. — Proverbe français"
+    ];
+    const today = new Date();
+    const start = new Date(today.getFullYear(), 0, 0);
+    const diff = today - start;
+    const oneDay = 86400000;
+    const dayOfYear = Math.floor(diff / oneDay);
+    const idx = dayOfYear % quotes.length;
+    document.getElementById('dailyQuote').textContent = '“ ' + quotes[idx] + ' ”';
+  };
+
+  auth.onAuthStateChanged(async (user) => {
+    document.getElementById('loadingOverlay').classList.add('hidden');
+    if (user) {
+      let userData = {};
+      try {
+        const userDoc = await db.collection("users").doc(user.uid).get();
+        if (userDoc.exists) userData = userDoc.data();
+      } catch (e) {
+        console.warn("Firestore indisponible, affichage avec les données locales:", e.message);
+        userData = {};
+      }
+      localStorage.setItem("currentUser", JSON.stringify({ uid: user.uid, email: user.email }));
+      const name = userData.prenom || user.displayName || "Utilisateur";
+      const initials = (userData.prenom?.[0] || (user.displayName?.[0]) || "?");
+      document.getElementById("avatarEl").textContent = initials.toUpperCase();
+      document.getElementById("userNameEl").textContent = `${userData.prenom || ""} ${userData.nom || ""}`.trim() || name;
+      document.getElementById("userEmailEl").textContent = userData.email || user.email || "";
+      const hour = new Date().getHours();
+      document.getElementById("greetingTitle").textContent = `${hour < 12 ? "Bonjour" : hour < 18 ? "Bon après-midi" : "Bonsoir"}, ${name} 👋`;
+      const dateStr = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+      document.getElementById('greetingDate').textContent = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+      setDailyQuote();
+      loadDashboardCourses();
+      updateToolProgress();
+      db.collection('userStats').doc(user.uid).get().then(function(doc) {
+        if (doc.exists) {
+          var d = doc.data();
+          var xpEl = document.getElementById('statsXp');
+          var levelEl = document.getElementById('statsLevel');
+          var streakEl = document.getElementById('statsStreak');
+          if (xpEl) xpEl.innerHTML = '⚡ ' + (d.xp || 0) + ' XP';
+          if (levelEl) levelEl.textContent = 'Niveau ' + (d.level || 1);
+          if (streakEl) streakEl.innerHTML = '🔥 ' + (d.streak || 0) + ' jours';
+
+          var xp=d.xp||0;
+          updateXPProgress(xp,500);
+          var days=JSON.parse(localStorage.getItem('internate_xp_days')||'{}');
+          var today=new Date().toDateString();
+          var oldXp=days[today]||0;
+          if(xp>oldXp){days[today]=xp;localStorage.setItem('internate_xp_days',JSON.stringify(days))}
+        }
+      }).catch(function() {});
+      startNotificationPolling();
+    } else {
+      window.location.href = "../auth/Login_Internate.html";
+    }
+  });
+
+window.toggleSidebar = function() {
+  document.querySelector('.sidebar').classList.toggle('open');
+};
+document.addEventListener('click', function(e) {
+  const sidebar = document.querySelector('.sidebar');
+  const toggle = document.querySelector('.menu-toggle');
+  if (window.innerWidth <= 900 && !sidebar.contains(e.target) && !toggle.contains(e.target)) {
+    sidebar.classList.remove('open');
+  }
+});
+</script>
+<script type="module" src="/js/app.js"></script>
+<div style="text-align:center;padding:20px;font-size:0.78rem;color:var(--muted);border-top:1px solid var(--border);margin-top:40px;">
+  Des retours ? <a href="../help/" style="color:var(--accent2);text-decoration:none;font-weight:500;">💬 Aide &amp; retours</a>
+</div>
+
+
+
+<!-- NOTIFICATION PANEL -->
+<div class="notif-panel" id="notifPanel">
+  <div class="notif-panel-header">
+    <h3>🔔 Notifications</h3>
+    <button class="notif-panel-close" onclick="closeNotifPanel()">✕</button>
+  </div>
+  <div class="notif-list" id="notifList">
+    <div class="notif-empty">Aucune notification pour le moment.</div>
+  </div>
+  <div class="notif-mark-read" onclick="markAllNotifRead()">Tout marquer comme lu</div>
+</div>
+<script type="module">
+window.openNotifPanel = function() {
+  document.getElementById('notifPanel').classList.add('open');
+  loadNotifications();
+};
+window.closeNotifPanel = function() {
+  document.getElementById('notifPanel').classList.remove('open');
+};
+function loadNotifications() {
+  var user = auth && auth.currentUser;
+  if (!user) return;
+  var list = document.getElementById('notifList');
+  db.collection('notifications').where('userId', '==', user.uid).orderBy('createdAt', 'desc').limit(50).get().then(function(snap) {
+    if (snap.empty) {
+      list.innerHTML = '<div class="notif-empty">Aucune notification pour le moment.</div>';
+      return;
+    }
+    list.innerHTML = '';
+    snap.forEach(function(doc) {
+      var d = doc.data();
+      var iconClass = d.type === 'levelup' ? 'levelup' : d.type === 'comment' ? 'comment' : 'class';
+      var iconEmoji = d.type === 'levelup' ? '🎉' : d.type === 'comment' ? '💬' : '👥';
+      var cls = d.read ? '' : 'unread';
+      var time = d.createdAt ? new Date(d.createdAt.seconds*1000).toLocaleDateString('fr-FR', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
+      list.innerHTML += '<div class="notif-item ' + cls + '" onclick="markNotifRead(\'' + escapeJsStr(doc.id) + '\')"><div class="notif-icon ' + iconClass + '">' + iconEmoji + '</div><div class="notif-body"><div class="notif-title">' + escapeHtml(d.title || '') + '</div><p>' + escapeHtml(d.body || '') + '</p><div class="notif-time">' + escapeHtml(time) + '</div></div></div>';
+    });
+  }).catch(function() {});
+}
+window.markNotifRead = function(id) {
+  db.collection('notifications').doc(id).update({ read: true }).then(function() {
+    updateNotificationBadge();
+    loadNotifications();
+  });
+};
+window.markAllNotifRead = function() {
+  var user = auth && auth.currentUser;
+  if (!user) return;
+  db.collection('notifications').where('userId', '==', user.uid).where('read', '==', false).get().then(function(snap) {
+    var batch = db.batch();
+    snap.forEach(function(doc) { batch.update(doc.ref, { read: true }); });
+    return batch.commit();
+  }).then(function() {
+    updateNotificationBadge();
+    loadNotifications();
+  });
+};
+</script>
+</body>
+</html>
+

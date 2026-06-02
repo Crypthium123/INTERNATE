@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tableau Blanc — Internate</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  .tool-topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 24px;
+    background: var(--surface-glass);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    z-index: 100;
+  }
+  .tool-topbar a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.82rem;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  .tool-topbar a:hover { color: var(--text); }
+  .tool-topbar .sep { color: var(--border); font-size: 0.7rem; }
+  .tool-topbar .current { color: var(--accent); font-size: 0.82rem; font-weight: 600; }
+  .back-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text);
+    text-decoration: none;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .back-btn:hover { background: var(--accent); border-color: var(--accent); color: white; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    height: 100vh;
+    padding-top: 52px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .toolbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 20px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .toolbar h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.3rem;
+    margin-right: auto;
+  }
+
+  .tool {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+  }
+
+  .tool:hover {
+    background: var(--overlay-accent);
+    border-color: var(--accent);
+  }
+
+  .tool.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
+
+  .tool-separator {
+    width: 1px;
+    height: 24px;
+    background: var(--border);
+  }
+
+  input[type="color"] {
+    width: 40px;
+    height: 32px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  input[type="range"] {
+    width: 100px;
+  }
+
+  .size-display {
+    font-size: 0.8rem;
+    color: var(--muted);
+    width: 40px;
+    text-align: center;
+  }
+
+  button {
+    padding: 8px 14px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  button:hover {
+    background: var(--hover-overlay);
+  }
+
+  button.danger {
+    color: var(--red);
+    border-color: var(--red);
+  }
+
+  button.danger:hover {
+    background: var(--overlay-red);
+  }
+
+  #canvas {
+    flex: 1;
+    background: white;
+    cursor: crosshair;
+  }
+
+  @media (max-width: 768px) {
+    .toolbar {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .toolbar h1 {
+      margin-right: 0;
+    }
+  }
+
+  @media (max-width: 768px) {
+    body { padding: 52px 12px 12px; }
+    .tool-topbar { padding: 10px 16px; font-size: 0.8rem; }
+    .tool-topbar a, .tool-topbar .current { font-size: 0.75rem; }
+  }
+  @media (max-width: 480px) {
+    body { padding: 48px 8px 8px; }
+    .tool-topbar { padding: 8px 12px; gap: 8px; }
+    .tool-topbar a, .tool-topbar .current { font-size: 0.7rem; }
+  }
+  .loading-overlay {
+    position: fixed; inset: 0;
+    background: var(--bg);
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.4s ease;
+  }
+  .loading-overlay.hidden { opacity: 0; pointer-events: none; }
+  .spinner {
+    width: 40px; height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-overlay p { color: var(--muted); font-size: 0.85rem; margin-top: 16px; }
+</style>
+</head>
+<body id="tool-content">
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <p>Chargement...</p>
+</div>
+<div class="tool-topbar">
+  <a href="../dashboard/connected_internate.html" class="back-btn">← Retour</a>
+  <span class="sep">›</span>
+  <a href="../courses/Ressources_ex.html">Cours</a>
+  <span class="sep">›</span>
+  <span class="current">Tableau Blanc</span>
+  </div>
+
+<div class="toolbar">
+  <h1>🎨 Tableau Blanc</h1>
+  
+  
+  <div class="tool" onclick="selectTool('pen',this)" id="penTool">✏️ Crayon</div>
+  <div class="tool" onclick="selectTool('line',this)">📐 Ligne</div>
+  <div class="tool" onclick="selectTool('rect',this)">▭ Rectangle</div>
+  <div class="tool" onclick="selectTool('circle',this)">● Cercle</div>
+  <div class="tool" onclick="selectTool('eraser',this)">🧹 Gomme</div>
+  
+  <div class="tool-separator"></div>
+  
+  <label>Couleur:
+    <input type="color" id="colorPicker" value="#000000" onchange="setColor(this.value)">
+  </label>
+  
+  <label>Taille:
+    <input type="range" id="sizePicker" min="1" max="20" value="3" onchange="setSize(this.value)">
+    <span class="size-display" id="sizeDisplay">3</span>
+  </label>
+  
+  <div class="tool-separator"></div>
+  
+  <button onclick="undo()">↶ Annuler</button>
+  <button onclick="clearCanvas()" class="danger">🗑️ Effacer tout</button>
+  <button onclick="downloadDrawing()">💾 Télécharger</button>
+</div>
+
+<canvas id="canvas"></canvas>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight - 70;
+
+let isDrawing = false;
+let currentTool = 'pen';
+let currentColor = '#000000';
+let currentSize = 3;
+let lastX, lastY;
+let states = [];
+let snapshot = null;
+
+function saveState() {
+  states.push(canvas.toDataURL());
+}
+
+function selectTool(tool, el) {
+  currentTool = tool;
+  document.querySelectorAll('.tool').forEach(t => t.classList.remove('active'));
+  (el || event.target).classList.add('active');
+  canvas.style.cursor = tool === 'eraser' ? 'grab' : 'crosshair';
+}
+
+function setColor(color) {
+  currentColor = color;
+}
+
+function setSize(size) {
+  currentSize = size;
+  document.getElementById('sizeDisplay').textContent = size;
+}
+
+canvas.addEventListener('mousedown', (e) => {
+  isDrawing = true;
+  saveState();
+  lastX = e.offsetX;
+  lastY = e.offsetY;
+  if (currentTool === 'line' || currentTool === 'rect' || currentTool === 'circle') {
+    snapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  }
+});
+
+canvas.addEventListener('mousemove', (e) => {
+  if (!isDrawing) return;
+  
+  const x = e.offsetX;
+  const y = e.offsetY;
+  
+  ctx.strokeStyle = currentTool === 'eraser' ? 'white' : currentColor;
+  ctx.fillStyle = currentColor;
+  ctx.lineWidth = currentSize;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  
+  if (currentTool === 'pen' || currentTool === 'eraser') {
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    lastX = x;
+    lastY = y;
+  } else if (currentTool === 'line') {
+    ctx.putImageData(snapshot, 0, 0);
+    ctx.strokeStyle = currentColor;
+    ctx.lineWidth = currentSize;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+  } else if (currentTool === 'rect') {
+    ctx.putImageData(snapshot, 0, 0);
+    ctx.strokeStyle = currentColor;
+    ctx.lineWidth = currentSize;
+    ctx.strokeRect(Math.min(lastX, x), Math.min(lastY, y), Math.abs(x - lastX), Math.abs(y - lastY));
+  } else if (currentTool === 'circle') {
+    ctx.putImageData(snapshot, 0, 0);
+    const cx = (lastX + x) / 2;
+    const cy = (lastY + y) / 2;
+    const rx = Math.abs(x - lastX) / 2;
+    const ry = Math.abs(y - lastY) / 2;
+    ctx.strokeStyle = currentColor;
+    ctx.lineWidth = currentSize;
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+});
+
+canvas.addEventListener('mouseup', () => {
+  isDrawing = false;
+  snapshot = null;
+});
+
+canvas.addEventListener('mouseleave', () => {
+  isDrawing = false;
+});
+
+function undo() {
+  if (states.length > 0) {
+    states.pop();
+    if (states.length > 0) {
+      const img = new Image();
+      img.src = states[states.length - 1];
+      img.onload = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0);
+      };
+    } else {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  }
+}
+
+function clearCanvas() {
+  if (confirm('Effacer tout le dessin ?')) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    states = [];
+  }
+}
+
+function downloadDrawing() {
+  const link = document.createElement('a');
+  link.download = `dessin-${Date.now()}.png`;
+  link.href = canvas.toDataURL();
+  link.click();
+}
+
+function showToast(msg, type) {
+  var c = document.getElementById('toastContainer');
+  if (!c) return;
+  var e = document.createElement('div');
+  e.className = 'toast toast-' + (type || 'info');
+  e.textContent = msg;
+  c.appendChild(e);
+  setTimeout(function() {
+    e.style.animation = 'toastOut 0.3s ease both';
+    setTimeout(function() { e.remove(); }, 300);
+  }, 3500);
+}
+
+const loadingOverlay = document.getElementById('loadingOverlay');
+const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+if (user && user.uid) {
+  loadingOverlay.classList.add('hidden');
+} else {
+  window.location.href = '../auth/Login_Internate.html';
+}
+
+window.addEventListener('resize', () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight - 70;
+});
+
+selectTool('pen', document.getElementById('penTool'));
+</script>
+<div style="text-align:center;padding:16px;font-size:0.75rem;color:var(--muted);margin-top:20px;">
+<div class="toast-container" id="toastContainer"></div>
+
+  <a href="../help/" style="color:var(--accent2);text-decoration:none;">💬 Aide & retours</a>
+</div>
+
+
+</body>
+</html>

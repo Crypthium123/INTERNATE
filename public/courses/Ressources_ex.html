@@ -1,0 +1,2117 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cours & Ressources — Internate</title>
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  :root {
+    --bg: #09090f;
+    --surface: #11111c;
+    --surface2: #1a1a2e;
+    --border: rgba(255,255,255,0.07);
+    --accent: #6c63ff;
+    --accent2: #00d4aa;
+    --accent3: #ff6b6b;
+    --accent4: #ffa94d;
+    --text: #e8e8f0;
+    --muted: #6b6b8a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 28px 16px;
+    position: fixed;
+    height: 100vh;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .sidebar::-webkit-scrollbar { display: none; }
+
+  .sidebar-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.4rem;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, #6c63ff, #00d4aa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    padding: 0 12px;
+    margin-bottom: 36px;
+    text-decoration: none;
+  }
+
+  .nav-section-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0 12px;
+    margin-bottom: 8px;
+    margin-top: 24px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--muted);
+    font-size: 0.88rem;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+
+  .nav-item:hover { color: var(--text); background: var(--hover-overlay); }
+  .nav-item.active { color: var(--accent);     background: var(--overlay-accent); }
+  .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .avatar {
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .user-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+  }
+
+  .user-info strong { display: block; font-size: 0.85rem; font-weight: 600; }
+  .user-info span { font-size: 0.72rem; color: var(--muted); }
+
+  .logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    color: var(--muted);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 4px;
+    border: none;
+    background: none;
+    width: 100%;
+  }
+  .logout-btn:hover { color: var(--accent3);     background: var(--btn-danger-bg); }
+
+  /* MAIN */
+  .main {
+    margin-left: 260px;
+    flex: 1;
+    padding: 40px 48px;
+    animation: fadeIn 0.5s ease both;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* PAGE HEADER */
+  .page-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 40px;
+  }
+
+  .page-header h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 2rem;
+    letter-spacing: -0.03em;
+    margin-bottom: 6px;
+  }
+
+  .page-header p { color: var(--muted); font-size: 0.9rem; }
+
+  .btn-upload {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 20px;
+    background: var(--accent);
+    border: none;
+    border-radius: 9px;
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.87rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 0 20px rgba(108,99,255,0.3);
+  }
+  .btn-upload:hover {
+    background: var(--accent);
+    box-shadow: 0 0 30px rgba(108,99,255,0.5);
+    transform: translateY(-1px);
+  }
+
+  /* FILTER TABS */
+  .filter-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+  }
+
+  .tab {
+    padding: 7px 16px;
+    border-radius: 100px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .tab:hover { color: var(--text); border-color: rgba(255,255,255,0.15); }
+  .tab.active { background: var(--accent); border-color: var(--accent); color: white; }
+
+  /* GRID */
+  .cours-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+
+  .cours-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.25s;
+    display: block;
+    cursor: pointer;
+    animation: cardIn 0.4s ease both;
+  }
+
+  @keyframes cardIn {
+    from { opacity: 0; transform: scale(0.97); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .cours-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+    border-color: rgba(255,255,255,0.12);
+  }
+
+  .cours-thumb {
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cours-thumb-bg {
+    position: absolute;
+    inset: 0;
+    opacity: 0.15;
+    background-size: 20px 20px;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px);
+  }
+
+  .download-badge {
+    position: absolute;
+    top: 12px; right: 12px;
+    padding: 4px 10px;
+    background: rgba(0,0,0,0.6);
+    border: 1px solid var(--hover-overlay-strong);
+    border-radius: 100px;
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.8);
+    backdrop-filter: blur(8px);
+  }
+
+  .cours-body { padding: 18px 20px; }
+
+  .cours-matiere {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .cours-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    font-size: 0.92rem;
+    margin-bottom: 14px;
+    line-height: 1.35;
+  }
+
+  .cours-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .meta-tag {
+    padding: 3px 9px;
+    background: var(--hover-overlay);
+    border-radius: 100px;
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+
+  .cours-footer {
+    padding: 12px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .dl-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--accent);
+    text-decoration: none;
+    transition: gap 0.2s;
+  }
+  .cours-card:hover .dl-btn { gap: 8px; }
+
+  /* SECTION TOOLS */
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: -0.02em;
+    margin-bottom: 18px;
+    margin-top: 48px;
+  }
+
+  .tools-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+  }
+
+  .tool-pill {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--text);
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+
+  .tool-pill:hover {
+    background: var(--surface2);
+    border-color: rgba(255,255,255,0.12);
+    transform: translateX(3px);
+  }
+
+  .tool-pill .pill-icon {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+
+  /* ---- FILTER DROPDOWNS ---- */
+  .filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 28px;
+    align-items: center;
+  }
+
+  .filter-select {
+    padding: 9px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    cursor: pointer;
+    min-width: 150px;
+    transition: border-color 0.2s;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%236b6b8a' d='M1.41.59L6 5.17 10.59.59 12 2l-6 6-6-6z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 34px;
+  }
+  .filter-select:hover { border-color: rgba(255,255,255,0.15); }
+  .filter-select:focus { outline: none; border-color: var(--accent); }
+
+  .filter-select option { background: var(--surface); color: var(--text); }
+
+  .filter-reset {
+    padding: 9px 16px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .filter-reset:hover { color: var(--text); border-color: rgba(255,255,255,0.15); }
+
+  .filter-count {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-left: auto;
+  }
+
+  /* ---- ACTIVE CLASS BANNER ---- */
+  .active-class-banner {
+    display: none;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, rgba(0,212,170,0.08), rgba(108,99,255,0.08));
+    border: 1px solid rgba(0,212,170,0.2);
+    border-radius: 12px;
+    margin-bottom: 16px;
+    animation: fadeIn 0.3s ease both;
+  }
+  .active-class-banner.show { display: flex; }
+
+  .active-class-banner .banner-icon {
+    font-size: 1.3rem;
+    flex-shrink: 0;
+  }
+
+  .active-class-banner .banner-text {
+    flex: 1;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .active-class-banner .banner-text strong {
+    color: var(--accent2);
+  }
+
+  .active-class-banner .banner-btn {
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.04);
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .active-class-banner .banner-btn:hover {
+    background: rgba(255,107,107,0.1);
+    border-color: rgba(255,107,107,0.2);
+    color: var(--accent3);
+  }
+
+  /* ---- MODAL ---- */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(6px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.show { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    width: 520px;
+    max-width: 94vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding: 32px;
+    animation: modalIn 0.25s ease both;
+  }
+  .modal::-webkit-scrollbar { display: none; }
+
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+
+  .modal-header h2 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.2rem;
+  }
+
+  .modal-close {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 1.4rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: all 0.2s;
+  }
+  .modal-close:hover { color: var(--text);     background: var(--hover-overlay); }
+
+  .form-group {
+    margin-bottom: 16px;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 10px 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.87rem;
+    transition: border-color 0.2s;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .form-group textarea {
+    resize: vertical;
+    min-height: 70px;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 24px;
+  }
+
+  .btn-primary {
+    padding: 10px 22px;
+    background: var(--accent);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.87rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-primary:hover { background: var(--accent); transform: translateY(-1px); }
+
+  .btn-secondary {
+    padding: 10px 22px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.87rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-secondary:hover { color: var(--text); border-color: rgba(255,255,255,0.15); }
+
+  /* ---- DELETE BTN ON CARD ---- */
+  .cours-card { position: relative; }
+  .delete-btn {
+    position: absolute;
+    top: 10px; right: 44px;
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--hover-overlay-strong);
+    color: var(--accent3);
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.2s;
+    z-index: 2;
+    backdrop-filter: blur(4px);
+  }
+  .cours-card:hover .delete-btn,
+  .cours-card:hover .edit-btn,
+  .cours-card:hover .share-btn { opacity: 1; }
+  .delete-btn:hover { background: rgba(255,107,107,0.2); border-color: var(--accent3); }
+
+  .share-btn {
+    position: absolute;
+    top: 10px; right: 10px;
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--hover-overlay-strong);
+    color: var(--accent);
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.2s;
+    z-index: 2;
+    backdrop-filter: blur(4px);
+  }
+  .share-btn:hover { background: rgba(108,99,255,0.2); border-color: var(--accent); }
+
+  .cours-card.highlight {
+    animation: highlightPulse 1.5s ease;
+    border-color: var(--accent);
+    box-shadow: 0 0 20px rgba(108,99,255,0.2);
+  }
+  @keyframes highlightPulse {
+    0%, 100% { box-shadow: 0 0 20px rgba(108,99,255,0.2); }
+    50% { box-shadow: 0 0 40px rgba(108,99,255,0.4); }
+  }
+
+  .edit-btn {
+    position: absolute;
+    top: 10px; right: 78px;
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--hover-overlay-strong);
+    color: var(--accent2);
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.2s;
+    z-index: 2;
+    backdrop-filter: blur(4px);
+  }
+  .edit-btn:hover { background: rgba(0,212,170,0.2); border-color: var(--accent2); }
+
+  /* ---- CONDITIONAL FIELDS ---- */
+  .conditional-field {
+    display: none;
+  }
+  .conditional-field.show {
+    display: block;
+  }
+
+  /* ---- TOAST ---- */
+  .toast-container {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+  }
+
+  .toast {
+    padding: 14px 20px;
+    border-radius: 10px;
+    font-size: 0.87rem;
+    font-weight: 500;
+    color: white;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    backdrop-filter: blur(8px);
+    animation: toastIn 0.3s ease both;
+    max-width: 380px;
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .toast-success { background: rgba(0,212,170,0.9); }
+  .toast-error { background: rgba(255,107,107,0.9); }
+  .toast-info { background: rgba(108,99,255,0.9); }
+
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateX(40px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes toastOut {
+    from { opacity: 1; transform: translateX(0); }
+    to { opacity: 0; transform: translateX(40px); }
+  }
+
+  /* ---- CONFIRM MODAL ---- */
+  .confirm-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    z-index: 9998;
+    align-items: center;
+    justify-content: center;
+  }
+  .confirm-overlay.show { display: flex; }
+
+  .confirm-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px 32px;
+    width: 360px;
+    max-width: 90vw;
+    animation: modalIn 0.2s ease both;
+  }
+
+  .confirm-box p {
+    font-size: 0.92rem;
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+
+  .confirm-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+  }
+
+
+
+  .menu-toggle {
+    display: none;
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 60;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    width: 40px; height: 40px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    color: var(--text);
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .menu-toggle:hover { background: var(--surface2); }
+
+  /* ---- DISCUSSION ---- */
+  .discussion-btn {
+    position: absolute;
+    top: 10px; right: 112px;
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--hover-overlay-strong);
+    color: var(--accent2);
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.2s;
+    z-index: 2;
+    backdrop-filter: blur(4px);
+  }
+  .cours-card:hover .discussion-btn { opacity: 1; }
+  .discussion-btn:hover { background: rgba(0,212,170,0.2); border-color: var(--accent2); }
+
+  .comment { padding:12px 16px; border-bottom:1px solid var(--border); }
+  .comment-user { font-size:0.78rem; font-weight:600; color:var(--accent); }
+  .comment-text { font-size:0.85rem; color:var(--text2); margin-top:4px; line-height:1.5; }
+  .comment-time { font-size:0.7rem; color:var(--muted); margin-top:2px; }
+  .comment-input-area { display:flex; gap:8px; padding:16px 0; }
+  .comment-input-area textarea { flex:1; padding:10px 14px; border-radius:8px; background:var(--surface2); border:1px solid var(--border); color:var(--text); font-family:'DM Sans',sans-serif; font-size:0.85rem; resize:vertical; min-height:44px; }
+  .comment-input-area button { padding:10px 20px; border-radius:8px; background:var(--accent); color:white; border:none; cursor:pointer; font-weight:600; }
+
+
+  @media (max-width: 900px) {
+    .menu-toggle { display: flex; position: fixed; top: 12px; left: 12px; z-index: 60; }
+    .sidebar { transform: translateX(-100%); transition: transform 0.3s ease; z-index: 55; width: 260px; }
+    .sidebar.open { transform: translateX(0); }
+    .main { margin-left: 0; width: 100%; max-width: 100%; }
+    .page-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .page-header h1 { font-size: 1.3rem; }
+  }
+  @media (max-width: 600px) {
+    .main { padding: 14px 10px; padding-top: 64px; }
+    .page-header { flex-direction: column; align-items: stretch; gap: 12px; }
+    .page-header h1 { font-size: 1.1rem; }
+    .page-header p { font-size: 0.8rem; }
+    .page-header .btn-upload { width: 100%; justify-content: center; }
+    .filter-bar { flex-direction: column; gap: 8px; }
+    .filter-select { width: 100%; min-width: unset; }
+    .filter-tabs { gap: 8px; }
+    .tab { padding: 10px 18px; font-size: 0.85rem; }
+    .cours-grid { grid-template-columns: 1fr; gap: 12px; }
+    .modal { padding: 20px 16px; max-width: 100vw; margin: 10px; border-radius: 12px; }
+    .form-row { grid-template-columns: 1fr; }
+    .tools-row { gap: 8px; }
+    .tools-row { grid-template-columns: 1fr 1fr; }
+    .cours-card .delete-btn,
+    .cours-card .edit-btn,
+    .cours-card .share-btn,
+    .cours-card .discussion-btn { width: 40px; height: 40px; font-size: 1.1rem; opacity: 1; }
+    .cours-card .discussion-btn { right: 156px; }
+    .cours-card .edit-btn { right: 108px; }
+    .cours-card .delete-btn { right: 60px; }
+    .cours-card .share-btn { right: 12px; }
+    .toast-container { top: 12px; right: 50%; transform: translateX(50%); }
+    .toast { max-width: 90vw; }
+  }
+  @media (max-width: 400px) {
+    .sidebar { width: 220px; }
+    .tools-row { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .stat-card { padding: 14px; }
+    .stat-value { font-size: 1.3rem; }
+  }
+
+  /* Touch devices: always show card action buttons */
+  @media (hover: none) and (pointer: coarse) {
+    .cours-card .delete-btn,
+    .cours-card .edit-btn,
+    .cours-card .share-btn,
+    .cours-card .discussion-btn { opacity: 1; }
+  }
+
+  /* Loading spinner overlay */
+  .loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.4s ease;
+  }
+  .loading-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  .loading-overlay p {
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-top: 16px;
+  }
+</style>
+</head>
+<body>
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <p>Chargement...</p>
+</div>
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <header role="banner">
+    <a href="../dashboard/connected_internate.html" class="sidebar-logo">Internate</a>
+  </header>
+
+  <nav aria-label="Navigation principale">
+  <div class="nav-section-label">Principal</div>
+  <a class="nav-item" href="../dashboard/connected_internate.html">
+    <span class="nav-icon">🏠</span> Dashboard
+  </a>
+  <a class="nav-item active" href="#">
+    <span class="nav-icon">📚</span> Mes cours
+  </a>
+  <a class="nav-item" href="../classes/">
+    <span class="nav-icon">👥</span> Classes
+  </a>
+  <button class="notif-btn" onclick="openNotifPanel()">
+    <span class="nav-icon">🔔</span> Notifications
+    <span class="notif-badge" id="notifBadge">0</span>
+  </button>
+
+  <div class="nav-section-label">Outils</div>
+  <a class="nav-item" href="../tools/Calculatrice_Scientifique.html">
+    <span class="nav-icon">🧮</span> Calculatrice
+  </a>
+  <a class="nav-item" href="../tools/Convertisseur_Unites.html">
+    <span class="nav-icon">📊</span> Convertisseur
+  </a>
+  <a class="nav-item" href="../tools/Fabricateur_Fiches.html">
+    <span class="nav-icon">🗂️</span> Fiches
+  </a>
+  <a class="nav-item" href="../tools/Generateur_QCM.html">
+    <span class="nav-icon">📋</span> QCM
+  </a>
+  <a class="nav-item" href="../tools/Minuteur_Pomodoro.html">
+    <span class="nav-icon">⏱️</span> Pomodoro
+  </a>
+  <a class="nav-item" href="../tools/Redacteur_Plan.html">
+    <span class="nav-icon">📝</span> Plan
+  </a>
+  <a class="nav-item" href="../tools/Tableau_Blanc.html">
+    <span class="nav-icon">🎨</span> Tableau Blanc
+  </a>
+  <a class="nav-item" href="../tools/Analyseur_Texte.html">
+    <span class="nav-icon">&#x1F50D;</span> Analyseur de Texte
+  </a>
+  <a class="nav-item" href="../tools/Calculateur_Moyenne.html">
+    <span class="nav-icon">&#x1F4C8;</span> Calculateur de Moyenne
+  </a>
+  <a class="nav-item" href="../tools/Conjugueur_Francais.html">
+    <span class="nav-icon">&#x1F4D6;</span> Conjugueur Français
+  </a>
+  <a class="nav-item" href="../tools/Generateur_Citations.html">
+    <span class="nav-icon">&#x1F4AC;</span> Générateur de Citations
+  </a>
+</nav>
+
+<div class="sidebar-footer">
+    <div class="user-card">
+      <div class="avatar" id="avatarEl">?</div>
+      <div class="user-info">
+        <strong id="userNameEl">Utilisateur</strong>
+        <span id="userEmailEl">—</span>
+      </div>
+    </div>
+    <button class="logout-btn" id="installBtn" onclick="installPWA()" style="display:none;">
+      <span>⬇️</span> Installer l'app
+    </button>
+    <a href="../profile/index.html" class="logout-btn" style="text-decoration:none;">
+      <span>👤</span> Mon profil
+    </a>
+    <a href="../admin/" class="logout-btn" id="adminLink" style="display:none;text-decoration:none;">
+      <span>⚙️</span> Administration
+    </a>
+    <button class="logout-btn" onclick="logout()">
+      <span>🚪</span> Se déconnecter
+    </button>
+    <a href="../contact.html" class="logout-btn" style="text-decoration:none;margin-top:2px;">
+      <span>💬</span> Contact & retours
+    </a>
+  </div>
+
+  </aside>
+
+<button class="menu-toggle" onclick="toggleSidebar()" aria-label="Menu">&#9776;</button>
+
+<main role="main" class="main">
+  <div class="page-header">
+    <div>
+      <h1>📚 Mes cours</h1>
+      <p>Ressources et supports pédagogiques</p>
+    </div>
+    <button class="btn-upload" id="addCourseBtn"><span>＋</span> Ajouter un cours</button>
+  </div>
+<!-- RECHERCHE -->
+  <div class="filter-bar" style="margin-bottom:10px;">
+    <input type="text" class="filter-select" id="searchInput" placeholder="🔍 Rechercher un cours..." oninput="applyFilters()" style="flex:1;min-width:200px;">
+  </div>
+
+<!-- FILTRES -->
+  <div class="filter-bar">
+    <select class="filter-select" id="filterFiliere" onchange="applyFilters()">
+      <option value="">Toutes filières</option>
+      <option value="generale">Générale</option>
+      <option value="technologique">Technologique</option>
+    </select>
+    <select class="filter-select" id="filterClasse" onchange="applyFilters()">
+      <option value="">Toutes les classes</option>
+    </select>
+    <select class="filter-select" id="filterAnnee" onchange="applyFilters()">
+      <option value="">Toutes années</option>
+      <option value="2nde">2nde</option>
+      <option value="1ere">1ère</option>
+      <option value="terminale">Terminale</option>
+    </select>
+    <select class="filter-select" id="filterSpecialite" onchange="applyFilters()">
+      <option value="">Toutes spécialités/séries</option>
+    </select>
+    <select class="filter-select" id="filterMatiere" onchange="applyFilters()">
+      <option value="">Toutes matières</option>
+    </select>
+    <button class="filter-reset" onclick="resetFilters()">Réinitialiser</button>
+    <span class="filter-count" id="filterCount">0 cours</span>
+    <select class="filter-select" id="sortBy" onchange="renderCourses()" style="min-width:120px;">
+      <option value="date-desc">Plus récents</option>
+      <option value="date-asc">Plus anciens</option>
+      <option value="title">A–Z</option>
+      <option value="matiere">Matière</option>
+    </select>
+  </div>
+
+  <!-- ACTIVE CLASS BANNER -->
+  <div class="active-class-banner" id="activeClassBanner">
+    <span class="banner-icon">📚</span>
+    <span class="banner-text">Classe active : <strong id="activeBannerName">—</strong> — seuls les cours de cette classe sont affichés</span>
+    <button class="banner-btn" onclick="deactivateActiveClass()">✕ Désactiver</button>
+  </div>
+
+  <!-- BARRE DE PROGRESSION -->
+  <div style="margin-bottom:16px;display:none;" id="progressSection">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+      <span style="font-size:0.78rem;color:var(--muted);font-weight:500;">Progression</span>
+      <span class="progress-text" id="progressLabel">0 / 0</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  </div>
+
+  <!-- COURS -->
+  <div class="cours-grid" id="coursGrid" ondrop="onDrop(event)" ondragover="onDragOver(event)"></div>
+
+  <!-- DISCUSSION -->
+  <div id="discussionSection" style="display:none;margin-top:32px;">
+    <div class="section-title" style="display:flex;justify-content:space-between;align-items:center;">
+      <span>💬 Discussion</span>
+      <button class="filter-reset" onclick="closeDiscussion()">Fermer</button>
+    </div>
+    <div id="discussionArea">
+      <div class="comment-input-area"><textarea id="commentText" placeholder="Écris un commentaire…"></textarea><button onclick="addComment()">Envoyer</button></div>
+      <div id="discussionComments"><div class="empty-state"><div class="empty-icon">💬</div><p>Sélectionne un cours pour voir les commentaires.</p></div></div>
+    </div>
+  </div>
+
+  <!-- OUTILS -->
+  <div class="section-title">Accès rapide aux outils</div>
+  <div class="tools-row">
+    <a class="tool-pill" href="../tools/Calculatrice_Scientifique.html">
+      <span class="pill-icon">🧮</span> Calculatrice
+    </a>
+    <a class="tool-pill" href="../tools/Convertisseur_Unites.html">
+      <span class="pill-icon">📊</span> Convertisseur
+    </a>
+    <a class="tool-pill" href="../tools/Fabricateur_Fiches.html">
+      <span class="pill-icon">🗂️</span> Fiches
+    </a>
+    <a class="tool-pill" href="../tools/Generateur_QCM.html">
+      <span class="pill-icon">📋</span> QCM
+    </a>
+    <a class="tool-pill" href="../tools/Minuteur_Pomodoro.html">
+      <span class="pill-icon">⏱️</span> Pomodoro
+    </a>
+    <a class="tool-pill" href="../tools/Redacteur_Plan.html">
+      <span class="pill-icon">📝</span> Plan
+    </a>
+    <a class="tool-pill" href="../tools/Tableau_Blanc.html">
+      <span class="pill-icon">🎨</span> Tableau Blanc
+    </a>
+    <a class="tool-pill" href="../tools/Analyseur_Texte.html">
+      <span class="pill-icon">&#x1F50D;</span> Analyseur de Texte
+    </a>
+    <a class="tool-pill" href="../tools/Calculateur_Moyenne.html">
+      <span class="pill-icon">&#x1F4C8;</span> Calculateur de Moyenne
+    </a>
+    <a class="tool-pill" href="../tools/Conjugueur_Francais.html">
+      <span class="pill-icon">&#x1F4D6;</span> Conjugueur Français
+    </a>
+    <a class="tool-pill" href="../tools/Generateur_Citations.html">
+      <span class="pill-icon">&#x1F4AC;</span> Générateur de Citations
+    </a>
+  </div>
+
+  <!-- MODAL AJOUTER COURS -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modalTitle">Ajouter un cours</h2>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <div class="form-group">
+        <label>Titre du cours</label>
+        <input type="text" id="formTitle" placeholder="Ex: Thème 7 — Vecteurs" required>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Filière</label>
+          <select id="formFiliere" onchange="updateFormSpecialite()">
+            <option value="">Sélectionner…</option>
+            <option value="generale">Générale</option>
+            <option value="technologique">Technologique</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Année</label>
+          <select id="formAnnee" onchange="updateFormSpecialite()">
+            <option value="">Sélectionner…</option>
+            <option value="2nde">2nde</option>
+            <option value="1ere">1ère</option>
+            <option value="terminale">Terminale</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group conditional-field" id="formSpecialiteGroup">
+        <label id="formSpecialiteLabel">Spécialité / Série</label>
+        <select id="formSpecialite"></select>
+      </div>
+      <div class="form-group">
+        <label>Matière</label>
+        <select id="formMatiere">
+          <option value="">Sélectionner…</option>
+          <option value="mathematiques">Mathématiques</option>
+          <option value="physique-chimie">Physique-Chimie</option>
+          <option value="francais">Français</option>
+          <option value="histoire-geo">Histoire-Géographie</option>
+          <option value="anglais">Anglais</option>
+          <option value="espagnol">Espagnol</option>
+          <option value="allemand">Allemand</option>
+          <option value="svt">SVT</option>
+          <option value="nsi">NSI</option>
+          <option value="ses">SES</option>
+          <option value="philosophie">Philosophie</option>
+          <option value="arts">Arts</option>
+          <option value="eps">EPS</option>
+          <option value="autre">Autre</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Classe (optionnelle)</label>
+        <select id="formClasse">
+          <option value="">Aucune classe</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Description (optionnelle)</label>
+        <textarea id="formDescription" placeholder="Description du cours…"></textarea>
+      </div>
+      <div class="form-group">
+        <label>URL du fichier (optionnelle)</label>
+        <input type="text" id="formFileUrl" placeholder="https://exemple.com/cours.pdf">
+      </div>
+      <div class="form-group">
+        <label>Nom du fichier (optionnel)</label>
+        <input type="text" id="formFileName" placeholder="cours-vecteurs.pdf">
+      </div>
+      <div class="form-actions">
+        <button class="btn-secondary" onclick="closeModal()">Annuler</button>
+        <button class="btn-primary" onclick="addCourse()">Ajouter le cours</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- CONFIRM -->
+  <div class="confirm-overlay" id="confirmOverlay">
+    <div class="confirm-box">
+      <p id="confirmMessage">Supprimer ce cours ?</p>
+      <div class="confirm-actions">
+        <button class="btn-secondary" onclick="closeConfirm()">Annuler</button>
+        <button class="btn-primary" style="background:var(--accent3);" id="confirmBtn" onclick="">Supprimer</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script type="module" src="/js/firebase-config.js"></script>
+
+<script type="module">
+  let currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+  let authEmail = currentUser.email || '';
+
+  function getUserEmail() {
+    if (authEmail) return authEmail;
+    if (firebase.auth().currentUser) return firebase.auth().currentUser.email;
+    return currentUser.email || '';
+  }
+
+  function updateUserUI(userData) {
+    currentUser = userData;
+    const prenom = userData.prenom || '';
+    const nom = userData.nom || '';
+    const initial = ((prenom?.[0] || '') + (nom?.[0] || '')).toUpperCase() || '?';
+    document.getElementById('avatarEl').textContent = initial;
+    document.getElementById('userNameEl').textContent = (prenom + ' ' + nom).trim() || 'Utilisateur';
+    document.getElementById('userEmailEl').textContent = userData.email || '';
+  }
+
+  auth.onAuthStateChanged(function(user) {
+    if (user) {
+      authEmail = user.email;
+      currentUser = { uid: user.uid, email: user.email };
+      let userData = { uid: user.uid, email: user.email };
+      localStorage.setItem('currentUser', JSON.stringify({ uid: user.uid, email: user.email }));
+      updateUserUI(userData);
+      loadFormClasses();
+      startNotificationPolling();
+      initAdminLink();
+      db.collection('users').doc(user.uid).get().then(doc => {
+        if (doc.exists) {
+          Object.assign(userData, doc.data());
+          currentUser = userData;
+          updateUserUI(userData);
+        }
+      }).catch(() => {});
+      document.getElementById('loadingOverlay').classList.add('hidden');
+      syncCoursesFromFirestore().then(() => { renderCourses(); renderActiveBanner(); });
+    } else if (currentUser.email) {
+      authEmail = currentUser.email;
+      document.getElementById('loadingOverlay').classList.add('hidden');
+      updateUserUI(currentUser);
+      loadFormClasses();
+      syncCoursesFromFirestore().then(() => { renderCourses(); renderActiveBanner(); });
+    } else {
+      window.location.href = '../auth/Login_Internate.html';
+    }
+  });
+
+  function logout() {
+    auth.signOut().then(() => {
+      localStorage.removeItem('currentUser');
+      window.location.href = '../auth/Login_Internate.html';
+    });
+  }
+
+
+  // ---- TOAST ----
+  function showToast(msg, type) {
+    const container = document.getElementById('toastContainer');
+    const el = document.createElement('div');
+    el.className = `toast toast-${type || 'info'}`;
+    el.textContent = msg;
+    container.appendChild(el);
+    setTimeout(() => {
+      el.style.animation = 'toastOut 0.3s ease both';
+      setTimeout(() => el.remove(), 300);
+    }, 3500);
+  }
+
+  // ---- CONFIRM ----
+  let confirmCallback = null;
+  function showConfirm(msg, cb) {
+    confirmCallback = cb;
+    document.getElementById('confirmMessage').textContent = msg;
+    document.getElementById('confirmOverlay').classList.add('show');
+  }
+  function closeConfirm() {
+    document.getElementById('confirmOverlay').classList.remove('show');
+    confirmCallback = null;
+  }
+  document.getElementById('confirmBtn').addEventListener('click', () => {
+    if (confirmCallback) confirmCallback();
+    closeConfirm();
+  });
+  document.getElementById('confirmOverlay').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) closeConfirm();
+  });
+
+  // ---- DATA ----
+  const STORAGE_KEY = 'internate_courses';
+  let firestoreReady = false;
+
+  function getLocalCourses() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch { return []; }
+  }
+
+  function saveLocalCourses(courses) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(courses));
+  }
+
+  async function syncCoursesFromFirestore() {
+    if (typeof db === 'undefined') return;
+    try {
+      const snapshot = await db.collection('cours').orderBy('dateAdded', 'desc').get();
+      const courses = [];
+      snapshot.forEach(doc => {
+        const d = doc.data();
+        if (d.dateAdded && typeof d.dateAdded.toDate === 'function') {
+          d.dateAdded = d.dateAdded.toDate().toISOString();
+        }
+        courses.push({ id: doc.id, firestoreId: doc.id, ...d });
+      });
+      saveLocalCourses(courses);
+      firestoreReady = true;
+      return courses;
+    } catch (e) {
+      if (e.code !== 'failed-precondition' && e.code !== 'unavailable') {
+        console.warn('Firestore sync error:', e.message);
+      }
+      return null;
+    }
+  }
+
+  async function saveToFirestore(course) {
+    if (typeof db === 'undefined') return false;
+    try {
+      const { firestoreId, id, ...data } = course;
+      data.dateAdded = firebase.firestore.FieldValue.serverTimestamp();
+      if (course.firestoreId) {
+        delete data.dateAdded;
+        await db.collection('cours').doc(firestoreId).set(data, { merge: true });
+      } else {
+        const ref = await db.collection('cours').add(data);
+        course.firestoreId = ref.id;
+        course.id = ref.id;
+        addGamificationXP(20);
+      }
+      return true;
+    } catch (e) {
+      console.warn('Firestore save error:', e.message);
+      return false;
+    }
+  }
+
+  async function deleteFromFirestore(firestoreId) {
+    if (typeof db === 'undefined' || !firestoreId) return;
+    try {
+      await db.collection('cours').doc(firestoreId).delete();
+    } catch (e) {
+      console.warn('Firestore delete error:', e.message);
+    }
+  }
+
+  const SPECIALITES_GENERALE = {
+    '1ere': [
+      'Histoire Géographie, Géopolitique et Sciences politiques',
+      'Humanités, Littérature et Philosophie',
+      'Langues, Littératures et Cultures Étrangères',
+      'Littérature, Langues et Cultures de l\'Antiquité',
+      'Mathématiques',
+      'Numérique et Sciences Informatiques',
+      'Sciences de la vie et de la Terre',
+      'Sciences de l\'ingénieur',
+      'Sciences Économiques et Sociales',
+      'Physique Chimie',
+      'Arts : Histoire des arts, Théâtre, Arts Plastiques, Arts du Spectacle',
+      'Biologie Écologie (uniquement dans les lycées agricoles)',
+      'Éducation Physique, Pratiques et Culture Sportives'
+    ],
+    'terminale': [
+      'Histoire Géographie, Géopolitique et Sciences politiques',
+      'Humanités, Littérature et Philosophie',
+      'Langues, Littératures et Cultures Étrangères',
+      'Littérature, Langues et Cultures de l\'Antiquité',
+      'Mathématiques',
+      'Numérique et Sciences Informatiques',
+      'Sciences de la vie et de la Terre',
+      'Sciences de l\'ingénieur',
+      'Sciences Économiques et Sociales',
+      'Physique Chimie',
+      'Arts : Histoire des arts, Théâtre, Arts Plastiques, Arts du Spectacle',
+      'Biologie Écologie (uniquement dans les lycées agricoles)',
+      'Éducation Physique, Pratiques et Culture Sportives'
+    ]
+  };
+
+  const SERIES_TECHNOLOGIQUE = {
+    '1ere': ['STMG', 'ST2S', 'STHR', 'STI2D', 'STL', 'STD2A', 'S2TMD', 'STAV'],
+    'terminale': ['STMG', 'ST2S', 'STHR', 'STI2D', 'STL', 'STD2A', 'S2TMD', 'STAV']
+  };
+
+  const MATIERES = [
+    { value: 'mathematiques', label: 'Mathématiques', icon: '📐', color: '#6c63ff' },
+    { value: 'physique-chimie', label: 'Physique-Chimie', icon: '🧪', color: '#00d4aa' },
+    { value: 'francais', label: 'Français', icon: '📖', color: '#ffa94d' },
+    { value: 'histoire-geo', label: 'Histoire-Géographie', icon: '🌍', color: '#a78bfa' },
+    { value: 'anglais', label: 'Anglais', icon: '🇬🇧', color: '#ff6b6b' },
+    { value: 'espagnol', label: 'Espagnol', icon: '🇪🇸', color: '#f97316' },
+    { value: 'allemand', label: 'Allemand', icon: '🇩🇪', color: '#eab308' },
+    { value: 'svt', label: 'SVT', icon: '🌿', color: '#22c55e' },
+    { value: 'nsi', label: 'NSI', icon: '💻', color: '#3b82f6' },
+    { value: 'ses', label: 'SES', icon: '📊', color: '#ec4899' },
+    { value: 'philosophie', label: 'Philosophie', icon: '🤔', color: '#8b5cf6' },
+    { value: 'arts', label: 'Arts', icon: '🎨', color: '#f472b6' },
+    { value: 'eps', label: 'EPS', icon: '🏃', color: '#14b8a6' },
+    { value: 'autre', label: 'Autre', icon: '📁', color: '#6b7280' }
+  ];
+
+  function getCourses() {
+    return getLocalCourses();
+  }
+
+  function saveCourses(courses) {
+    saveLocalCourses(courses);
+  }
+
+  // ---- MODAL ----
+  let editId = null;
+
+  function openModal(course) {
+    if (course && course.userId.toLowerCase() !== getUserEmail().toLowerCase()) {
+      showToast("Tu ne peux pas modifier ce cours.", "error");
+      return;
+    }
+    loadFormClasses();
+    document.getElementById('modalOverlay').classList.add('show');
+    if (course) {
+      editId = course.id;
+      document.getElementById('modalTitle').textContent = 'Modifier le cours';
+      document.getElementById('formTitle').value = course.title;
+      document.getElementById('formFiliere').value = course.filiere;
+      document.getElementById('formAnnee').value = course.annee;
+      updateFormSpecialite();
+      setTimeout(() => {
+        if (course.specialite) document.getElementById('formSpecialite').value = course.specialite;
+        if (course.classId) document.getElementById('formClasse').value = course.classId;
+      }, 50);
+      document.getElementById('formMatiere').value = course.matiere;
+      document.getElementById('formClasse').value = course.classId || '';
+      document.getElementById('formDescription').value = course.description || '';
+      document.getElementById('formFileUrl').value = course.fileUrl || '';
+      document.getElementById('formFileName').value = course.fileName || '';
+    } else {
+      editId = null;
+      document.getElementById('modalTitle').textContent = 'Ajouter un cours';
+      document.getElementById('modalOverlay').classList.add('show');
+      const activeClassId = localStorage.getItem('activeClassId');
+      if (activeClassId) document.getElementById('formClasse').value = activeClassId;
+    }
+    document.getElementById('formTitle').focus();
+  }
+
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('show');
+    editId = null;
+    document.getElementById('formTitle').value = '';
+    document.getElementById('formFiliere').value = '';
+    document.getElementById('formAnnee').value = '';
+    document.getElementById('formSpecialite').innerHTML = '';
+    document.getElementById('formSpecialiteGroup').classList.remove('show');
+    document.getElementById('formMatiere').value = '';
+    document.getElementById('formClasse').value = '';
+    document.getElementById('formDescription').value = '';
+    document.getElementById('formFileUrl').value = '';
+    document.getElementById('formFileName').value = '';
+  }
+
+  document.getElementById('modalOverlay').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) closeModal();
+  });
+
+  function updateFormSpecialite() {
+    const filiere = document.getElementById('formFiliere').value;
+    const annee = document.getElementById('formAnnee').value;
+    const group = document.getElementById('formSpecialiteGroup');
+    const select = document.getElementById('formSpecialite');
+    const label = document.getElementById('formSpecialiteLabel');
+
+    select.innerHTML = '';
+    group.classList.remove('show');
+
+    if (!filiere || !annee || annee === '2nde') return;
+
+    let options = [];
+    if (filiere === 'generale' && SPECIALITES_GENERALE[annee]) {
+      options = SPECIALITES_GENERALE[annee];
+      label.textContent = 'Spécialité';
+    } else if (filiere === 'technologique' && SERIES_TECHNOLOGIQUE[annee]) {
+      options = SERIES_TECHNOLOGIQUE[annee];
+      label.textContent = 'Série';
+    }
+
+    if (options.length) {
+      group.classList.add('show');
+      select.innerHTML = '<option value="">Sélectionner…</option>' +
+        options.map(o => `<option value="${o}">${o}</option>`).join('');
+    }
+  }
+
+  // ---- CRUD ----
+  function addCourse() {
+    const title = document.getElementById('formTitle').value.trim();
+    const filiere = document.getElementById('formFiliere').value;
+    const annee = document.getElementById('formAnnee').value;
+    const specialite = document.getElementById('formSpecialite').value;
+    const matiere = document.getElementById('formMatiere').value;
+    const classId = document.getElementById('formClasse').value;
+    const description = document.getElementById('formDescription').value.trim();
+    const fileUrl = document.getElementById('formFileUrl').value.trim();
+    const fileName = document.getElementById('formFileName').value.trim();
+
+    if (!title) { showToast('Veuillez saisir un titre.', 'error'); return; }
+    if (!filiere) { showToast('Veuillez sélectionner une filière.', 'error'); return; }
+    if (!annee) { showToast('Veuillez sélectionner une année.', 'error'); return; }
+    if (!matiere) { showToast('Veuillez sélectionner une matière.', 'error'); return; }
+
+    const specialiteGroup = document.getElementById('formSpecialiteGroup');
+    if (specialiteGroup.classList.contains('show') && !specialite) {
+      const label = document.getElementById('formSpecialiteLabel').textContent;
+      showToast(`Veuillez sélectionner une ${label.toLowerCase()}.`, 'error');
+      return;
+    }
+
+    let courses = getCourses();
+    const matiereObj = MATIERES.find(m => m.value === matiere) || MATIERES[MATIERES.length - 1];
+
+    const now = new Date().toISOString();
+
+    if (editId) {
+      const idx = courses.findIndex(c => c.id === editId);
+      if (idx !== -1) {
+        const updated = { ...courses[idx], title, filiere, annee, specialite, matiere, classId, matiereLabel: matiereObj.label, matiereIcon: matiereObj.icon, matiereColor: matiereObj.color, description, fileUrl, fileName: fileName || (fileUrl ? fileUrl.split('/').pop() : '') };
+        courses[idx] = updated;
+        saveCourses(courses);
+        saveToFirestore(updated);
+      }
+      closeModal();
+      renderCourses();
+      showToast('Cours modifié !', 'success');
+    } else {
+      const newCourse = {
+        id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        title, filiere, annee, specialite, matiere, classId,
+        matiereLabel: matiereObj.label,
+        matiereIcon: matiereObj.icon,
+        matiereColor: matiereObj.color,
+        description, fileUrl,
+        fileName: fileName || (fileUrl ? fileUrl.split('/').pop() : ''),
+        dateAdded: now,
+        userId: getUserEmail() || 'unknown'
+      };
+      courses.push(newCourse);
+      saveCourses(courses);
+      saveToFirestore(newCourse);
+      closeModal();
+      renderCourses();
+      showToast('Cours ajouté !', 'success');
+    }
+  }
+
+  function deleteCourse(id) {
+    const target = getCourses().find(c => c.id === id);
+    if (!target) return;
+    if (target.userId.toLowerCase() !== getUserEmail().toLowerCase()) {
+      showToast("Tu ne peux pas supprimer ce cours.", "error");
+      return;
+    }
+    showConfirm('Supprimer ce cours ?', () => {
+      const courses = getCourses().filter(c => c.id !== id);
+      saveCourses(courses);
+      deleteFromFirestore(target.firestoreId || target.id);
+      renderCourses();
+      showToast('Cours supprimé.', 'success');
+    });
+  }
+
+  // ---- SHARE ----
+  function shareCourse(id) {
+    const url = window.location.origin + window.location.pathname + '#cours-' + id;
+    navigator.clipboard.writeText(url).then(() => {
+      showToast('🔗 Lien copié ! Partage-le avec tes camarades.', 'success');
+    }).catch(() => {
+      showToast('📋 Copie manuelle : ' + url, 'info');
+    });
+  }
+
+  // ---- EXPORT ----
+  function exportJSON() {
+    const data = getCourses();
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'internate_cours.json';
+    a.click(); URL.revokeObjectURL(url);
+    showToast('📥 Export JSON téléchargé !', 'success');
+  }
+
+  // ---- DISCUSSION (REAL-TIME) ----
+  let currentDiscussionCourseId = null;
+  let commentListener = null;
+
+  function openDiscussion(courseId) {
+    currentDiscussionCourseId = courseId;
+    document.getElementById('discussionSection').style.display = 'block';
+    subscribeComments(courseId);
+  }
+  function closeDiscussion() {
+    document.getElementById('discussionSection').style.display = 'none';
+    if (commentListener) { commentListener(); commentListener = null; }
+    currentDiscussionCourseId = null;
+  }
+
+  function subscribeComments(courseId) {
+    const commentsEl = document.getElementById('discussionComments');
+    if (commentListener) { commentListener(); commentListener = null; }
+    commentsEl.innerHTML = '<div class="empty-state"><div class="empty-icon">💬</div><p>Chargement…</p></div>';
+
+    commentListener = db.collection('comments')
+      .where('courseId', '==', courseId)
+      .orderBy('timestamp', 'asc')
+      .onSnapshot(snap => {
+        if (snap.empty) {
+          commentsEl.innerHTML = '<div class="empty-state"><div class="empty-icon">💬</div><p>Aucun commentaire pour ce cours. Sois le premier à commenter !</p></div>';
+        } else {
+          let html = '';
+          snap.forEach(doc => {
+            const d = doc.data();
+            const time = d.timestamp && d.timestamp.toDate ? d.timestamp.toDate().toLocaleString('fr-FR') : '';
+            html += '<div class="comment"><div class="comment-user">' + escapeHtml(d.userId || 'Anonyme') + '</div><div class="comment-text">' + escapeHtml(d.text || '') + '</div>' + (time ? '<div class="comment-time">' + time + '</div>' : '') + '</div>';
+          });
+          commentsEl.innerHTML = html;
+        }
+      }, err => {
+        if (err.code === 'failed-precondition') {
+          console.warn('Comment index missing, fallback without orderBy');
+          if (commentListener) { commentListener(); commentListener = null; }
+          commentListener = db.collection('comments')
+            .where('courseId', '==', courseId)
+            .onSnapshot(snap2 => {
+              if (snap2.empty) {
+                commentsEl.innerHTML = '<div class="empty-state"><div class="empty-icon">💬</div><p>Aucun commentaire pour ce cours.</p></div>';
+              } else {
+                const comments = [];
+                snap2.forEach(doc => comments.push(doc.data()));
+                comments.sort((a, b) => (a.timestamp?.toMillis() || 0) - (b.timestamp?.toMillis() || 0));
+                let html = '';
+                comments.forEach(d => {
+                  const time = d.timestamp && d.timestamp.toDate ? d.timestamp.toDate().toLocaleString('fr-FR') : '';
+                  html += '<div class="comment"><div class="comment-user">' + escapeHtml(d.userId || 'Anonyme') + '</div><div class="comment-text">' + escapeHtml(d.text || '') + '</div>' + (time ? '<div class="comment-time">' + time + '</div>' : '') + '</div>';
+                });
+                commentsEl.innerHTML = html;
+              }
+            }, err2 => {
+              commentsEl.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><p>Erreur de chargement.</p></div>';
+            });
+        } else {
+          commentsEl.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><p>Erreur de chargement.</p></div>';
+          console.warn('Comments subscribe error:', err.message);
+        }
+      });
+  }
+
+  async function addComment() {
+    const text = document.getElementById('commentText').value.trim();
+    if (!text) { showToast('Veuillez écrire un commentaire.', 'error'); return; }
+    if (!currentDiscussionCourseId) return;
+    const authUser = firebase.auth().currentUser;
+    if (!authUser) { showToast('Tu dois être connecté pour commenter.', 'error'); return; }
+    try {
+      await db.collection('comments').add({
+        courseId: currentDiscussionCourseId,
+        userId: authUser.email,
+        text: text,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      document.getElementById('commentText').value = '';
+      addGamificationXP(5, 'comment');
+    } catch (e) {
+      showToast('Erreur lors de l\'envoi du commentaire.', 'error');
+      console.warn('Comment add error:', e.message);
+    }
+  }
+
+  // ---- LOAD CLASSES ----
+  async function loadClasses() {
+    try {
+      const snapshot = await db.collection('classes').get();
+      const select = document.getElementById('filterClasse');
+      const activeId = localStorage.getItem('activeClassId');
+      snapshot.forEach(doc => {
+        const d = doc.data();
+        const opt = document.createElement('option');
+        opt.value = doc.id;
+        opt.textContent = d.name || d.nom || doc.id;
+        select.appendChild(opt);
+        if (doc.id === activeId) _activeClassName = d.name || d.nom || doc.id;
+      });
+      renderActiveBanner();
+      if (activeId) select.value = activeId;
+    } catch (e) {
+      console.warn('Classes load error:', e.message);
+    }
+  }
+
+  async function loadFormClasses() {
+    const select = document.getElementById('formClasse');
+    select.innerHTML = '<option value="">Aucune classe</option>';
+    if (!currentUser) return;
+    try {
+      const memberSnap = await db.collection('classMembers')
+        .where('userId', '==', currentUser.uid)
+        .get();
+      const classIds = [];
+      memberSnap.forEach(doc => classIds.push(doc.data().classId));
+      for (const id of classIds) {
+        try {
+          const doc = await db.collection('classes').doc(id).get();
+          if (doc.exists) {
+            const d = doc.data();
+            const opt = document.createElement('option');
+            opt.value = doc.id;
+            opt.textContent = d.name || 'Sans nom';
+            select.appendChild(opt);
+          }
+        } catch (e) { /* skip */ }
+      }
+    } catch (e) {
+      console.warn('Form classes load error:', e.message);
+    }
+  }
+
+  // ---- ACTIVE CLASS BANNER ----
+  let _activeClassName = '';
+
+  function renderActiveBanner() {
+    const banner = document.getElementById('activeClassBanner');
+    const nameEl = document.getElementById('activeBannerName');
+    const activeId = localStorage.getItem('activeClassId');
+    if (activeId) {
+      if (_activeClassName) {
+        nameEl.textContent = _activeClassName;
+        banner.classList.add('show');
+      } else {
+        db.collection('classes').doc(activeId).get().then(doc => {
+          if (doc.exists) {
+            _activeClassName = doc.data().name || doc.data().nom || 'Classe';
+            nameEl.textContent = _activeClassName;
+            banner.classList.add('show');
+          }
+        }).catch(() => {});
+      }
+    } else {
+      banner.classList.remove('show');
+    }
+  }
+
+  function deactivateActiveClass() {
+    localStorage.removeItem('activeClassId');
+    _activeClassName = '';
+    renderActiveBanner();
+    renderCourses();
+    showToast('Classe désactivée — tous les cours sont visibles.', 'info');
+  }
+
+  // ---- URL HASH ----
+  function checkUrlHash() {
+    const hash = window.location.hash;
+    if (hash && hash.startsWith('#cours-')) {
+      const id = hash.replace('#cours-', '');
+      const el = document.getElementById('cours-' + id);
+      if (el) {
+        setTimeout(() => {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          el.classList.add('highlight');
+          setTimeout(() => el.classList.remove('highlight'), 3000);
+        }, 500);
+      }
+    }
+  }
+
+  // ---- FILTERS ----
+  function applyFilters() {
+    renderCourses();
+    updateFilterSpecialite();
+  }
+
+  function updateFilterSpecialite() {
+    const filiere = document.getElementById('filterFiliere').value;
+    const annee = document.getElementById('filterAnnee').value;
+    const select = document.getElementById('filterSpecialite');
+    const currentVal = select.value;
+
+    select.innerHTML = '<option value="">Toutes spécialités/séries</option>';
+
+    if (filiere === 'generale' && annee && annee !== '2nde' && SPECIALITES_GENERALE[annee]) {
+      select.innerHTML += SPECIALITES_GENERALE[annee].map(s => `<option value="${s}">${s}</option>`).join('');
+    } else if (filiere === 'technologique' && annee && annee !== '2nde' && SERIES_TECHNOLOGIQUE[annee]) {
+      select.innerHTML += SERIES_TECHNOLOGIQUE[annee].map(s => `<option value="${s}">${s}</option>`).join('');
+    }
+
+    if (currentVal) select.value = currentVal;
+  }
+
+  function resetFilters() {
+    document.getElementById('filterFiliere').value = '';
+    document.getElementById('filterSpecialite').innerHTML = '<option value="">Toutes spécialités/séries</option>';
+    document.getElementById('filterAnnee').value = '';
+    document.getElementById('filterMatiere').value = '';
+    const activeId = localStorage.getItem('activeClassId');
+    if (!activeId) document.getElementById('filterClasse').value = '';
+    renderCourses();
+  }
+
+  // ---- RENDER ----
+  async function renderCourses() {
+    const grid = document.getElementById('coursGrid');
+    const countEl = document.getElementById('filterCount');
+    const allCourses = getCourses();
+    const sortBy = document.getElementById('sortBy').value;
+
+    const filiere = document.getElementById('filterFiliere').value;
+    const annee = document.getElementById('filterAnnee').value;
+    const specialite = document.getElementById('filterSpecialite').value;
+    const matiere = document.getElementById('filterMatiere').value;
+
+    let filtered = allCourses;
+    const searchVal = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+    if (searchVal) {
+      filtered = filtered.filter(c =>
+        (c.title || '').toLowerCase().includes(searchVal) ||
+        (c.matiereLabel || c.matiere || '').toLowerCase().includes(searchVal) ||
+        (c.description || '').toLowerCase().includes(searchVal) ||
+        (c.userId || '').toLowerCase().includes(searchVal)
+      );
+    }
+    if (filiere) filtered = filtered.filter(c => c.filiere === filiere);
+    if (annee) filtered = filtered.filter(c => c.annee === annee);
+    if (specialite) filtered = filtered.filter(c => c.specialite === specialite);
+    const activeId = localStorage.getItem('activeClassId');
+    if (activeId) {
+      filtered = filtered.filter(c => c.classId === activeId);
+    } else {
+      filtered = filtered.filter(c => !c.classId);
+      const classe = document.getElementById('filterClasse').value;
+      if (classe) filtered = filtered.filter(c => c.classId === classe);
+    }
+    if (matiere) filtered = filtered.filter(c => c.matiere === matiere);
+
+    if (sortBy === 'date-desc') filtered.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
+    else if (sortBy === 'date-asc') filtered.sort((a, b) => new Date(a.dateAdded) - new Date(b.dateAdded));
+    else if (sortBy === 'title') filtered.sort((a, b) => a.title.localeCompare(b.title));
+    else if (sortBy === 'matiere') filtered.sort((a, b) => (a.matiereLabel || '').localeCompare(b.matiereLabel || ''));
+
+    countEl.textContent = `${filtered.length} cours`;
+
+    if (!filtered.length) {
+      grid.innerHTML = `
+        <div class="empty-state" style="grid-column: 1 / -1; text-align:center; padding:60px 20px; color:var(--muted);">
+          <div style="font-size:3rem; margin-bottom:16px;">📭</div>
+          <p style="font-size:0.9rem;">Aucun cours trouvé.</p>
+          <p style="font-size:0.85rem; margin-top:8px;">Ajoute un cours ou modifie tes filtres.</p>
+        </div>`;
+      return;
+    }
+
+    const matiereColors = {};
+    MATIERES.forEach(m => { matiereColors[m.value] = m.color; });
+
+    let filiereLabel = { 'generale': 'Générale', 'technologique': 'Technologique' };
+    let anneeLabel = { '2nde': '2nde', '1ere': '1ère', 'terminale': 'Terminale' };
+
+    var progressData = {};
+    try {
+      if (auth.currentUser) {
+        var pSnap = await db.collection('courseProgress').where('userId', '==', auth.currentUser.uid).get();
+        pSnap.forEach(function(d) { progressData[d.data().courseId] = d.data().completed; });
+      }
+    } catch(e){}
+
+    grid.innerHTML = filtered.map(c => {
+      var safeTitle = escapeHtml(c.title);
+      var safeDesc = escapeHtml(c.description || '');
+      var safeMat = escapeHtml(c.matiereLabel || c.matiere);
+      var safeFn = escapeHtml(c.fileName || 'Fichier');
+      var safeIcon = escapeHtml(c.matiereIcon || '📁');
+      var safeSpec = escapeHtml(c.specialite || '');
+      var safeFl = escapeHtml(filiereLabel[c.filiere] || c.filiere);
+      var safeAl = escapeHtml(anneeLabel[c.annee] || c.annee);
+      var safeCreator = escapeHtml(c.userId ? c.userId.replace(/@.*/, '') : '');
+      var safeUrl = c.fileUrl ? escapeAttr(c.fileUrl) : '';
+      var sid = escapeJsStr(c.id);
+
+      const color = matiereColors[c.matiere] || '#6c63ff';
+
+      const metaTags = `<span class="meta-tag">${safeFl}</span><span class="meta-tag">${safeAl}</span>${safeSpec ? `<span class="meta-tag">${safeSpec}</span>` : ''}`;
+
+      const fileSection = c.fileUrl
+        ? `<div class="cours-footer">
+             <span style="font-size:0.75rem; color:var(--muted);">${safeFn}</span>
+             <a href="${safeUrl}" target="_blank" rel="noopener noreferrer" class="dl-btn" onclick="event.stopPropagation()">Télécharger →</a>
+           </div>`
+        : '';
+
+      const dateStr = c.dateAdded ? new Date(c.dateAdded).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) : '';
+      const userEmail = getUserEmail().toLowerCase();
+      const isOwner = safeCreator && userEmail && c.userId.toLowerCase() === userEmail;
+      var completed = progressData[c.id] || false;
+
+      return `
+        <div class="cours-card${completed ? ' completed' : ''}" id="cours-${sid}" draggable="${isOwner ? 'true' : 'false'}" style="cursor:default;">
+          ${isOwner ? `<button class="edit-btn" onclick="openModal(getCourses().find(x => x.id === '${sid}'))" title="Modifier">✎</button>` : ''}
+          ${isOwner ? `<button class="delete-btn" onclick="deleteCourse('${sid}')" title="Supprimer">✕</button>` : ''}
+          <button class="discussion-btn" onclick="event.stopPropagation();openDiscussion('${sid}')" title="Commentaires">💬</button>
+          <button class="share-btn" onclick="shareCourse('${sid}')" title="Partager">↗</button>
+          <div class="cours-thumb" style="background: linear-gradient(135deg, ${color}22, ${color}44);">
+            <div class="cours-thumb-bg"></div>
+            <span style="position:relative; z-index:1;">${safeIcon}</span>
+            <div class="download-badge">${safeFl}</div>
+          </div>
+          <div class="cours-body">
+            <div class="cours-matiere" style="color:${color}">${safeMat}</div>
+            <div class="cours-title">${safeTitle}</div>
+            ${safeDesc ? `<p style="font-size:0.78rem; color:var(--muted); margin-bottom:12px; line-height:1.4;">${safeDesc}</p>` : ''}
+            <div class="cours-meta">${metaTags}${dateStr ? `<span style="margin-left:auto;font-size:0.7rem;color:var(--muted)">${dateStr}</span>` : ''}</div>
+            <div style="font-size:0.7rem;color:var(--muted);margin-top:8px;display:flex;align-items:center;gap:4px;">
+              <span>👤 ${safeCreator || 'inconnu'}</span>
+              ${!isOwner ? `<span style="color:var(--accent2);font-weight:500;">partagé</span>` : ''}
+            </div>
+            <label class="course-complete-toggle" onclick="event.stopPropagation()">
+              <input type="checkbox" ${completed ? 'checked' : ''} onchange="toggleCourseComplete('${sid}', this.checked)">
+              <label>${completed ? 'Terminé' : 'Marquer comme terminé'}</label>
+            </label>
+          </div>
+          ${fileSection}
+        </div>`;
+    }).join('');
+    updateProgressBar(filtered.length);
+  }
+
+  // ---- INIT ----
+  const addCourseBtn = document.getElementById('addCourseBtn');
+  if (addCourseBtn) addCourseBtn.addEventListener('click', function() { openModal(); });
+
+  // Populate matière filter
+  const matiereFilter = document.getElementById('filterMatiere');
+  MATIERES.forEach(m => {
+    const opt = document.createElement('option');
+    opt.value = m.value;
+    opt.textContent = m.label;
+    matiereFilter.appendChild(opt);
+  });
+
+  // Load classes
+  loadClasses();
+
+  renderCourses();
+  renderActiveBanner();
+  checkUrlHash();
+
+function toggleSidebar() {
+  document.querySelector('.sidebar').classList.toggle('open');
+}
+document.addEventListener('click', function(e) {
+  const sidebar = document.querySelector('.sidebar');
+  const toggle = document.querySelector('.menu-toggle');
+  if (window.innerWidth <= 900 && !sidebar.contains(e.target) && !toggle.contains(e.target)) {
+    sidebar.classList.remove('open');
+  }
+});
+
+function toggleCourseComplete(courseId, completed) {
+  var user = auth && auth.currentUser;
+  if (!user) return;
+  var ref = db.collection('courseProgress').doc(user.uid + '_' + courseId);
+  ref.set({ userId: user.uid, courseId: courseId, completed: completed, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true }).then(function() {
+    if (completed) addGamificationXP(10, 'complete_course');
+    renderCourses();
+  }).catch(function(err) {
+    console.error('Error saving progress:', err);
+  });
+}
+
+function updateProgressBar(total) {
+  if (!total) {
+    var cards = document.querySelectorAll('.cours-card');
+    total = cards.length;
+  }
+  var completed = document.querySelectorAll('.cours-card.completed').length;
+  var section = document.getElementById('progressSection');
+  var fill = document.getElementById('progressFill');
+  var label = document.getElementById('progressLabel');
+  if (total > 0 && completed > 0) {
+    section.style.display = 'block';
+    fill.style.width = (completed / total * 100) + '%';
+    label.textContent = completed + ' / ' + total + ' terminés';
+  } else {
+    section.style.display = 'none';
+  }
+}
+
+var draggedItem = null;
+function onDragOver(e) { e.preventDefault(); }
+function onDrop(e) {
+  e.preventDefault();
+  if (!draggedItem) return;
+  var target = e.target.closest('.cours-card');
+  if (!target || target === draggedItem) return;
+  var grid = document.getElementById('coursGrid');
+  var items = Array.from(grid.children);
+  var fromIdx = items.indexOf(draggedItem);
+  var toIdx = items.indexOf(target);
+  if (fromIdx < toIdx) grid.insertBefore(draggedItem, target.nextSibling);
+  else grid.insertBefore(draggedItem, target);
+  var order = Array.from(grid.children).map(function(el, i) {
+    var id = el.id.replace('cours-', '');
+    return { id: id, order: i };
+  });
+  localStorage.setItem('courseOrder', JSON.stringify(order));
+}
+document.addEventListener('dragstart', function(e) {
+  var card = e.target.closest('.cours-card');
+  if (card) { draggedItem = card; e.dataTransfer.effectAllowed = 'move'; }
+});
+document.addEventListener('dragend', function() { draggedItem = null; });
+
+window.logout = logout;
+window.closeConfirm = closeConfirm;
+window.openModal = openModal;
+window.closeModal = closeModal;
+window.updateFormSpecialite = updateFormSpecialite;
+window.addCourse = addCourse;
+window.deleteCourse = deleteCourse;
+window.shareCourse = shareCourse;
+window.openDiscussion = openDiscussion;
+window.closeDiscussion = closeDiscussion;
+window.addComment = addComment;
+window.deactivateActiveClass = deactivateActiveClass;
+window.applyFilters = applyFilters;
+window.resetFilters = resetFilters;
+window.renderCourses = renderCourses;
+window.toggleSidebar = toggleSidebar;
+window.toggleCourseComplete = toggleCourseComplete;
+window.onDragOver = onDragOver;
+window.onDrop = onDrop;
+window.getCourses = getCourses;
+</script>
+<script type="module" src="/js/app.js"></script>
+<div style="text-align:center;padding:20px;font-size:0.78rem;color:var(--muted);border-top:1px solid var(--border);margin-top:40px;">
+  Des retours ? <a href="../help/" style="color:var(--accent2);text-decoration:none;font-weight:500;">💬 Aide &amp; retours</a>
+</div>
+
+
+
+<!-- NOTIFICATION PANEL -->
+<div class="notif-panel" id="notifPanel">
+  <div class="notif-panel-header">
+    <h3>🔔 Notifications</h3>
+    <button class="notif-panel-close" onclick="closeNotifPanel()">✕</button>
+  </div>
+  <div class="notif-list" id="notifList">
+    <div class="notif-empty">Aucune notification pour le moment.</div>
+  </div>
+  <div class="notif-mark-read" onclick="markAllNotifRead()">Tout marquer comme lu</div>
+</div>
+<script type="module">
+window.openNotifPanel = function() {
+  document.getElementById('notifPanel').classList.add('open');
+  loadNotifications();
+};
+window.closeNotifPanel = function() {
+  document.getElementById('notifPanel').classList.remove('open');
+};
+function loadNotifications() {
+  var user = auth && auth.currentUser;
+  if (!user) return;
+  var list = document.getElementById('notifList');
+  db.collection('notifications').where('userId', '==', user.uid).orderBy('createdAt', 'desc').limit(50).get().then(function(snap) {
+    if (snap.empty) { list.innerHTML = '<div class="notif-empty">Aucune notification pour le moment.</div>'; return; }
+    list.innerHTML = '';
+    snap.forEach(function(doc) {
+      var d = doc.data();
+      var iconClass = d.type === 'levelup' ? 'levelup' : d.type === 'comment' ? 'comment' : 'class';
+      var iconEmoji = d.type === 'levelup' ? '🎉' : d.type === 'comment' ? '💬' : '👥';
+      var cls = d.read ? '' : 'unread';
+      var time = d.createdAt ? new Date(d.createdAt.seconds*1000).toLocaleDateString('fr-FR', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
+      list.innerHTML += '<div class="notif-item ' + cls + '" onclick="markNotifRead(\'' + escapeJsStr(doc.id) + '\')"><div class="notif-icon ' + iconClass + '">' + iconEmoji + '</div><div class="notif-body"><div class="notif-title">' + escapeHtml(d.title || '') + '</div><p>' + escapeHtml(d.body || '') + '</p><div class="notif-time">' + escapeHtml(time) + '</div></div></div>';
+    });
+  }).catch(function() {});
+}
+window.markNotifRead = function(id) {
+  db.collection('notifications').doc(id).update({ read: true }).then(function() { updateNotificationBadge(); loadNotifications(); });
+};
+window.markAllNotifRead = function() {
+  var user = auth && auth.currentUser;
+  if (!user) return;
+  db.collection('notifications').where('userId', '==', user.uid).where('read', '==', false).get().then(function(snap) {
+    var batch = db.batch();
+    snap.forEach(function(doc) { batch.update(doc.ref, { read: true }); });
+    return batch.commit();
+  }).then(function() { updateNotificationBadge(); loadNotifications(); });
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="/manifest.json">
+<title>Hors ligne — Internate</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+  .container { text-align: center; max-width: 480px; }
+  .icon {
+    font-size: 4rem; margin-bottom: 16px; line-height: 1;
+  }
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.6rem;
+    letter-spacing: -0.03em;
+    margin-bottom: 12px;
+  }
+  p {
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    margin-bottom: 32px;
+  }
+  .btn {
+    display: inline-block;
+    padding: 14px 32px;
+    background: var(--accent);
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.25s;
+  }
+  .btn:hover {
+    background: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 0 30px rgba(108,99,255,0.4);
+  }
+  .btn-outline {
+    display: inline-block;
+    margin-top: 12px;
+    margin-left: 8px;
+    padding: 14px 32px;
+    background: transparent;
+    color: var(--text);
+    text-decoration: none;
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    font-weight: 500;
+    transition: all 0.25s;
+  }
+  .btn-outline:hover {
+    border-color: var(--border2);
+    background: var(--hover-overlay);
+  }
+  .signal-bars { display: flex; justify-content: center; gap: 6px; margin-bottom: 24px; align-items: end; height: 60px; }
+  .signal-bar { width: 8px; border-radius: 4px 4px 0 0; background: var(--accent); opacity: 0.3; }
+  .signal-bar:nth-child(1) { height: 20px; }
+  .signal-bar:nth-child(2) { height: 30px; }
+  .signal-bar:nth-child(3) { height: 40px; }
+  .signal-bar:nth-child(4) { height: 50px; }
+  .signal-bar:nth-child(5) { height: 60px; }
+  @media (max-width: 480px) {
+    h1 { font-size: 1.3rem; }
+    .btn, .btn-outline { display: block; margin: 12px auto; width: 100%; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <div class="signal-bars" aria-hidden="true">
+      <div class="signal-bar"></div>
+      <div class="signal-bar"></div>
+      <div class="signal-bar"></div>
+      <div class="signal-bar"></div>
+      <div class="signal-bar"></div>
+    </div>
+    <h1>Tu es hors ligne</h1>
+    <p>Internate n'a pas pu charger cette page car tu n'es pas connecté à Internet. Vérifie ta connexion et réessaie.</p>
+    <a href="/" class="btn" aria-label="Recharger la page d'accueil">Réessayer</a>
+    <a href="/auth/Login_Internate.html" class="btn-outline">Connexion</a>
+  </div>
+</body>
+</html>

@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculateur de Moyenne — Internate</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  :root { --orange: #ffa726; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  .tool-topbar {
+    position: fixed; top: 0; left: 0; right: 0;
+    display: flex; align-items: center; gap: 16px;
+    padding: 12px 24px;
+    background: var(--surface-glass); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border); z-index: 100;
+  }
+  .tool-topbar a { color: var(--muted); text-decoration: none; font-size: 0.82rem; font-weight: 500; transition: color 0.2s; }
+  .tool-topbar a:hover { color: var(--text); }
+  .tool-topbar .sep { color: var(--border); font-size: 0.7rem; }
+  .tool-topbar .current { color: var(--accent); font-size: 0.82rem; font-weight: 600; }
+  .back-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text);
+    text-decoration: none;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .back-btn:hover { background: var(--accent); border-color: var(--accent); color: white; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding: 80px 20px 20px; }
+  .container { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 28px; max-width: 860px; width: 100%; margin: 0 auto; }
+  h1 { font-family: 'Syne', sans-serif; font-size: 1.4rem; margin-bottom: 8px; text-align: center; }
+  .subtitle { text-align: center; color: var(--muted); font-size: 0.85rem; margin-bottom: 24px; }
+
+  .subject-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 14px; }
+  .subject-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+  .subject-header input[type="text"] { flex: 1; min-width: 120px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.85rem; outline: none; }
+  .subject-header input:focus { border-color: var(--accent); }
+  .subject-header .coeff-wrap { display: flex; align-items: center; gap: 4px; }
+  .subject-header .coeff-wrap label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .subject-header .coeff-wrap input { width: 50px; text-align: center; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 6px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.85rem; outline: none; }
+  .subject-header .coeff-wrap input:focus { border-color: var(--accent); }
+  .subject-avg { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700; min-width: 50px; text-align: center; }
+  .subject-avg.green { color: var(--green); } .subject-avg.orange { color: var(--orange); } .subject-avg.red { color: var(--red); }
+  .subject-remove { background: rgba(255,107,107,0.15); border: 1px solid var(--red); color: var(--red); border-radius: 6px; width: 30px; height: 30px; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; transition: background 0.2s; flex-shrink: 0; }
+  .subject-remove:hover { background: rgba(255,107,107,0.3); }
+
+  .grade-row { display: grid; grid-template-columns: 1fr 80px 70px 60px auto; gap: 6px; align-items: center; padding: 8px 10px; margin-bottom: 6px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }
+  .grade-row input { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 6px 8px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.8rem; outline: none; width: 100%; text-align: center; }
+  .grade-row input:focus { border-color: var(--accent); }
+  .grade-row input[type="text"] { text-align: left; }
+  .grade-remove { background: transparent; border: none; color: var(--muted); cursor: pointer; font-size: 0.85rem; padding: 4px; transition: color 0.2s; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; }
+  .grade-remove:hover { color: var(--red); }
+  .add-grade-btn { font-size: 0.75rem; color: var(--accent); background: none; border: 1px dashed var(--border); border-radius: 6px; padding: 6px 12px; cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+  .add-grade-btn:hover { border-color: var(--accent); background: var(--overlay-accent); }
+
+  .subject-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+
+  .globals { display: flex; gap: 16px; align-items: center; justify-content: center; margin: 20px 0; flex-wrap: wrap; }
+  .global-item { text-align: center; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 16px 24px; min-width: 140px; }
+  .global-item .val { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 700; }
+  .global-item .val.green { color: var(--green); } .global-item .val.orange { color: var(--orange); } .global-item .val.red { color: var(--red); }
+  .global-item .lbl { font-size: 0.75rem; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  .target-section { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-top: 20px; }
+  .target-section h3 { font-family: 'Syne', sans-serif; font-size: 0.95rem; margin-bottom: 12px; color: var(--accent2); }
+  .target-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .target-row input { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.85rem; outline: none; width: 100px; text-align: center; }
+  .target-row input:focus { border-color: var(--accent); }
+  .target-result { margin-top: 12px; font-size: 0.9rem; color: var(--accent2); display: none; line-height: 1.6; }
+  .target-result.show { display: block; }
+  .target-result .per-subject { margin-top: 8px; font-size: 0.82rem; color: var(--muted); }
+
+  button { padding: 8px 16px; background: var(--surface2); color: var(--text); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.82rem; transition: all 0.2s; font-family: 'Syne', sans-serif; }
+  button:hover { background: var(--overlay-accent); border-color: var(--accent); }
+  button.primary { background: var(--accent); color: white; border-color: var(--accent); }
+  button.primary:hover { opacity: 0.9; }
+  button.danger { background: rgba(255,107,107,0.15); border-color: var(--red); color: var(--red); }
+  button.danger:hover { background: rgba(255,107,107,0.3); }
+  button.success { background: var(--green); color: white; border-color: var(--green); }
+  button.success:hover { opacity: 0.9; }
+
+  .grade-header { display: grid; grid-template-columns: 1fr 80px 70px 60px auto; gap: 6px; padding: 0 10px 4px 10px; font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; }
+
+  .loading-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.4s ease; }
+  .loading-overlay.hidden { opacity: 0; pointer-events: none; }
+  .spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-overlay p { color: var(--muted); font-size: 0.85rem; margin-top: 16px; }
+  .toast-container { position: fixed; top: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+  .toast { padding: 14px 20px; border-radius: 10px; font-size: 0.87rem; font-weight: 500; color: white; box-shadow: 0 8px 32px rgba(0,0,0,0.4); backdrop-filter: blur(8px); animation: toastIn 0.3s ease both; max-width: 380px; pointer-events: auto; display: flex; align-items: center; gap: 10px; }
+  .toast-success { background: rgba(0,212,170,0.9); } .toast-error { background: rgba(255,107,107,0.9); } .toast-info { background: rgba(108,99,255,0.9); }
+  @keyframes toastIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+  .confirm-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 9998; align-items: center; justify-content: center; }
+  .confirm-overlay.show { display: flex; }
+  .confirm-box { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px 32px; width: 400px; max-width: 90vw; animation: modalIn 0.2s ease both; }
+  .confirm-box p { font-size: 0.92rem; margin-bottom: 20px; line-height: 1.5; color: var(--text); }
+  .confirm-actions { display: flex; gap: 10px; justify-content: flex-end; }
+  .btn-cancel { padding: 10px 22px; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 0.87rem; cursor: pointer; }
+  .btn-cancel:hover { color: var(--text); border-color: rgba(255,255,255,0.15); }
+  .btn-confirm { padding: 10px 22px; background: #ff6b6b; border: none; border-radius: 8px; color: white; font-family: 'DM Sans', sans-serif; font-size: 0.87rem; font-weight: 600; cursor: pointer; }
+
+  @media (max-width: 768px) {
+    body { padding: 76px 12px 12px; }
+    .tool-topbar { padding: 10px 16px; }
+    .container { padding: 16px; }
+    .grade-row { grid-template-columns: 1fr 70px 60px 50px auto; gap: 4px; padding: 6px 8px; }
+    .grade-header { display: none; }
+    .globals { gap: 10px; }
+    .global-item { padding: 12px 16px; min-width: 100px; }
+    .global-item .val { font-size: 1.5rem; }
+  }
+  @media (max-width: 480px) {
+    .subject-header { flex-direction: column; align-items: stretch; }
+    .grade-row input { font-size: 0.75rem; padding: 5px; }
+    .grade-row input[type="text"] { min-width: 0; }
+  }
+</style>
+<script src="../js/escape.js"></script>
+</head>
+<body>
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <p>Chargement...</p>
+</div>
+
+<div class="tool-topbar">
+  <a href="../dashboard/connected_internate.html" class="back-btn">← Retour</a>
+  <span class="sep">›</span>
+  <a href="../courses/Ressources_ex.html">Cours</a>
+  <span class="sep">›</span>
+  <span class="current">Calculateur de Moyenne</span>
+</div>
+
+<div class="container" id="mainContent">
+  <h1>📊 Calculateur de Moyenne</h1>
+  <p class="subtitle">Comme Pronote : ajoute des matières, des notes, des coefficients — le calcul est automatique</p>
+
+  <div class="actions" style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+    <button id="addSubjectBtn" class="primary">+ Ajouter une matière</button>
+    <button id="clearAllBtn" class="danger">🗑️ Tout effacer</button>
+    
+  </div>
+
+  <div id="subjectsContainer"></div>
+
+  <div class="globals" id="globalsBox" style="display:none;">
+    <div class="global-item">
+      <div class="val" id="overallAvg">—</div>
+      <div class="lbl">Moyenne générale</div>
+    </div>
+    <div class="global-item">
+      <div class="val" id="totalCoeffs">0</div>
+      <div class="lbl">Coefficients</div>
+    </div>
+    <div class="global-item">
+      <div class="val" id="gradeCount">0</div>
+      <div class="lbl">Notes</div>
+    </div>
+  </div>
+
+  <div class="target-section">
+    <h3>🎯 Objectif de moyenne générale</h3>
+    <div class="target-row">
+      <span style="font-size:0.85rem;color:var(--muted);">J'aimerais obtenir</span>
+      <input type="number" id="targetInput" step="0.1" min="0" max="20" placeholder="14">
+      <span style="font-size:0.85rem;color:var(--muted);">/20</span>
+      <button id="targetBtn" class="primary">Calculer</button>
+    </div>
+    <div class="target-result" id="targetResult"></div>
+  </div>
+</div>
+
+<div style="text-align:center;padding:16px;font-size:0.75rem;color:var(--muted);margin-top:12px;">
+  <a href="../help/" style="color:var(--accent2);text-decoration:none;">💬 Aide & retours</a>
+</div>
+<div class="toast-container" id="toastContainer"></div>
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <p id="confirmMessage">Confirmer ?</p>
+    <div class="confirm-actions">
+      <button class="btn-cancel" onclick="closeConfirm()">Annuler</button>
+      <button class="btn-confirm" id="confirmBtn">Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'internate_pronote';
+const subjectsContainer = document.getElementById('subjectsContainer');
+const overallAvg = document.getElementById('overallAvg');
+const totalCoeffs = document.getElementById('totalCoeffs');
+const gradeCount = document.getElementById('gradeCount');
+const globalsBox = document.getElementById('globalsBox');
+const targetInput = document.getElementById('targetInput');
+const targetResult = document.getElementById('targetResult');
+
+function uid() { return Math.random().toString(36).slice(2, 8) + Date.now().toString(36); }
+
+function createGradeRow(subjectId, grade) {
+  var div = document.createElement('div');
+  div.className = 'grade-row';
+  div.dataset.gradeId = grade ? grade.id : uid();
+
+  var nameInput = document.createElement('input');
+  nameInput.type = 'text';
+  nameInput.placeholder = 'Devoir';
+  nameInput.value = grade ? (grade.name || '') : '';
+  nameInput.addEventListener('input', saveAndCalc);
+
+  var noteInput = document.createElement('input');
+  noteInput.type = 'number';
+  noteInput.placeholder = 'Note';
+  noteInput.step = '0.1';
+  noteInput.min = '0';
+  noteInput.max = '20';
+  noteInput.value = grade && grade.note !== undefined ? grade.note : '';
+  noteInput.addEventListener('input', saveAndCalc);
+
+  var baremeInput = document.createElement('input');
+  baremeInput.type = 'number';
+  baremeInput.placeholder = '/20';
+  baremeInput.min = '1';
+  baremeInput.max = '100';
+  baremeInput.value = grade && grade.bareme !== undefined ? grade.bareme : 20;
+  baremeInput.addEventListener('input', saveAndCalc);
+
+  var coeffInput = document.createElement('input');
+  coeffInput.type = 'number';
+  coeffInput.placeholder = 'Coef';
+  coeffInput.min = '0.5';
+  coeffInput.max = '10';
+  coeffInput.step = '0.5';
+  coeffInput.value = grade && grade.coeff !== undefined ? grade.coeff : 1;
+  coeffInput.addEventListener('input', saveAndCalc);
+
+  var removeBtn = document.createElement('button');
+  removeBtn.className = 'grade-remove';
+  removeBtn.textContent = '✕';
+  removeBtn.title = 'Supprimer cette note';
+  removeBtn.addEventListener('click', function() { div.remove(); saveAndCalc(); });
+
+  div.appendChild(nameInput);
+  div.appendChild(noteInput);
+  div.appendChild(baremeInput);
+  div.appendChild(coeffInput);
+  div.appendChild(removeBtn);
+  return div;
+}
+
+function addGrade(subjectDiv, subjectId, grade) {
+  var gradesContainer = subjectDiv.querySelector('.grades-container');
+  var row = createGradeRow(subjectId, grade);
+  gradesContainer.appendChild(row);
+}
+
+function addSubject(data) {
+  var id = data ? data.id : uid();
+  var div = document.createElement('div');
+  div.className = 'subject-card';
+  div.dataset.subjectId = id;
+
+  var header = document.createElement('div');
+  header.className = 'subject-header';
+
+  var nameInput = document.createElement('input');
+  nameInput.type = 'text';
+  nameInput.placeholder = 'Nom de la matière (ex: Maths)';
+  nameInput.value = data ? (data.name || '') : '';
+  nameInput.addEventListener('input', saveAndCalc);
+
+  var coeffWrap = document.createElement('div');
+  coeffWrap.className = 'coeff-wrap';
+  var coeffLabel = document.createElement('label');
+  coeffLabel.textContent = 'Coef. matière';
+  var coeffInput = document.createElement('input');
+  coeffInput.type = 'number';
+  coeffInput.min = '0.5';
+  coeffInput.max = '10';
+  coeffInput.step = '0.5';
+  coeffInput.value = data && data.subjectCoeff !== undefined ? data.subjectCoeff : 1;
+  coeffInput.addEventListener('input', saveAndCalc);
+  coeffWrap.appendChild(coeffLabel);
+  coeffWrap.appendChild(coeffInput);
+
+  var avgSpan = document.createElement('span');
+  avgSpan.className = 'subject-avg';
+  avgSpan.textContent = '—';
+
+  var removeBtn = document.createElement('button');
+  removeBtn.className = 'subject-remove';
+  removeBtn.textContent = '✕';
+  removeBtn.title = 'Supprimer cette matière';
+  removeBtn.addEventListener('click', function() {
+    div.remove();
+    saveAndCalc();
+  });
+
+  header.appendChild(nameInput);
+  header.appendChild(coeffWrap);
+  header.appendChild(avgSpan);
+  header.appendChild(removeBtn);
+  div.appendChild(header);
+
+  var gradeHeader = document.createElement('div');
+  gradeHeader.className = 'grade-header';
+  gradeHeader.innerHTML = '<span>Devoir</span><span>Note</span><span>Barème</span><span>Coef</span><span></span>';
+  div.appendChild(gradeHeader);
+
+  var gradesContainer = document.createElement('div');
+  gradesContainer.className = 'grades-container';
+  div.appendChild(gradesContainer);
+
+  var actions = document.createElement('div');
+  actions.className = 'subject-actions';
+  var addGradeBtn = document.createElement('button');
+  addGradeBtn.className = 'add-grade-btn';
+  addGradeBtn.textContent = '+ Ajouter une note';
+  addGradeBtn.addEventListener('click', function() {
+    addGrade(div, id);
+    saveAndCalc();
+  });
+  actions.appendChild(addGradeBtn);
+  div.appendChild(actions);
+
+  if (data && data.grades) {
+    data.grades.forEach(function(g) { addGrade(div, id, g); });
+  }
+
+  subjectsContainer.appendChild(div);
+  return div;
+}
+
+function getData() {
+  var subjects = [];
+  var cards = subjectsContainer.querySelectorAll('.subject-card');
+  cards.forEach(function(card) {
+    var inputs = card.querySelectorAll('.subject-header input');
+    var name = inputs[0].value.trim();
+    var subjectCoeff = parseFloat(inputs[1].value) || 1;
+    var grades = [];
+    var rows = card.querySelectorAll('.grade-row');
+    rows.forEach(function(row) {
+      var cells = row.querySelectorAll('input');
+      grades.push({
+        id: row.dataset.gradeId,
+        name: cells[0].value,
+        note: parseFloat(cells[1].value),
+        bareme: parseFloat(cells[2].value) || 20,
+        coeff: parseFloat(cells[3].value) || 1
+      });
+    });
+    subjects.push({ id: card.dataset.subjectId, name: name || 'Matière', subjectCoeff: subjectCoeff, grades: grades });
+  });
+  return subjects;
+}
+
+function calcSubjectAverage(grades) {
+  if (!grades || grades.length === 0) return null;
+  var totalPond = 0, totalCoef = 0;
+  grades.forEach(function(g) {
+    if (g.note !== undefined && !isNaN(g.note) && g.note !== '' && g.bareme && g.coeff) {
+      totalPond += (g.note / g.bareme) * g.coeff;
+      totalCoef += g.coeff;
+    }
+  });
+  if (totalCoef === 0) return null;
+  return (totalPond / totalCoef) * 20;
+}
+
+function calcOverall() {
+  var subjects = getData();
+  var totalPond = 0, totalCoef = 0, totalGrades = 0;
+  var hasAny = false;
+
+  subjects.forEach(function(s) {
+    var avg = calcSubjectAverage(s.grades);
+    if (avg !== null) {
+      totalPond += avg * s.subjectCoeff;
+      totalCoef += s.subjectCoeff;
+      hasAny = true;
+    }
+    s.grades.forEach(function(g) {
+      if (g.note !== undefined && !isNaN(g.note) && g.note !== '') totalGrades++;
+    });
+  });
+
+  gradeCount.textContent = totalGrades;
+
+  if (!hasAny || totalCoef === 0) {
+    globalsBox.style.display = 'none';
+    return null;
+  }
+
+  var overall = totalPond / totalCoef;
+  globalsBox.style.display = 'flex';
+  overallAvg.textContent = overall.toFixed(2);
+  overallAvg.className = 'val';
+  if (overall >= 14) overallAvg.classList.add('green');
+  else if (overall >= 10) overallAvg.classList.add('orange');
+  else overallAvg.classList.add('red');
+  totalCoeffs.textContent = totalCoef.toFixed(1);
+
+  return overall;
+}
+
+function updateSubjectDisplays() {
+  var cards = subjectsContainer.querySelectorAll('.subject-card');
+  cards.forEach(function(card) {
+    var id = card.dataset.subjectId;
+    var data = getData().find(function(s) { return s.id === id; });
+    var avgSpan = card.querySelector('.subject-avg');
+    if (data && data.grades.length > 0) {
+      var avg = calcSubjectAverage(data.grades);
+      if (avg !== null) {
+        avgSpan.textContent = avg.toFixed(2);
+        avgSpan.className = 'subject-avg';
+        if (avg >= 14) avgSpan.classList.add('green');
+        else if (avg >= 10) avgSpan.classList.add('orange');
+        else avgSpan.classList.add('red');
+      } else {
+        avgSpan.textContent = '—';
+        avgSpan.className = 'subject-avg';
+      }
+    } else {
+      avgSpan.textContent = '—';
+      avgSpan.className = 'subject-avg';
+    }
+  });
+}
+
+function saveAndCalc() {
+  var data = getData();
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  updateSubjectDisplays();
+  calcOverall();
+  targetResult.classList.remove('show');
+}
+
+function saveGrades() { saveAndCalc(); }
+
+function loadData() {
+  var raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return;
+  try {
+    var data = JSON.parse(raw);
+    if (!Array.isArray(data)) return;
+    data.forEach(function(s) { addSubject(s); });
+    saveAndCalc();
+  } catch(e) {}
+}
+
+function showToast(msg, type) {
+  var c = document.getElementById('toastContainer');
+  if (!c) return;
+  var e = document.createElement('div');
+  e.className = 'toast toast-' + (type || 'info');
+  e.textContent = msg;
+  c.appendChild(e);
+  setTimeout(function() { e.style.animation = 'toastOut 0.3s ease both'; setTimeout(function() { e.remove(); }, 300); }, 3500);
+}
+
+var confirmCallback = null;
+function showConfirm(msg, cb) {
+  confirmCallback = cb;
+  document.getElementById('confirmMessage').textContent = msg;
+  document.getElementById('confirmOverlay').classList.add('show');
+}
+function closeConfirm() { document.getElementById('confirmOverlay').classList.remove('show'); confirmCallback = null; }
+
+document.getElementById('addSubjectBtn').addEventListener('click', function() {
+  addSubject(null);
+  saveAndCalc();
+});
+
+document.getElementById('clearAllBtn').addEventListener('click', function() {
+  showConfirm('Voulez-vous vraiment effacer toutes les matières et notes ?', function() {
+    subjectsContainer.innerHTML = '';
+    globalsBox.style.display = 'none';
+    targetResult.classList.remove('show');
+    localStorage.removeItem(STORAGE_KEY);
+  });
+});
+
+document.getElementById('targetBtn').addEventListener('click', function() {
+  var target = parseFloat(targetInput.value);
+  if (isNaN(target) || target < 0 || target > 20) {
+    targetResult.textContent = 'Veuillez entrer un objectif valide entre 0 et 20.';
+    targetResult.classList.add('show');
+    return;
+  }
+
+  var subjects = getData();
+  var currentTotal = 0, currentCoef = 0;
+  var existingGrades = 0;
+
+  subjects.forEach(function(s) {
+    var avg = calcSubjectAverage(s.grades);
+    if (avg !== null) { currentTotal += avg * s.subjectCoeff; currentCoef += s.subjectCoeff; }
+    s.grades.forEach(function(g) {
+      if (g.note !== undefined && !isNaN(g.note) && g.note !== '') existingGrades++;
+    });
+  });
+
+  if (currentCoef === 0) {
+    targetResult.textContent = 'Ajoute d\'abord des notes pour calculer un objectif.';
+    targetResult.classList.add('show');
+    return;
+  }
+
+  var neededOverall = target * (currentCoef + 1) - currentTotal;
+  var neededClamped = Math.max(0, Math.min(20, neededOverall));
+
+  var html = '';
+  if (neededOverall > 20) {
+    html = '❌ Même avec un 20/20, tu ne pourras pas atteindre ' + target.toFixed(1) + '/20 de moyenne générale.';
+  } else if (neededOverall <= 0) {
+    html = '✅ Tu as déjà au moins ' + target.toFixed(1) + '/20 de moyenne générale !';
+  } else {
+    html = '📝 Il te faut <strong>' + neededClamped.toFixed(2) + '/20</strong> au prochain devoir (coeff. matière 1, devoir coeff. 1) pour atteindre <strong>' + target.toFixed(1) + '/20</strong>.';
+
+    var perSubject = [];
+    subjects.forEach(function(s) {
+      if (s.grades.length === 0 || !calcSubjectAverage(s.grades)) return;
+      var need = target * (currentCoef + s.subjectCoeff) - (currentTotal - (calcSubjectAverage(s.grades) * s.subjectCoeff));
+      var n = Math.max(0, Math.min(20, need));
+      perSubject.push({ name: s.name, need: n });
+    });
+
+    if (perSubject.length > 0) {
+      html += '<div class="per-subject">Par matière (si tu bosses uniquement celle-ci) :<br>';
+      perSubject.forEach(function(p) {
+        html += '• ' + p.name + ' : <strong>' + p.need.toFixed(2) + '/20</strong> (coeff. ' + p.need.toFixed(1) + ')<br>';
+      });
+      html += '</div>';
+    }
+  }
+
+  targetResult.innerHTML = html;
+  targetResult.classList.add('show');
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+  var btn = document.getElementById('confirmBtn');
+  if (btn) btn.addEventListener('click', function() { if (confirmCallback) confirmCallback(); closeConfirm(); });
+  var overlay = document.getElementById('confirmOverlay');
+  if (overlay) overlay.addEventListener('click', function(e) { if (e.target === e.currentTarget) closeConfirm(); });
+});
+
+var loadingOverlay = document.getElementById('loadingOverlay');
+var user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+if (user && user.uid) {
+  loadingOverlay.classList.add('hidden');
+} else {
+  window.location.href = '../auth/Login_Internate.html';
+}
+
+loadData();
+if (subjectsContainer.children.length === 0) addSubject(null);
+</script>
+
+</body>
+</html>

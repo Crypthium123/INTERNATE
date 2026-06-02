@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Plateforme éducative collaborative — cours, classes, chat, outils de révision pour lycéens. Construit par des lycéens, pour des lycéens.">
+<meta name="theme-color" content="#07070e">
+<meta property="og:title" content="Internate — La connaissance, partagée.">
+<meta property="og:description" content="Plateforme éducative collaborative — cours, classes, chat, outils de révision pour lycéens.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://internate.web.app">
+<meta property="og:image" content="https://internate.web.app/favicon.svg">
+<meta name="twitter:card" content="summary">
+<link rel="manifest" href="/manifest.json">
+<title>Internate — La connaissance, partagée.</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  :root {
+    --accent3: #ff6b6b;
+    --glow: rgba(108, 99, 255, 0.3);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+
+
+  /* ---- ANIMATED BACKGROUND ORBS ---- */
+  .bg-orbs {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    animation: float 20s ease-in-out infinite;
+  }
+  .orb-1 { width: 500px; height: 500px; background: var(--overlay-accent); top: -100px; left: -100px; animation-delay: 0s; }
+  .orb-2 { width: 400px; height: 400px; background: var(--overlay-green); top: 50%; right: -100px; animation-delay: -7s; }
+  .orb-3 { width: 350px; height: 350px; background: rgba(255,107,107,0.06); bottom: -80px; left: 30%; animation-delay: -14s; }
+
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -30px) scale(1.05); }
+    66% { transform: translate(-20px, 20px) scale(0.95); }
+  }
+
+  /* ---- NAV ---- */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 20px 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-glass-light);
+    animation: slideDown 0.6s ease both;
+  }
+
+  .nav-hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    z-index: 101;
+  }
+  .nav-hamburger span {
+    display: block;
+    width: 24px; height: 2px;
+    background: var(--text);
+    border-radius: 2px;
+    transition: all 0.3s ease;
+  }
+  .nav-hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+  .nav-hamburger.active span:nth-child(2) { opacity: 0; }
+  .nav-hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+  @keyframes slideDown {
+    from { transform: translateY(-100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.6rem;
+    letter-spacing: -0.03em;
+    background: var(--gen-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .logo span {
+    font-weight: 400;
+    -webkit-text-fill-color: rgba(255,255,255,0.4);
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 40px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--text); }
+
+  .nav-cta {
+    display: flex;
+    gap: 12px;
+  }
+
+  .btn-outline {
+    padding: 9px 22px;
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    background: transparent;
+    cursor: pointer;
+  }
+  .btn-outline:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .btn-primary {
+    padding: 9px 22px;
+    border-radius: 8px;
+    background: var(--accent);
+    color: white;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+    box-shadow: var(--shadow-btn);
+  }
+  .btn-primary:hover {
+    background: var(--accent);
+    box-shadow: var(--shadow-btn-hover);
+    transform: translateY(-1px);
+  }
+
+  /* ---- HERO ---- */
+  .hero {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 120px 40px 80px;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    border: 1px solid var(--overlay-accent-strong);
+    border-radius: 100px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: #a8a3ff;
+    background: var(--overlay-accent);
+    margin-bottom: 36px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    animation: fadeUp 0.8s ease 0.2s both;
+  }
+
+  .badge-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent2);
+    box-shadow: 0 0 8px var(--accent2);
+    animation: pulse 2s ease infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(3rem, 7vw, 6.5rem);
+    line-height: 1.0;
+    letter-spacing: -0.04em;
+    margin-bottom: 28px;
+    animation: fadeUp 0.8s ease 0.4s both;
+  }
+
+  .hero h1 .line1 { display: block; color: var(--text); }
+  .hero h1 .line2 {
+    display: block;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 60%, var(--accent3) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero p {
+    max-width: 600px;
+    font-size: 1.15rem;
+    line-height: 1.7;
+    color: var(--muted);
+    margin-bottom: 48px;
+    font-weight: 300;
+    animation: fadeUp 0.8s ease 0.6s both;
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    animation: fadeUp 0.8s ease 0.8s both;
+  }
+
+  .btn-hero {
+    padding: 14px 32px;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.25s;
+    cursor: pointer;
+    border: none;
+  }
+
+  .btn-hero-primary {
+    background: var(--accent);
+    color: white;
+    box-shadow: 0 0 30px rgba(108,99,255,0.5), 0 4px 20px rgba(0,0,0,0.3);
+  }
+  .btn-hero-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 50px rgba(108,99,255,0.7), 0 8px 30px rgba(0,0,0,0.3);
+  }
+
+  .btn-hero-secondary {
+    background: var(--hover-overlay);
+    color: var(--text);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(10px);
+  }
+  .btn-hero-secondary:hover {
+    background: var(--hover-overlay-strong);
+    border-color: var(--border2);
+    transform: translateY(-2px);
+  }
+
+  /* ---- SHOWCASE ---- */
+  .showcase {
+    position: relative;
+    z-index: 1;
+    padding: 40px 60px 120px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .showcase .section-label { text-align: center; }
+  .showcase .section-title { text-align: center; }
+  .showcase-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 40px;
+  }
+  .showcase-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    transition: all 0.3s;
+  }
+  .showcase-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--border2);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+  }
+  .showcase-card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+  .showcase-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+  .showcase-dot.red { background: #ff5f56; }
+  .showcase-dot.yellow { background: #ffbd2e; }
+  .showcase-dot.green { background: #27c93f; }
+  .showcase-card-url {
+    font-size: 0.72rem;
+    color: var(--muted);
+    background: var(--bg);
+    padding: 4px 12px;
+    border-radius: 4px;
+    flex: 1;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .showcase-card-body {
+    padding: 20px 24px 28px;
+    min-height: 220px;
+  }
+  .showcase-body-dash {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .showcase-greeting {
+    font-size: 0.85rem;
+    color: var(--text);
+    font-weight: 500;
+  }
+  .showcase-greeting strong { color: var(--accent); }
+  .showcase-quote {
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-style: italic;
+    padding: 8px 12px;
+    background: var(--hover-overlay);
+    border-radius: 8px;
+    border-left: 2px solid var(--accent);
+  }
+  .showcase-stats-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .showcase-stat-chip {
+    flex: 1;
+    padding: 10px;
+    background: var(--surface2);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    text-align: center;
+  }
+  .showcase-stat-chip strong {
+    display: block;
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem;
+    color: var(--accent2);
+  }
+  .showcase-stat-chip span {
+    font-size: 0.65rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .showcase-body-class {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .showcase-class-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: var(--surface2);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+  .showcase-class-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.8rem;
+    background: var(--overlay-accent);
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+  .showcase-class-info { flex: 1; }
+  .showcase-class-info strong { display: block; font-size: 0.82rem; }
+  .showcase-class-info span { font-size: 0.7rem; color: var(--muted); }
+  .showcase-class-badge {
+    font-size: 0.6rem;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: var(--overlay-green);
+    color: var(--accent2);
+    font-weight: 600;
+  }
+  .showcase-body-chat {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .showcase-msg {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .showcase-msg-avatar {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.65rem;
+    background: var(--overlay-accent);
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+  .showcase-msg-bubble {
+    padding: 8px 12px;
+    background: var(--surface2);
+    border-radius: 12px 12px 12px 4px;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--text);
+  }
+  .showcase-msg-bubble .time {
+    font-size: 0.6rem;
+    color: var(--muted);
+    display: block;
+    margin-top: 2px;
+  }
+  .showcase-msg.own { flex-direction: row-reverse; }
+  .showcase-msg.own .showcase-msg-bubble {
+    background: var(--overlay-accent);
+    border-radius: 12px 12px 4px 12px;
+    color: var(--text);
+  }
+  @media (max-width: 900px) {
+    .showcase { padding: 30px 20px 60px; }
+    .showcase-grid { grid-template-columns: 1fr; gap: 16px; }
+    .showcase-card-body { min-height: 180px; padding: 16px 20px 22px; }
+  }
+  @media (max-width: 600px) {
+    .showcase { padding: 20px 12px 40px; }
+  }
+
+  /* ---- SCROLL INDICATOR ---- */
+  .scroll-hint {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    color: var(--muted);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    animation: fadeIn 1s ease 1.5s both;
+  }
+
+  .scroll-line {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, var(--muted), transparent);
+    animation: scrollDown 2s ease infinite;
+  }
+
+  @keyframes scrollDown {
+    0% { transform: scaleY(0); transform-origin: top; }
+    50% { transform: scaleY(1); transform-origin: top; }
+    51% { transform: scaleY(1); transform-origin: bottom; }
+    100% { transform: scaleY(0); transform-origin: bottom; }
+  }
+
+  /* ---- STATS BAR ---- */
+  .stats-bar {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: var(--hover-overlay);
+    padding: 30px 0;
+    animation: fadeIn 0.8s ease 1s both;
+  }
+
+  .stat-item {
+    flex: 1;
+    max-width: 220px;
+    text-align: center;
+    padding: 0 40px;
+    border-right: 1px solid var(--border);
+  }
+  .stat-item:last-child { border-right: none; }
+
+  .stat-number {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 2.2rem;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .stat-label {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-top: 4px;
+    letter-spacing: 0.05em;
+  }
+
+  /* ---- FEATURES ---- */
+  .section {
+    position: relative;
+    z-index: 1;
+    padding: 120px 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: clamp(2rem, 4vw, 3rem);
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+    margin-bottom: 60px;
+  }
+
+  .section-title em {
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .feature-card {
+    background: var(--surface);
+    padding: 40px 36px;
+    transition: background 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent-color, var(--accent)), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .feature-card:hover { background: var(--surface2); }
+  .feature-card:hover::before { opacity: 1; }
+
+  .feature-icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 24px;
+    background: var(--icon-bg, var(--overlay-accent));
+  }
+
+  .feature-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+    letter-spacing: -0.02em;
+  }
+
+  .feature-desc {
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.65;
+  }
+
+  /* ---- TOOLS SHOWCASE ---- */
+  .tools-section {
+    position: relative;
+    z-index: 1;
+    padding: 80px 60px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tools-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+
+  .tools-list {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .tool-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 20px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.2s;
+    border: 1px solid transparent;
+    cursor: pointer;
+  }
+  .tool-item:hover {
+    background: var(--hover-overlay);
+    border-color: var(--border);
+    transform: translateX(4px);
+  }
+
+  .tool-emoji {
+    font-size: 1.4rem;
+    width: 44px; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--hover-overlay);
+    border-radius: 10px;
+    flex-shrink: 0;
+  }
+
+  .tool-info strong {
+    display: block;
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 2px;
+  }
+
+  .tool-info span {
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+
+  .tool-arrow {
+    margin-left: auto;
+    color: var(--muted);
+    font-size: 1rem;
+    transition: transform 0.2s, color 0.2s;
+  }
+  .tool-item:hover .tool-arrow {
+    transform: translateX(4px);
+    color: var(--accent);
+  }
+
+  /* ---- CTA FINALE ---- */
+  .cta-section {
+    position: relative;
+    z-index: 1;
+    padding: 140px 60px;
+    text-align: center;
+  }
+
+  .cta-inner {
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  .cta-section h2 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+    margin-bottom: 24px;
+  }
+
+  .cta-section p {
+    color: var(--muted);
+    font-size: 1.05rem;
+    line-height: 1.7;
+    margin-bottom: 48px;
+  }
+
+  /* ---- FOOTER ---- */
+  footer {
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid var(--border);
+    padding: 40px 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    color: var(--muted);
+    font-size: 0.82rem;
+    text-align: center;
+  }
+
+  /* ---- ANIMATIONS ---- */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* Intersection observer animations */
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: none;
+  }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  @media (max-width: 900px) {
+    nav { padding: 14px 20px; }
+    .nav-hamburger { display: flex; }
+    .nav-links {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      flex-direction: column;
+      background: rgba(9,9,15,0.98);
+      backdrop-filter: blur(20px);
+      padding: 80px 40px 40px;
+      gap: 8px;
+      z-index: 100;
+    }
+    .nav-links.open { display: flex; }
+    .nav-links a {
+      font-size: 1.2rem;
+      padding: 14px;
+      border-radius: 10px;
+    }
+    .nav-links a:hover { background: rgba(255,255,255,0.05); }
+    .nav-cta { gap: 8px; }
+    .hero { padding: 100px 24px 60px; }
+    .hero h1 { font-size: clamp(2.2rem, 8vw, 4rem); }
+    .hero p { font-size: 1rem; padding: 0 20px; }
+    .hero-cta { flex-direction: column; align-items: center; }
+    .section { padding: 60px 20px; }
+    .features-grid { grid-template-columns: 1fr; gap: 16px; }
+    .feature-card { padding: 24px 20px; }
+    .tools-inner { grid-template-columns: 1fr; gap: 30px; }
+    .stats-bar { flex-wrap: wrap; padding: 16px 0; }
+    .stat-item { padding: 14px 16px; max-width: 50%; border-right: none; border-bottom: 1px solid var(--border); }
+    .tools-section { padding: 50px 20px; }
+    .cta-section { padding: 60px 20px; }
+    footer { gap: 6px; padding: 24px 20px; }
+    .cta-buttons { flex-direction: column; align-items: center; }
+  }
+  @media (max-width: 600px) {
+    nav { padding: 10px 12px; }
+    .nav-cta { gap: 6px; }
+    .btn-outline, .btn-primary { padding: 6px 12px; font-size: 0.78rem; }
+    .hero { padding: 70px 12px 30px; }
+    .hero h1 { font-size: clamp(1.8rem, 10vw, 2.8rem); }
+    .hero p { font-size: 0.88rem; padding: 0 10px; }
+    .hero-badge { font-size: 0.65rem; padding: 3px 10px; }
+    .section { padding: 40px 12px; }
+    .section-title { font-size: clamp(1.3rem, 6vw, 1.8rem); }
+    .stat-item { max-width: 100%; padding: 10px 12px; }
+    .stat-number { font-size: 1.4rem; }
+    .stat-label { font-size: 0.72rem; }
+    .features-grid { gap: 12px; }
+    .tools-list { gap: 1px; }
+    .tool-item { padding: 12px 14px; gap: 14px; }
+    .tool-icon { width: 36px; height: 36px; font-size: 1rem; }
+    .tool-info h4 { font-size: 0.85rem; }
+    .tool-info p { font-size: 0.72rem; }
+    .cta-section h2 { font-size: 1.3rem; }
+    .cta-section p { font-size: 0.85rem; }
+    footer { padding: 20px 12px; font-size: 0.72rem; }
+  }
+  @media (max-width: 400px) {
+    nav { flex-wrap: wrap; gap: 6px; justify-content: center; }
+    .hero h1 { font-size: clamp(1.5rem, 10vw, 2rem); }
+    .hero p { font-size: 0.82rem; }
+    .feature-card { padding: 16px 14px; }
+    .feature-title { font-size: 0.9rem; }
+    .feature-desc { font-size: 0.78rem; }
+    .btn { font-size: 0.75rem; padding: 8px 14px; }
+  }
+
+  /* ---- STORY CARDS ---- */
+  .story-card{padding:32px;background:var(--surface);border:1px solid var(--border);border-radius:14px;transition:all 0.3s}
+  .story-card:hover{background:var(--surface2);border-color:rgba(255,255,255,0.1);transform:translateY(-2px)}
+  .story-card:hover h3{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+</style>
+</head>
+<body>
+
+<div class="bg-orbs">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+
+<header role="banner">
+<nav aria-label="Navigation principale">
+  <div class="logo">Inter<span>nate</span></div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#showcase" onclick="closeNav()">Aperçu</a></li>
+    <li><a href="#features" onclick="closeNav()">Fonctionnalités</a></li>
+    <li><a href="#outils" onclick="closeNav()">Outils</a></li>
+    <li><a href="courses/Ressources_ex.html" onclick="closeNav()">Cours</a></li>
+  </ul>
+  <div class="nav-cta">
+    <a href="auth/Login_Internate.html" class="btn-outline">Se connecter</a>
+    <a href="auth/Register_internate.html" class="btn-primary">Créer un compte</a>
+  </div>
+  <button class="nav-hamburger" id="navHamburger" onclick="toggleNav()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+  </nav>
+</header>
+
+<main role="main">
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">
+    <span class="badge-dot"></span>
+    Plateforme éducative collaborative
+  </div>
+  <h1>
+    <span class="line1">La connaissance,</span>
+    <span class="line2">partagée.</span>
+  </h1>
+  <p>On était en Seconde, on voulait partager nos cours. Aujourd'hui, Internate est une plateforme complète — cours, outils, classes — construite par des lycéens, pour des lycéens.</p>
+  <div class="hero-cta">
+    <a href="auth/Register_internate.html" class="btn-hero btn-hero-primary">Commencer gratuitement</a>
+    <a href="auth/Login_Internate.html" class="btn-hero btn-hero-secondary">J'ai déjà un compte →</a>
+  </div>
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    Découvrir
+  </div>
+</section>
+
+<!-- SHOWCASE -->
+<section class="showcase" id="showcase">
+  <div class="reveal">
+    <div class="section-label">Découvrez la plateforme</div>
+    <div class="section-title">Ton espace, ta classe,<br><em>ton réseau</em>.</div>
+  </div>
+  <div class="showcase-grid">
+    <div class="showcase-card reveal reveal-delay-1">
+      <div class="showcase-card-header">
+        <span class="showcase-dot red"></span>
+        <span class="showcase-dot yellow"></span>
+        <span class="showcase-dot green"></span>
+        <span class="showcase-card-url">internate.web.app/dashboard</span>
+      </div>
+      <div class="showcase-card-body">
+        <div class="showcase-body-dash">
+          <div class="showcase-greeting">👋 Bonjour <strong>Lucas</strong></div>
+          <div class="showcase-quote">"Le savoir est la seule richesse qui augmente quand on la partage."</div>
+          <div class="showcase-stats-row">
+            <div class="showcase-stat-chip">
+              <strong>1 280</strong>
+              <span>XP</span>
+            </div>
+            <div class="showcase-stat-chip">
+              <strong>Niv. 5</strong>
+              <span>Niveau</span>
+            </div>
+            <div class="showcase-stat-chip">
+              <strong>🔥 7</strong>
+              <span>Streak</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="showcase-card reveal reveal-delay-2">
+      <div class="showcase-card-header">
+        <span class="showcase-dot red"></span>
+        <span class="showcase-dot yellow"></span>
+        <span class="showcase-dot green"></span>
+        <span class="showcase-card-url">internate.web.app/classes</span>
+      </div>
+      <div class="showcase-card-body">
+        <div class="showcase-body-class">
+          <div class="showcase-class-item">
+            <div class="showcase-class-avatar">1G</div>
+            <div class="showcase-class-info">
+              <strong>1G10 — Maths</strong>
+              <span>28 membres · 15 cours</span>
+            </div>
+            <span class="showcase-class-badge">Actif</span>
+          </div>
+          <div class="showcase-class-item">
+            <div class="showcase-class-avatar">T</div>
+            <div class="showcase-class-info">
+              <strong>Terminale SVT</strong>
+              <span>19 membres · 8 cours</span>
+            </div>
+            <span class="showcase-class-badge">Actif</span>
+          </div>
+          <div class="showcase-class-item">
+            <div class="showcase-class-avatar">P</div>
+            <div class="showcase-class-info">
+              <strong>Prépa Bac Français</strong>
+              <span>12 membres · 6 cours</span>
+            </div>
+            <span class="showcase-class-badge">Nouveau</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="showcase-card reveal reveal-delay-3">
+      <div class="showcase-card-header">
+        <span class="showcase-dot red"></span>
+        <span class="showcase-dot yellow"></span>
+        <span class="showcase-dot green"></span>
+        <span class="showcase-card-url">internate.web.app/classes/chat</span>
+      </div>
+      <div class="showcase-card-body">
+        <div class="showcase-body-chat">
+          <div class="showcase-msg">
+            <div class="showcase-msg-avatar">L</div>
+            <div class="showcase-msg-bubble">Quelqu'un a les cours sur les suites pour demain ?<span class="time">14:32</span></div>
+          </div>
+          <div class="showcase-msg own">
+            <div class="showcase-msg-avatar">M</div>
+            <div class="showcase-msg-bubble">Oui je les ai, je partage dans la classe 📚<span class="time">14:33</span></div>
+          </div>
+          <div class="showcase-msg">
+            <div class="showcase-msg-avatar">S</div>
+            <div class="showcase-msg-bubble">Merci ! J'avais raté ce cours 🙏<span class="time">14:35</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stat-item">
+    <div class="stat-number">100%</div>
+    <div class="stat-label">Gratuit</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-number">50+</div>
+    <div class="stat-label">Cours partagés</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-number">15+</div>
+    <div class="stat-label">Classes créées</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-number">24/7</div>
+    <div class="stat-label">En ligne</div>
+  </div>
+</div>
+
+<!-- STORY -->
+<section class="section" id="story">
+  <div class="reveal">
+    <div class="section-label">Notre histoire</div>
+    <div class="section-title">D'une idée entre potes à une<br><em>plateforme complète</em>.</div>
+  </div>
+  <div style="max-width:800px;margin:0 auto;display:flex;flex-direction:column;gap:40px;">
+    <div class="reveal reveal-delay-1 story-card">
+      <div style="display:flex;gap:24px;align-items:flex-start;">
+        <div style="font-size:2rem;flex-shrink:0;width:48px;text-align:center;">🎒</div>
+        <div>
+          <h3 style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;margin-bottom:8px;">2024 — Les débuts</h3>
+          <p style="color:var(--muted);line-height:1.7;font-size:0.92rem;">On était en Seconde, et comme tous les lycéens, on accumulait des cours, des fiches, des liens. Un vrai bazar. L'idée ? Tout centraliser au même endroit. On a codé un premier prototype en HTML/CSS/JS pur, avec un système de localStorage. Ça marchait, mais c'était juste pour nous.</p>
+        </div>
+      </div>
+    </div>
+    <div class="reveal reveal-delay-2 story-card">
+      <div style="display:flex;gap:24px;align-items:flex-start;">
+        <div style="font-size:2rem;flex-shrink:0;width:48px;text-align:center;">🚀</div>
+        <div>
+          <h3 style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;margin-bottom:8px;">2025 — V2 : La refonte</h3>
+          <p style="color:var(--muted);line-height:1.7;font-size:0.92rem;">Interface sombre, animations, dashboard, 11 outils de révision interactifs. On a ajouté Firebase pour l'authentification et l'hébergement. Le projet est devenu plus sérieux : on a ouvert les inscriptions, partagé avec nos profs, et commencé à avoir de vrais retours d'utilisateurs.</p>
+        </div>
+      </div>
+    </div>
+    <div class="reveal reveal-delay-3 story-card">
+      <div style="display:flex;gap:24px;align-items:flex-start;">
+        <div style="font-size:2rem;flex-shrink:0;width:48px;text-align:center;">🌐</div>
+        <div>
+          <h3 style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;margin-bottom:8px;">2026 — V3 : Multi-utilisateur</h3>
+          <p style="color:var(--muted);line-height:1.7;font-size:0.92rem;">La grosse mise à jour : synchronisation Firestore, classes avec chat en temps réel, partage de cours, commentaires, système de gamification (XP, niveaux, streak). Le localStorage ne suffisait plus — on est passés à une vraie base de données. Aujourd'hui, Internate est utilisé par des lycéens de plusieurs établissements.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COLLABORATION -->
+<section class="section" id="features">
+  <div class="reveal">
+    <div class="section-label">Pourquoi Internate</div>
+    <div class="section-title">Apprendre ensemble,<br><em>pas tout seul</em>.</div>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card reveal reveal-delay-1" style="--accent-color: var(--accent); --icon-bg: var(--overlay-accent);">
+      <div class="feature-icon">📚</div>
+      <div class="feature-title">Cours partagés</div>
+      <div class="feature-desc">Chaque membre partage ses cours, ses fiches, ses liens. Finis les classeurs oubliés — tout est en ligne, accessible à la classe.</div>
+    </div>
+    <div class="feature-card reveal reveal-delay-2" style="--accent-color: var(--accent2); --icon-bg: var(--overlay-green);">
+      <div class="feature-icon">💬</div>
+      <div class="feature-title">Chat de classe</div>
+      <div class="feature-desc">Un salon par classe pour s'envoyer des messages, poser des questions et partager des ressources en temps réel. Comme Discord, mais intégré.</div>
+    </div>
+    <div class="feature-card reveal reveal-delay-3" style="--accent-color: var(--accent3); --icon-bg: rgba(255,107,107,0.15);">
+      <div class="feature-icon">🏆</div>
+      <div class="feature-title">Gamification</div>
+      <div class="feature-desc">Gagne de l'XP en révisant, en partageant des cours et en aidant tes camarades. Monte en niveau, enchaîne les streaks, rends l'apprentissage motivant.</div>
+    </div>
+    <div class="feature-card reveal reveal-delay-1" style="--accent-color: var(--orange); --icon-bg: rgba(255,169,77,0.15);">
+      <div class="feature-icon">👥</div>
+      <div class="feature-title">Espaces classe</div>
+      <div class="feature-desc">Crée ou rejoins une classe avec un code à 6 caractères. Retrouve tes camarades, partagez cours et exercices dans votre espace dédié.</div>
+    </div>
+    <div class="feature-card reveal reveal-delay-2" style="--accent-color: var(--purple); --icon-bg: rgba(167,139,250,0.15);">
+      <div class="feature-icon">💬</div>
+      <div class="feature-title">Commentaires</div>
+      <div class="feature-desc">Chaque cours peut être commenté. Pose une question, apporte une précision, remercie — la connaissance se construit à plusieurs.</div>
+    </div>
+    <div class="feature-card reveal reveal-delay-3" style="--accent-color: var(--accent2); --icon-bg: rgba(52,211,153,0.15);">
+      <div class="feature-icon">📈</div>
+      <div class="feature-title">Progression</div>
+      <div class="feature-desc">Suis ton avancement cours par cours. XP, niveaux et statistiques — vois tes progrès et reste motivé toute l'année.</div>
+    </div>
+  </div>
+</section>
+
+<!-- TOOLS SHOWCASE (compact) -->
+<section class="tools-section" id="outils">
+  <div class="tools-inner" style="grid-template-columns:1fr 1.6fr;">
+    <div class="reveal">
+      <div class="section-label">Outils bonus</div>
+      <div class="section-title" style="margin-bottom:16px;">Des <em>outils pratiques</em><br>en complément.</div>
+      <p style="color:var(--muted); font-size:0.85rem; line-height:1.6; margin-bottom: 24px;">Calculatrice, fiches de révision, QCM, minuteur… Des utilitaires pour réviser, sans quitter la plateforme.</p>
+      <a href="auth/Login_Internate.html" class="btn-hero btn-hero-primary" style="display:inline-flex;font-size:0.85rem;padding:10px 22px;">Tous les outils →</a>
+    </div>
+    <div class="tools-list reveal" style="display:grid;grid-template-columns:1fr 1fr;gap:3px;">
+      <div class="tool-item" style="padding:12px 14px;"><div class="tool-emoji" style="width:32px;height:32px;font-size:1rem;">🧮</div><div class="tool-info"><strong style="font-size:0.85rem;">Calculatrice</strong></div><span class="tool-arrow">→</span></div>
+      <div class="tool-item" style="padding:12px 14px;"><div class="tool-emoji" style="width:32px;height:32px;font-size:1rem;">📊</div><div class="tool-info"><strong style="font-size:0.85rem;">Convertisseur</strong></div><span class="tool-arrow">→</span></div>
+      <div class="tool-item" style="padding:12px 14px;"><div class="tool-emoji" style="width:32px;height:32px;font-size:1rem;">🗂️</div><div class="tool-info"><strong style="font-size:0.85rem;">Fiches</strong></div><span class="tool-arrow">→</span></div>
+      <div class="tool-item" style="padding:12px 14px;"><div class="tool-emoji" style="width:32px;height:32px;font-size:1rem;">📋</div><div class="tool-info"><strong style="font-size:0.85rem;">QCM</strong></div><span class="tool-arrow">→</span></div>
+      <div class="tool-item" style="padding:12px 14px;"><div class="tool-emoji" style="width:32px;height:32px;font-size:1rem;">⏱️</div><div class="tool-info"><strong style="font-size:0.85rem;">Pomodoro</strong></div><span class="tool-arrow">→</span></div>
+      <div class="tool-item" style="padding:12px 14px;"><div class="tool-emoji" style="width:32px;height:32px;font-size:1rem;">📝</div><div class="tool-info"><strong style="font-size:0.85rem;">Plan</strong></div><span class="tool-arrow">→</span></div>
+      <div class="tool-item" style="padding:12px 14px;"><div class="tool-emoji" style="width:32px;height:32px;font-size:1rem;">🎨</div><div class="tool-info"><strong style="font-size:0.85rem;">Tableau Blanc</strong></div><span class="tool-arrow">→</span></div>
+      <div class="tool-item" style="padding:12px 14px;"><div class="tool-emoji" style="width:32px;height:32px;font-size:1rem;">🔍</div><div class="tool-info"><strong style="font-size:0.85rem;">Analyseur</strong></div><span class="tool-arrow">→</span></div>
+      <div class="tool-item" style="padding:12px 14px;"><div class="tool-emoji" style="width:32px;height:32px;font-size:1rem;">📈</div><div class="tool-info"><strong style="font-size:0.85rem;">Moyenne</strong></div><span class="tool-arrow">→</span></div>
+      <div class="tool-item" style="padding:12px 14px;"><div class="tool-emoji" style="width:32px;height:32px;font-size:1rem;">📖</div><div class="tool-info"><strong style="font-size:0.85rem;">Conjugueur</strong></div><span class="tool-arrow">→</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINALE -->
+<section class="cta-section">
+  <div class="cta-inner">
+    <h2 class="reveal">Prêt à rejoindre<br><span style="color:var(--accent)">Internate ?</span></h2>
+    <p class="reveal">Crée ton compte en moins d'une minute et accède immédiatement à toutes les ressources de ta classe.</p>
+    <div class="reveal" style="display:flex; gap:16px; justify-content:center;">
+      <a href="auth/Register_internate.html" class="btn-hero btn-hero-primary">Créer mon compte</a>
+      <a href="auth/Login_Internate.html" class="btn-hero btn-hero-secondary">Se connecter</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer role="contentinfo">
+  <div class="logo" style="font-size:1.1rem;">Inter<span style="-webkit-text-fill-color:rgba(255,255,255,0.4)">nate</span></div>
+  <span>Construit par des lycéens, pour des lycéens — <a href="https://github.com/Crypthium123/INTERNATE" style="color:var(--accent2);text-decoration:none;font-weight:500;">Open source</a></span>
+  <span style="font-size:0.75rem;">© 2026 Internate — Tous droits réservés</span>
+</footer>
+
+<script>
+  function toggleNav() {
+    document.getElementById('navLinks').classList.toggle('open');
+    document.getElementById('navHamburger').classList.toggle('active');
+  }
+  function closeNav() {
+    document.getElementById('navLinks').classList.remove('open');
+    document.getElementById('navHamburger').classList.remove('active');
+  }
+  document.addEventListener('click', function(e) {
+    var nav = document.getElementById('navLinks');
+    var ham = document.getElementById('navHamburger');
+    if (nav.classList.contains('open') && !nav.contains(e.target) && !ham.contains(e.target)) {
+      closeNav();
+    }
+  });
+
+  // Intersection Observer for reveal animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.15 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Tool items click (redirect to login)
+  document.querySelectorAll('.tool-item').forEach(item => {
+    item.addEventListener('click', () => {
+      window.location.href = 'auth/Login_Internate.html';
+    });
+  });
+</script>
+<div style="text-align:center;padding:20px 20px 30px;font-size:0.8rem;color:var(--muted);border-top:1px solid var(--border);margin-top:60px;">
+  Des retours ? <a href="help/" style="color:var(--accent2);text-decoration:none;font-weight:500;">💬 Aide &amp; retours</a>
+  · <a href="contact.html" style="color:var(--muted);text-decoration:none;">Page contact</a>
+</div>
+<script type="module" src="/js/firebase-config.js"></script>
+<script type="module">
+  var db = window.db;
+  var analytics = window.analytics;
+  try {
+    db.collection('_stats').doc('public').get().then(function(doc) {
+      if (doc.exists) {
+        var d = doc.data();
+        var items = document.querySelectorAll('.stat-number');
+        if (d.cours && items[1]) items[1].textContent = d.cours + '+';
+        if (d.classes && items[2]) items[2].textContent = d.classes + '+';
+      }
+    }).catch(function(e) { console.warn('Stats fallback:', e.message); });
+  } catch(e) { console.warn('Stats unavailable'); }
+
+  document.addEventListener('click', function(e) {
+    var link = e.target.closest('a');
+    if (!link || !analytics) return;
+    var href = link.getAttribute('href') || '';
+    if (href.includes('Register')) {
+      analytics.logEvent('sign_up_start', { source: 'landing' });
+    } else if (href.includes('Login')) {
+      analytics.logEvent('login_start', { source: 'landing' });
+    }
+  });
+</script>
+
+</body>
+</html>

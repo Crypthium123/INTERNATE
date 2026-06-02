@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rédacteur de Plan — Internate</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  .tool-topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 24px;
+    background: var(--surface-glass);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    z-index: 100;
+  }
+  .tool-topbar a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.82rem;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  .tool-topbar a:hover { color: var(--text); }
+  .tool-topbar .sep { color: var(--border); font-size: 0.7rem; }
+  .tool-topbar .current { color: var(--accent); font-size: 0.82rem; font-weight: 600; }
+  .back-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text);
+    text-decoration: none;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .back-btn:hover { background: var(--accent); border-color: var(--accent); color: white; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 20px;
+    padding: 52px 20px 20px;
+  }
+
+  .sidebar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    height: fit-content;
+    position: sticky;
+    top: 20px;
+  }
+
+  .sidebar h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.2rem;
+    margin-bottom: 16px;
+    color: var(--accent);
+  }
+
+  .template-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .template-btn {
+    padding: 12px 16px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+    font-size: 0.9rem;
+  }
+
+  .template-btn:hover, .template-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+
+  .editor {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+
+  .editor h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.8rem;
+    margin-bottom: 12px;
+  }
+
+  .editor input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    margin-bottom: 24px;
+    font-size: 1rem;
+  }
+
+  .plan-container {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 16px;
+    min-height: 400px;
+    margin-bottom: 24px;
+  }
+
+  .plan-item {
+    padding: 12px;
+    margin: 8px 0 8px 20px;
+    border-left: 2px solid var(--accent);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .plan-item:hover {
+    background: var(--overlay-accent);
+    border-left-width: 4px;
+  }
+
+  .plan-item input {
+    background: transparent;
+    border: none;
+    color: var(--text);
+    width: 100%;
+    font-size: 0.95rem;
+    padding: 0;
+  }
+
+  .btn-group {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  button {
+    padding: 12px 20px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+
+  button:hover {
+    background: var(--accent);
+    transform: translateY(-2px);
+  }
+
+  button.secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  button.secondary:hover {
+    background: var(--hover-overlay);
+  }
+
+  .export-options {
+    display: flex;
+    gap: 8px;
+  }
+
+  @media (max-width: 768px) {
+    body { grid-template-columns: 1fr; }
+    .sidebar { position: static; }
+  }
+
+  @media (max-width: 768px) {
+    body { padding: 52px 12px 12px; }
+    .tool-topbar { padding: 10px 16px; font-size: 0.8rem; }
+    .tool-topbar a, .tool-topbar .current { font-size: 0.75rem; }
+  }
+  @media (max-width: 480px) {
+    body { padding: 48px 8px 8px; }
+    .tool-topbar { padding: 8px 12px; gap: 8px; }
+    .tool-topbar a, .tool-topbar .current { font-size: 0.7rem; }
+  }
+  .loading-overlay {
+    position: fixed; inset: 0;
+    background: var(--bg);
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.4s ease;
+  }
+  .loading-overlay.hidden { opacity: 0; pointer-events: none; }
+  .spinner {
+    width: 40px; height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-overlay p { color: var(--muted); font-size: 0.85rem; margin-top: 16px; }
+.toast-container { position: fixed; top: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+  .toast { padding: 14px 20px; border-radius: 10px; font-size: 0.87rem; font-weight: 500; color: white; box-shadow: 0 8px 32px rgba(0,0,0,0.4); backdrop-filter: blur(8px); animation: toastIn 0.3s ease both; max-width: 380px; pointer-events: auto; display: flex; align-items: center; gap: 10px; }
+  .toast-success { background: rgba(0,212,170,0.9); }
+  .toast-error { background: rgba(255,107,107,0.9); }
+  .toast-info { background: rgba(108,99,255,0.9); }
+  @keyframes toastIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes toastOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(40px); } }
+  .confirm-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 9998; align-items: center; justify-content: center; }
+  .confirm-overlay.show { display: flex; }
+  .confirm-box { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px 32px; width: 360px; max-width: 90vw; animation: modalIn 0.2s ease both; }
+  .confirm-box p { font-size: 0.92rem; margin-bottom: 20px; line-height: 1.5; color: var(--text); }
+  .confirm-actions { display: flex; gap: 10px; justify-content: flex-end; }
+  .btn-cancel { padding: 10px 22px; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 0.87rem; cursor: pointer; transition: all 0.2s; }
+  .btn-cancel:hover { color: var(--text); border-color: rgba(255,255,255,0.15); }
+  .btn-confirm { padding: 10px 22px; background: #ff6b6b; border: none; border-radius: 8px; color: white; font-family: 'DM Sans', sans-serif; font-size: 0.87rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .btn-confirm:hover { opacity: 0.9; }
+  @keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+</style>
+<script src="../js/escape.js"></script>
+</head>
+<body id="tool-content">
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <p>Chargement...</p>
+</div>
+<div class="tool-topbar">
+  <a href="../dashboard/connected_internate.html" class="back-btn">← Retour</a>
+  <span class="sep">›</span>
+  <a href="../courses/Ressources_ex.html">Cours</a>
+  <span class="sep">›</span>
+  <span class="current">Plan</span>
+  </div>
+
+<div class="sidebar">
+  <h2>📝 Modèles</h2>
+  <div class="template-list">
+    <button class="template-btn active" onclick="loadTemplate('dissertation')">📚 Dissertation</button>
+    <button class="template-btn" onclick="loadTemplate('compte_rendu')">📋 Compte-rendu</button>
+    <button class="template-btn" onclick="loadTemplate('rapport_tp')">🔬 Rapport de TP</button>
+    <button class="template-btn" onclick="loadTemplate('expose')">🎤 Exposé</button>
+    <button class="template-btn" onclick="loadTemplate('analyse')">📊 Analyse</button>
+  </div>
+</div>
+
+<div class="editor">
+  <h1>Rédacteur de Plan</h1>
+  <input type="text" id="title" placeholder="Titre de votre travail…" value="">
+  
+  <div class="plan-container" id="planContainer"></div>
+  
+  <div class="btn-group">
+    <button onclick="addItem()">➕ Ajouter une section</button>
+    <button class="secondary" onclick="removeLastItem()">❌ Supprimer la dernière</button>
+    <button class="secondary" onclick="clearAll()">🗑️ Vider le plan</button>
+  </div>
+  
+  <div class="btn-group" style="margin-top:12px;">
+    <button onclick="exportTXT()">📄 Télécharger .TXT</button>
+    <button onclick="exportMarkdown()">📝 Télécharger .MD</button>
+  </div>
+</div>
+
+<script>
+const templates = {
+  dissertation: [
+    'Introduction',
+    'I. Premier argument',
+    '  A. Sous-point 1',
+    '  B. Sous-point 2',
+    'II. Deuxième argument',
+    '  A. Sous-point 1',
+    '  B. Sous-point 2',
+    'III. Troisième argument',
+    '  A. Sous-point 1',
+    '  B. Sous-point 2',
+    'Conclusion'
+  ],
+  compte_rendu: [
+    'Objectif',
+    'Matériel utilisé',
+    'Protocole',
+    'Résultats',
+    '  A. Observation 1',
+    '  B. Observation 2',
+    'Analyse',
+    'Conclusion'
+  ],
+  rapport_tp: [
+    'Titre du TP',
+    'Date et groupe',
+    'Objectifs',
+    'Théorie',
+    'Protocole expérimental',
+    'Observations et mesures',
+    'Résultats',
+    'Discussion',
+    'Conclusion',
+    'Références'
+  ],
+  expose: [
+    'Introduction / Accroche',
+    'Contexte et définitions',
+    'I. Point principal 1',
+    'II. Point principal 2',
+    'III. Point principal 3',
+    'Conclusion et synthèse',
+    'Questions/Discussion'
+  ],
+  analyse: [
+    'Présentation du sujet',
+    'Contexte historique/scientifique',
+    'I. Premier axe d\'analyse',
+    '  A. Aspect 1',
+    '  B. Aspect 2',
+    'II. Deuxième axe d\'analyse',
+    '  A. Aspect 1',
+    '  B. Aspect 2',
+    'III. Troisième axe d\'analyse',
+    'Synthèse et perspectives'
+  ]
+};
+
+let plan = [];
+
+function loadTemplate(type, e) {
+  e = e || window.event;
+  plan = [...templates[type]];
+  document.querySelectorAll('.template-btn').forEach(b => b.classList.remove('active'));
+  e.target.classList.add('active');
+  renderPlan();
+}
+
+function renderPlan() {
+  const container = document.getElementById('planContainer');
+  container.innerHTML = '';
+  plan.forEach((item, idx) => {
+    const div = document.createElement('div');
+    const level = (item.match(/^ */)[0].length) / 2;
+    div.className = 'plan-item';
+    div.style.marginLeft = (level * 20) + 'px';
+    div.innerHTML = `<input type="text" value="${item.trim()}" onchange="updateItem(${idx}, this.value)">`;
+    container.appendChild(div);
+  });
+}
+
+function updateItem(idx, value) {
+  const indent = plan[idx].match(/^ */)[0];
+  plan[idx] = indent + value;
+}
+
+function showToast(msg, type) {
+  var c = document.getElementById('toastContainer');
+  if (!c) return;
+  var e = document.createElement('div');
+  e.className = 'toast toast-' + (type || 'info');
+  e.textContent = msg;
+  c.appendChild(e);
+  setTimeout(function() {
+    e.style.animation = 'toastOut 0.3s ease both';
+    setTimeout(function() { e.remove(); }, 300);
+  }, 3500);
+}
+var confirmCallback = null;
+function showConfirm(msg, cb) {
+  confirmCallback = cb;
+  document.getElementById('confirmMessage').textContent = msg;
+  document.getElementById('confirmOverlay').classList.add('show');
+}
+function closeConfirm() {
+  document.getElementById('confirmOverlay').classList.remove('show');
+  confirmCallback = null;
+}
+document.addEventListener('DOMContentLoaded', function() {
+  var btn = document.getElementById('confirmBtn');
+  if (btn) btn.addEventListener('click', function() {
+    if (confirmCallback) confirmCallback();
+    closeConfirm();
+  });
+  var overlay = document.getElementById('confirmOverlay');
+  if (overlay) overlay.addEventListener('click', function(e) {
+    if (e.target === e.currentTarget) closeConfirm();
+  });
+});
+function addItem() {
+  plan.push('Nouvelle section');
+  renderPlan();
+}
+
+function removeLastItem() {
+  plan.pop();
+  renderPlan();
+}
+
+function clearAll() {
+  if (confirm('Êtes-vous sûr ? Cette action est irréversible.')) {
+    plan = [];
+    renderPlan();
+  }
+}
+
+function exportTXT() {
+  const title = document.getElementById('title').value || 'Plan';
+  let content = title + '\n' + '='.repeat(title.length) + '\n\n';
+  content += plan.join('\n');
+  downloadFile(content, title + '.txt', 'text/plain');
+}
+
+function exportMarkdown() {
+  const title = document.getElementById('title').value || 'Plan';
+  let content = '# ' + title + '\n\n';
+  content += plan.map(item => {
+    const level = (item.match(/^ */)[0].length) / 2 + 1;
+    return '#'.repeat(level) + ' ' + item.trim();
+  }).join('\n');
+  downloadFile(content, title + '.md', 'text/markdown');
+}
+
+function downloadFile(content, filename, type) {
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+const loadingOverlay = document.getElementById('loadingOverlay');
+const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+if (user && user.uid) {
+  loadingOverlay.classList.add('hidden');
+} else {
+  window.location.href = '../auth/Login_Internate.html';
+}
+
+loadTemplate('dissertation');
+</script>
+<div class="toast-container" id="toastContainer"></div>
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <p id="confirmMessage">Confirmer ?</p>
+    <div class="confirm-actions">
+      <button class="btn-cancel" onclick="closeConfirm()">Annuler</button>
+      <button class="btn-confirm" id="confirmBtn">Confirmer</button>
+    </div>
+  </div>
+</div>
+<div style="text-align:center;padding:16px;font-size:0.75rem;color:var(--muted);margin-top:20px;">
+  <a href="../help/" style="color:var(--accent2);text-decoration:none;">💬 Aide & retours</a>
+</div>
+
+
+</body>
+</html>
